@@ -6,6 +6,9 @@ from app.ershoufang import Ershoufang
 from app.shuqi import start
 from dao.dushuService import loadExistsSQId
 from local.shuqi.shuqiLocal import loadShuQC
+from manager.Manager import Manager
+from rest.restServices import  webServer
+
 
 def shuqiTest():
     # updateCapDigest()
@@ -139,10 +142,11 @@ def shuqiTest():
 
 
 if __name__ == '__main__':
-
-    manager = Manager()
-
-    ershoufangCrawler = Ershoufang()
-    manager.addCrawler(ershoufangCrawler)
-
-    manager.start()
+    webApp = webServer()
+    webApp.run()
+    # manager = Manager()
+    #
+    # ershoufangCrawler = Ershoufang()
+    # manager.addCrawler(ershoufangCrawler)
+    #
+    # manager.start()

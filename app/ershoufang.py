@@ -70,12 +70,14 @@ class Ershoufang(BaseCrawler):
             csor.close()
             conn.close()
 
-            send_email(msg=unicode(section),
-                       subject=unicode(tds[0].text.replace(' ', '').replace('\n', '').replace(u'存量房网上签约', ''))
-                               + u'网签住宅' + unicode(sign_zhuzai_count) + u'套, 平均'
-                               + unicode(float(sign_zhuzai_area) / float(sign_zhuzai_count))
-                               + u'平/套'
-                       , receivers=['467959945@qq.com', '961124666@qq.com', '577682692@qq.com'], )
+            print unicode(tds[0].text.replace(' ', '').replace('\n', '').replace(u'存量房网上签约', ''))
+
+            # send_email(msg=unicode(section),
+            #            subject=unicode(tds[0].text.replace(' ', '').replace('\n', '').replace(u'存量房网上签约', ''))
+            #                    + u'网签住宅' + unicode(sign_zhuzai_count) + u'套, 平均'
+            #                    + unicode(float(sign_zhuzai_area) / float(sign_zhuzai_count))
+            #                    + u'平/套'
+            #            , receivers=['467959945@qq.com', '961124666@qq.com', '577682692@qq.com'], )
 
 
 

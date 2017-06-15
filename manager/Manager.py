@@ -32,7 +32,7 @@ class Manager():
             else:
                 raise NotImplementedError
 
-            if 1 == crawler_count:
+            if 1 == output_count:
                 crawler.output()
             else:
                 raise NotImplementedError
