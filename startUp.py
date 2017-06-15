@@ -138,30 +138,6 @@ def shuqiTest():
         # startFromLatestAjax()
 
 
-class Manager():
-
-    def __init__(self):
-        self.crawlTasks = list()
-
-    def addCrawler(self, crawler, crawler_count = 1, output_count = 1):
-        task = dict()
-        task['crawler'] = crawler
-        task['crawler_count'] = crawler_count
-        task['output_count'] = output_count
-        self.crawlTasks.append(task)
-
-    def start(self):
-        for task in self.crawlTasks:
-            crawler = task['crawler']
-            crawler_count = task['crawler_count']
-            output_count = task['output_count']
-
-#           @TODO 按照配置的爬虫和入库进程数起对应的进程
-
-            crawler.init()
-            crawler.crawl()
-            crawler.output()
-
 if __name__ == '__main__':
 
     manager = Manager()
