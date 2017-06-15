@@ -5,6 +5,7 @@ import MySQLdb
 from Config import EADPASSWD, EADHOST, ERAPASSWD, ERAHOST, DAVIDPASSWD
 
 dushuPool = None
+tmathPool = None
 
 def getConn():
 

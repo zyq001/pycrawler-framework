@@ -6,16 +6,20 @@
 zyq
 
 '''
+import abc
+
 
 class BaseCrawler:
 
+    @abc.abstractmethod
     def init(self):
         print 'init'
 
-
+    @abc.abstractmethod
     def crawl(self):
         print 'crawling,,'
 
+    @abc.abstractmethod
     def output(self):
         print 'Persistence'
 

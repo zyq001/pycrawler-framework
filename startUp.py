@@ -2,11 +2,12 @@
 # -*- coding: UTF-8 -*-
 import random
 
+from app.ershoufang import Ershoufang
 from app.shuqi import start
 from dao.dushuService import loadExistsSQId
 from local.shuqi.shuqiLocal import loadShuQC
 
-if __name__ == '__main__':
+def shuqiTest():
     # updateCapDigest()
     # http: // api.shuqireader.com / reader / bc_cover.php?bookId = 93511
     # handleWebsiteNoise(581398, 582410)
@@ -50,12 +51,12 @@ if __name__ == '__main__':
     # uploadCapFromTo(int(sys.argv[1]), int(sys.argv[2]))
 
     # seq = range(st, end)
-    print 'start from shuqi id ',st, ' to ',end, '; insert into ', db_dushu ,', and ',db_acticle
+    print 'start from shuqi id ', st, ' to ', end, '; insert into ', db_dushu, ', and ', db_acticle
     idx = st
     carry = 10000
 
     while idx < end:
-    # seq = range(5000, 6000)
+        # seq = range(5000, 6000)
         seq = range(idx, idx + carry)
 
         random.shuffle(seq)
@@ -66,72 +67,106 @@ if __name__ == '__main__':
             #     continue
             if not 'shuqi' + str(sqBid) in bloom:
                 try:
-                    start(3648845,shuqCategory2)
+                    start(3648845, shuqCategory2)
                 except Exception as e:
-                    print sqBid, ':  ',e
+                    print sqBid, ':  ', e
                 except IOError as e2:
-                    print sqBid, ':  ',e2
+                    print sqBid, ':  ', e2
                 bloom.add('shuqi' + str(sqBid))
 
         idx = idx + carry
         # dumpBloomToFile(donedegest)
 
-    # start(5837744, shuqCategory2)
+        # start(5837744, shuqCategory2)
 
 
-    # start(115468,shuqCategory2)
+        # start(115468,shuqCategory2)
 
-    # shuqiAddInitTmp()
-    # startFromCId()
-    # shuqiAddInit()
-    # miss = open('missBookId.txt', 'r')
-    # while 1:
-    #     line = miss.readline()
-    #     if not line:
-    #         break
-    #     lineArr = line.split(',')
-    #     bookId = lineArr[0]
-    #     csor2.execute('select rawUrl from cn_dushu_book where id = %s', (bookId,))
-    #     conn2.commit()
-    #     rawUrl = csor2.fetchone()[0]
-    #     findex = rawUrl.find('bookId=') + 7
-    #     if len(rawUrl) - findex > 7:
-    #         print bookId
-    #         continue
-    #     shuqiId = rawUrl[findex:]
-    #     start(shuqiId, shuqCategory2)
-    # f = open('shuqiBookId.log', 'r')
-    # f.readline()
-    # while 1:
-    #     id = f.readline()
-    #     if not id:
-    #         break
-    #     id = id.replace('\n', '')
-    #     start(id, shuqCategory2)
-
-
-
-    # from multiprocessing import Pool
-    #
-    # manager = multiprocessing.Manager()
-    #
-    # # 父进程创建Queue，并传给各个子进程：
-    # queue = manager.Queue(maxsize=100)
-    #
-    # p = Pool(5)
-    #
-    # p.apply_async(onlyInsertCap, args=(queue,))
-    # # p.apply_async(onlyInsertCap, args=(queue,))
-    # # p.apply_async(onlyInsertCap, args=(queue,))
-    # #
-    # startFromCId(p,queue)
-    # p.close()
-    # p.join()
+        # shuqiAddInitTmp()
+        # startFromCId()
+        # shuqiAddInit()
+        # miss = open('missBookId.txt', 'r')
+        # while 1:
+        #     line = miss.readline()
+        #     if not line:
+        #         break
+        #     lineArr = line.split(',')
+        #     bookId = lineArr[0]
+        #     csor2.execute('select rawUrl from cn_dushu_book where id = %s', (bookId,))
+        #     conn2.commit()
+        #     rawUrl = csor2.fetchone()[0]
+        #     findex = rawUrl.find('bookId=') + 7
+        #     if len(rawUrl) - findex > 7:
+        #         print bookId
+        #         continue
+        #     shuqiId = rawUrl[findex:]
+        #     start(shuqiId, shuqCategory2)
+        # f = open('shuqiBookId.log', 'r')
+        # f.readline()
+        # while 1:
+        #     id = f.readline()
+        #     if not id:
+        #         break
+        #     id = id.replace('\n', '')
+        #     start(id, shuqCategory2)
 
 
 
+        # from multiprocessing import Pool
+        #
+        # manager = multiprocessing.Manager()
+        #
+        # # 父进程创建Queue，并传给各个子进程：
+        # queue = manager.Queue(maxsize=100)
+        #
+        # p = Pool(5)
+        #
+        # p.apply_async(onlyInsertCap, args=(queue,))
+        # # p.apply_async(onlyInsertCap, args=(queue,))
+        # # p.apply_async(onlyInsertCap, args=(queue,))
+        # #
+        # startFromCId(p,queue)
+        # p.close()
+        # p.join()
 
-    # ids = '6692553,4871569,5067938,57392,51602'
-    # for bookId in ids.split(','):
-    #     start(bookId, shuqCategory2)
-    # startFromLatestAjax()
+
+
+
+        # ids = '6692553,4871569,5067938,57392,51602'
+        # for bookId in ids.split(','):
+        #     start(bookId, shuqCategory2)
+        # startFromLatestAjax()
+
+
+class Manager():
+
+    def __init__(self):
+        self.crawlTasks = list()
+
+    def addCrawler(self, crawler, crawler_count = 1, output_count = 1):
+        task = dict()
+        task['crawler'] = crawler
+        task['crawler_count'] = crawler_count
+        task['output_count'] = output_count
+        self.crawlTasks.append(task)
+
+    def start(self):
+        for task in self.crawlTasks:
+            crawler = task['crawler']
+            crawler_count = task['crawler_count']
+            output_count = task['output_count']
+
+#           @TODO 按照配置的爬虫和入库进程数起对应的进程
+
+            crawler.init()
+            crawler.crawl()
+            crawler.output()
+
+if __name__ == '__main__':
+
+    manager = Manager()
+
+    ershoufangCrawler = Ershoufang()
+    manager.addCrawler(ershoufangCrawler)
+
+    manager.start()

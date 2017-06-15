@@ -48,14 +48,14 @@ def send(msg):
         print "Error: 无法发送邮件"
 
 
-def send_email(msg, recievers, fromHeader = 'no-reply', toHeader = '' ,subject = '无主题'):
+def send_email(msg, receivers, fromHeader = 'no-reply', toHeader = '' ,subject = '无主题'):
 
     mail_host= SMTP_EXMAIL_QQ_COM  #设置服务器
     mail_user= NO_REPLY_TATATIMES_COM  #用户名
     mail_pass= MAILPASS  #口令
 
     sender = NOREPLAYEMAIL
-    receivers = [recievers]  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱
+    assert  isinstance(receivers, list)  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱, 需要时个list
 
 
 
