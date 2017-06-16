@@ -68,11 +68,11 @@ class ershoufang:
 
         return response
 
-class webServer:
+class WebServer:
 
     def run(self, port=8000):
         app = web.application(urls, globals())
-        web.httpserver.runsimple(app.wsgifunc(), ('127.0.0.1', port))
+        web.httpserver.runsimple(app.wsgifunc(), ('0.0.0.0', port))
 
 
 if __name__ == "__main__":

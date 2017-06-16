@@ -7,7 +7,7 @@ from app.shuqi import start
 from dao.dushuService import loadExistsSQId
 from local.shuqi.shuqiLocal import loadShuQC
 from manager.Manager import Manager
-from rest.restServices import  webServer
+from rest.restServices import WebServer
 
 
 def shuqiTest():
@@ -142,7 +142,7 @@ def shuqiTest():
 
 
 if __name__ == '__main__':
-    webApp = webServer()
+    webApp = WebServer()
     webApp.run()
     # manager = Manager()
     #
