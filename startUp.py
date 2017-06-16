@@ -144,7 +144,7 @@ def shuqiTest():
 if __name__ == '__main__':
     crawlManager.crawlers['ershoufang'] = Ershoufang()
     webApp = WebServer()
-    webApp.run()
+    webApp.run(port=10008)
     # manager = Manager()
     #
     # ershoufangCrawler = Ershoufang()
