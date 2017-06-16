@@ -22,6 +22,7 @@ from PIL import Image
 
 from app.ershoufang import Ershoufang
 from manager.Manager import Manager, crawlManager
+from manager.Task import Task
 
 urls = (
     # '/', 'index',
@@ -56,13 +57,18 @@ class ershoufang:
 
         manager = crawlManager
 
+        if not manager.crawlers.has_key(inputParams.crawlerName):
+            response['msg'] = 'no crawler name!'
+            return response
         # manager.start()
-
-        if 'ershoufang' == inputParams.crawlerName:
-            ershoufangCrawler = Ershoufang()
-            manager.addCrawler(ershoufangCrawler, inputParams.crawler_count, inputParams.output_count)
-
-        manager.start()
+        crawler = manager.crawlers[inputParams.crawlerName]
+        task = Task(crawler, crawler_count, output_count)
+        task.start()
+        # if 'ershoufang' == inputParams.crawlerName:
+        #     ershoufangCrawler = Ershoufang()
+        #     manager.addCrawler(ershoufangCrawler, inputParams.crawler_count, inputParams.output_count)
+        #
+        # manager.start()
         # send response json
         # self.write(response)
 

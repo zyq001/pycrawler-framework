@@ -6,7 +6,7 @@ from app.ershoufang import Ershoufang
 from app.shuqi import start
 from dao.dushuService import loadExistsSQId
 from local.shuqi.shuqiLocal import loadShuQC
-from manager.Manager import Manager
+from manager.Manager import Manager, crawlManager
 from rest.restServices import WebServer
 
 
@@ -142,6 +142,7 @@ def shuqiTest():
 
 
 if __name__ == '__main__':
+    crawlManager.crawlers['ershoufang'] = Ershoufang()
     webApp = WebServer()
     webApp.run()
     # manager = Manager()

@@ -14,19 +14,19 @@ class Task():
         self.output_count = output_count
 
     def start(self):
-        crawler = self.crawler['crawler']
-        crawler_count = self.crawler['crawler_count']
-        output_count = self.crawler['output_count']
+        # crawler = self.crawler
+        # crawler_count = self.crawler['crawler_count']
+        # output_count = self.crawler['output_count']
 
-        crawler.init()
+        self.crawler.init()
 
         #           @TODO 按照配置的爬虫和入库进程数起对应的进程
-        if 1 == crawler_count:
-            crawler.crawl()
+        if 1 == self.crawler_count:
+            self.crawler.crawl()
         else:
             raise NotImplementedError
 
-        if 1 == output_count:
-            crawler.output()
+        if 1 == self.output_count:
+            self.crawler.output()
         else:
             raise NotImplementedError
