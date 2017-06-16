@@ -21,7 +21,7 @@ import tesserocr
 from PIL import Image
 
 from app.ershoufang import Ershoufang
-from manager.Manager import Manager
+from manager.Manager import Manager, crawlManager
 
 urls = (
     # '/', 'index',
@@ -54,7 +54,7 @@ class ershoufang:
         crawler_count = inputParams.crawler_count
         output_count = inputParams.output_count
 
-        manager = Manager()
+        manager = crawlManager
 
         # manager.start()
 

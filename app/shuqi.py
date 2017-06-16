@@ -375,7 +375,11 @@ def getCapContentObj(bookId, capId,mysqlBKid):
 
 
 
-def start(bookId, shuqCategory2):
+def start(bookId, shuqCategory2 = None):
+
+    if not shuqCategory2:
+        shuqCategory2 = loadShuQC()
+
     global donedegest
     capObjList = getCapObjListByBookId(bookId, shuqCategory2)
     if not capObjList:

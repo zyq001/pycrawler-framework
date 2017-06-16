@@ -5,34 +5,25 @@
 管理类，进程池调度等
 @author: zyq
 '''
+from manager.Task import Task
 
 
 class Manager():
     def __init__(self):
-        self.crawlTasks = list()
+        self.crawlers = dict()
 
-    def addCrawler(self, crawler, crawler_count=1, output_count=1):
-        task = dict()
-        task['crawler'] = crawler
-        task['crawler_count'] = crawler_count
-        task['output_count'] = output_count
-        self.crawlTasks.append(task)
+    def addCrawler(self, name, crawler):
+        self.crawlers[name] = crawler
 
-    def start(self):
-        for task in self.crawlTasks:
-            crawler = task['crawler']
-            crawler_count = task['crawler_count']
-            output_count = task['output_count']
+    def startAll(self):
+        for crawler in self.crawlers:
+            task = Task(crawler)
+            task.start()
 
-            crawler.init()
+    def getCrawlerByName(self, name):
+        if self.crawlers.has_key(name):
+            return self.crawlers[name]
+        return None
 
-            #           @TODO 按照配置的爬虫和入库进程数起对应的进程
-            if 1 == crawler_count:
-                crawler.crawl()
-            else:
-                raise NotImplementedError
-
-            if 1 == output_count:
-                crawler.output()
-            else:
-                raise NotImplementedError
+# 单例
+crawlManager = Manager()
