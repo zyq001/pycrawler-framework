@@ -8,8 +8,10 @@
 import json
 
 import requests
+import time
 
 from dao.connFactory import getDushuConnCsor
+from util.timeHelper import getToday
 
 
 def updateFromMysql():
@@ -43,5 +45,11 @@ def updateFromMysql():
 
 
 if __name__ == '__main__':
+    lastTime = time.time()
     while 1:
+        nowTime = time.time()
+        sinceLastTime = nowTime - lastTime
+        if sinceLastTime < 24 * 3600:
+            print getToday() + ' sleep ' + str(24* 3600 - sinceLastTime) + 's until 24h after last time.'
+            time.sleep(24* 3600 - sinceLastTime)
         updateFromMysql()
