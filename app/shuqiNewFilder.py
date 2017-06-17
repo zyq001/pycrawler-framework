@@ -59,7 +59,7 @@ def updateFromMysql(st = 10000, end = 7000000):
             if not srcIdBloom.contains('shuqi' + str(sqBid)) :
                 try:
                     start(sqBid)
-                    # start(105809)
+                    # start(17928)
                 except Exception as e:
                     print sqBid, ':  ', e
                 except IOError as e2:

@@ -97,7 +97,7 @@ def insertBookWithConn(bookObj, conn2 = None,csor2 = None):
 
         if u'完结' == bookObj['bookType']:
             updateBookTypeByRawUrl(bookObj['bookType'], bookObj['rawUrl'])
-            return None
+            # return None #有bug
         # @TODO 检查数量是否一致即可，数量《=库中 即可跳过
     # sql2 = 'select id from cn_dushu_book where rawUrl = "%s";' % (bookObj['rawUrl'])
 
