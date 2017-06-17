@@ -17,7 +17,7 @@ from xml.etree import ElementTree
 import MySQLdb
 import yaml
 
-from Config import EADHOST, EADPASSWD, bloomDumpCapsName
+from Config import EADHOST, EADPASSWD, bloomDumpCapsName, MINCHAPNUM
 from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
 from dao.dushuService import getExistsCapsRawUrlId, insertCapWithCapObj2, insertCapWithCapObj, \
@@ -33,6 +33,8 @@ capListAPIDeviceInfo = '&soft_id=1&ver=110817&platform=an&placeid=1007&imei=8629
                        '&mod=M3'
 
 donedegest = getBloom(1500 * 10000)
+
+shuqCategory = loadShuQC()
 
 gBookDict = dict()
 
@@ -190,6 +192,9 @@ def getBookObjFromSQid(id, shuqCategory):
     NumChapter = 1
     if root.getiterator('NumChapter') and len(root.getiterator('NumChapter')) > 0 and root.getiterator('NumChapter')[0].text:
         NumChapter = int(root.getiterator('NumChapter')[0].text)
+
+    if NumChapter < MINCHAPNUM:
+        return None,None
     source = 'shuqi' + str(id)
     subtitle = root.getiterator('Description')[0].text
     title = root.getiterator('BookName')[0].text
@@ -315,7 +320,7 @@ def getCapContentObj(bookId, capId,mysqlBKid):
 
         if not (capText and len(capText) > 30):
             print 'cap content too short ,skip and del book'
-            # delBookById(mysqlBKid)
+            delBookById(mysqlBKid)
             return None
         capRoot = ElementTree.fromstring(capText.encode('utf-8'))
 
@@ -377,8 +382,10 @@ def getCapContentObj(bookId, capId,mysqlBKid):
 
 def start(bookId, shuqCategory2 = None):
 
+
     if not shuqCategory2:
-        shuqCategory2 = loadShuQC()
+        global shuqCategory
+        shuqCategory2 = shuqCategory
 
     global donedegest
     capObjList = getCapObjListByBookId(bookId, shuqCategory2)

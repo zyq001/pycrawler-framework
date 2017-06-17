@@ -5,6 +5,7 @@ import random
 from app.ShuqiCrawler import ShuqiCrawler
 from app.ershoufang import Ershoufang
 from app.shuqi import start
+from app.shuqiNewFilder import ShuqiFilder
 from dao.dushuService import loadExistsSQId
 from local.shuqi.shuqiLocal import loadShuQC
 from manager.Manager import Manager, crawlManager
@@ -145,6 +146,7 @@ def shuqiTest():
 if __name__ == '__main__':
     crawlManager.crawlers['ershoufang'] = Ershoufang()
     crawlManager.crawlers['shuqiById'] = ShuqiCrawler()
+    crawlManager.crawlers['shuqiFilder'] = ShuqiFilder()
     webApp = WebServer()
     webApp.run(port=10008)
     # manager = Manager()
