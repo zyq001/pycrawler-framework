@@ -13,11 +13,12 @@ from util.timeHelper import getToday
 
 
 if __name__ == '__main__':
-    lastTime = time.time()
+    lastTime = 0
     while 1:
         nowTime = time.time()
         sinceLastTime = nowTime - lastTime
         if sinceLastTime < 24 * 3600:
             print getToday() + ' sleep ' + str(24* 3600 - sinceLastTime) + 's until 24h after last time.'
             time.sleep(24* 3600 - sinceLastTime)
+        lastTime = time.time()
         updateFromMysql()
