@@ -85,7 +85,7 @@ def insertBookWithConn(bookObj, conn2 = None,csor2 = None):
         # csorDoc.execute('update cn_dushu_book set subtitle = %s where digest = %s'
         #   , (bookObj['subtitle'],digest))
         conn2.commit()
-        print 'succ book, ',unicode(bookObj['title'])
+        # print 'succ book, ',unicode(bookObj['title'])
     except Exception as e:
         #     # 发生错误时回滚
         print 'update rollback; maybe exists， ', bookObj['rawUrl'],e
