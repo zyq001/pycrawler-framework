@@ -43,13 +43,3 @@ def updateFromMysql():
             print 'sid: ',sid, ' done with exception: ', e.message
 
 
-
-if __name__ == '__main__':
-    lastTime = time.time()
-    while 1:
-        nowTime = time.time()
-        sinceLastTime = nowTime - lastTime
-        if sinceLastTime < 24 * 3600:
-            print getToday() + ' sleep ' + str(24* 3600 - sinceLastTime) + 's until 24h after last time.'
-            time.sleep(24* 3600 - sinceLastTime)
-        updateFromMysql()
