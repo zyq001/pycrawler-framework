@@ -77,11 +77,11 @@ def insertBookWithConn(bookObj, conn2 = None,csor2 = None):
     try:
         csor2.execute('insert  ' + db_dushu +
           '(categoryCode,typeCode,category,type,userId,title,subtitle,imgUrl,author,updateTime' \
-          ",rawUrl,source,digest,status,viewNum, chapterNum, bookType) values" \
-          "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" \
+          ",rawUrl,source,digest,status,viewNum, chapterNum, bookType, size) values" \
+          "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, %s)" \
           , (bookObj['categoryCode'],bookObj['typeCode'], bookObj['category'], bookObj['type'], userId,bookObj['title']
              ,bookObj['subtitle'],bookObj['imgUrl'],bookObj['author'],updateTime, bookObj['rawUrl']
-             ,bookObj['source'],digest, 11,bookObj['viewNum'],bookObj['chapterNum'],bookObj['bookType']))
+             ,bookObj['source'],digest, 11,bookObj['viewNum'],bookObj['chapterNum'],bookObj['bookType'],bookObj['size']))
         # csorDoc.execute('update cn_dushu_book set subtitle = %s where digest = %s'
         #   , (bookObj['subtitle'],digest))
         conn2.commit()
