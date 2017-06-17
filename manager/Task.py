@@ -18,7 +18,7 @@ class Task():
         # crawler_count = self.crawler['crawler_count']
         # output_count = self.crawler['output_count']
 
-        self.crawler.init()
+        # self.crawler.init()
 
         #           @TODO 按照配置的爬虫和入库进程数起对应的进程
         if 1 == self.crawler_count:

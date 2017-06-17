@@ -12,7 +12,7 @@ import abc
 class BaseCrawler:
 
     @abc.abstractmethod
-    def init(self):
+    def init(self, data = None):
         print 'init'
 
     @abc.abstractmethod
