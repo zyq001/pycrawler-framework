@@ -21,6 +21,13 @@ db_dushu = 'cn_dushu_book'
 db_acticle = 'cn_dushu_acticle'
 
 
+def updateBookTypeByRawUrl(type, rawUrl):
+    conn, csor = getDushuConnCsor()
+    try:
+        csor.execute("update " + db_dushu + " set bookType = %s where rawUrl = %s", (type, rawUrl,))
+        conn.commit()
+    except Exception as e:
+        print 'update bookType exception: ',e
 
 
 def handleWebsiteNoise(begin, end):
@@ -68,7 +75,7 @@ def insertBookWithConn(bookObj, conn2 = None,csor2 = None):
         bookObj['source'] = 'yisouxiaoshuo'
 
     try:
-        csor2.execute('insert ignore ' + db_dushu +
+        csor2.execute('insert  ' + db_dushu +
           '(categoryCode,typeCode,category,type,userId,title,subtitle,imgUrl,author,updateTime' \
           ",rawUrl,source,digest,status,viewNum, chapterNum, bookType) values" \
           "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" \
@@ -87,9 +94,14 @@ def insertBookWithConn(bookObj, conn2 = None,csor2 = None):
                 conn2.rollback()
             except Exception as ee:
                 print 'rollback error : ',bookObj['rawUrl']
-        # return None
+
+        if u'完结' == bookObj['bookType']:
+            updateBookTypeByRawUrl(bookObj['bookType'], bookObj['rawUrl'])
+            return None
 
     # sql2 = 'select id from cn_dushu_book where rawUrl = "%s";' % (bookObj['rawUrl'])
+
+
     csor2.execute("select id from " + db_dushu + " where rawUrl = %s", (bookObj['rawUrl'],))
     conn2.commit()
 
