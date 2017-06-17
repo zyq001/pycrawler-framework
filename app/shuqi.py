@@ -135,6 +135,8 @@ def handleOneBook(id,shuqCategory):
 
     bookObj, digest = getBookObjFromSQid(id, shuqCategory)
 
+    if not bookObj or not digest:
+        return None
     global gBookDict
     if gBookDict.has_key(digest):
         albook = gBookDict[digest]
