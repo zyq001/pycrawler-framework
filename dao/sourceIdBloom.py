@@ -28,5 +28,5 @@ class SourceIdBloom:
     def add(self, iid):
         self.ids.add(iid)
 
-sourceIdBloom = SourceIdBloom()
-sourceIdBloom.loadDid()
+srcIdBloom = SourceIdBloom()
+srcIdBloom.loadDid()

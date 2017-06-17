@@ -14,7 +14,8 @@ import time
 from app.baseCrawler import BaseCrawler
 from app.shuqi import start
 from dao.connFactory import getDushuConnCsor
-from dao.shuqIdBloom import sourceIdBloom
+# from dao.shuqIdBloom import sourceIdBloom
+from dao.sourceIdBloom import srcIdBloom
 from util.timeHelper import getToday
 
 class ShuqiFilder(BaseCrawler):
@@ -55,7 +56,7 @@ def updateFromMysql(st = 10000, end = 7000000):
             # print sqBid
             # if sqBid in nullIdSet:
             #     continue
-            if not sourceIdBloom.contains('shuqi' + str(sqBid)) :
+            if not srcIdBloom.contains('shuqi' + str(sqBid)) :
                 try:
                     start(sqBid)
                     # start(105809)
@@ -64,6 +65,6 @@ def updateFromMysql(st = 10000, end = 7000000):
                 except IOError as e2:
                     print sqBid, ':  ', e2
 
-                sourceIdBloom.add('shuqi' + str(sqBid))
+                srcIdBloom.add('shuqi' + str(sqBid))
 
         idx = idx + carry
