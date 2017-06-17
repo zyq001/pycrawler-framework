@@ -19,7 +19,7 @@ class Ershoufang(BaseCrawler):
 
 
 
-    def init(self):
+    def init(self, data = None):
         print 'ershoufang init'
 
     def output(self):

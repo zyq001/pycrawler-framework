@@ -23,10 +23,11 @@ from PIL import Image
 from app.ershoufang import Ershoufang
 from manager.Manager import Manager, crawlManager
 from manager.Task import Task
+from rest.util.webpyHelper import getParams
 
 urls = (
     # '/', 'index',
-    '/ershoufang', 'ershoufang'
+    '/simpleCrawler', 'SimpleCrawler'
 )
 
 # render = web.template.render('templates/')
@@ -36,7 +37,7 @@ Handles the GET/POST of image url to OCR result string.
 """
 
 
-class ershoufang:
+class SimpleCrawler:
     # def initialize(self, *args, **kwargs):
     #     self.contentType = self.request.headers.get('Content-Type')
 
@@ -46,31 +47,23 @@ class ershoufang:
     def POST(self):
         web.header("Content-Type", "application/json; charset=UTF-8")
         response = {'code': 200, 'msg': 'ok'}
+        try:
+            params = getParams(web, crawlerName="", crawler_count=1, output_count=1, data = None)
 
-        inputParams = web.input(crawlerName="", crawler_count=1, output_count=1)
-        if '' == inputParams.crawlerName:
-            response['msg'] = 'no crawler name!'
-            return response
+            manager = crawlManager
+            if not manager.crawlers.has_key(params['crawlerName']):
+                response['msg'] = 'no crawler name!'
+                return response
 
-        crawler_count = inputParams.crawler_count
-        output_count = inputParams.output_count
+            crawler = manager.crawlers[params['crawlerName']]
 
-        manager = crawlManager
+            if params['data']:
+                crawler.init(params['data'])
 
-        if not manager.crawlers.has_key(inputParams.crawlerName):
-            response['msg'] = 'no crawler name!'
-            return response
-        # manager.start()
-        crawler = manager.crawlers[inputParams.crawlerName]
-        task = Task(crawler, crawler_count, output_count)
-        task.start()
-        # if 'ershoufang' == inputParams.crawlerName:
-        #     ershoufangCrawler = Ershoufang()
-        #     manager.addCrawler(ershoufangCrawler, inputParams.crawler_count, inputParams.output_count)
-        #
-        # manager.start()
-        # send response json
-        # self.write(response)
+            task = Task(crawler, params['crawler_count'], params['output_count'])
+            task.start()
+        except Exception as e:
+            response['msg'] = unicode(e)
 
         return response
 
