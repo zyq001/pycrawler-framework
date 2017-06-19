@@ -1,7 +1,9 @@
 
 Config.py
+phantomjs-2.1.1-macosx
 *Dump
 .idea
+.DS_Store
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files

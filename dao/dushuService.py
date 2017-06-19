@@ -212,9 +212,7 @@ def insertCapWithCapObj2(capObj, conn2 = None, csor2 = None):
           "(%s,%s,%s,%s,%s,%s)" , (capObj['bookId'], capObj['idx'], capObj['digest'], capObj['bookUUID'], capObj['title'], capObj['size']))
         # csor2.execute("update cn_dushu_acticle set title = %s, size= %s where digest = %s" , (capObj['title'], capObj['size'], capObj['digest'] ))
         conn2.commit()
-        print 'scap， ', capObj['source']+":" + str(capObj['idx']), ', content: ', capObj['content'][0:15]
-
-
+        print 'scap， ', capObj['source']+":" + str(capObj['idx'])
 
     except Exception as e:
         #     # 发生错误时回滚

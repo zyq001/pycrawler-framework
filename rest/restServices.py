@@ -21,12 +21,13 @@ import tesserocr
 from PIL import Image
 
 from app.ershoufang import Ershoufang
+from dao.ershoufangService import getChartAsStr
 from manager.Manager import Manager, crawlManager
 from manager.Task import Task
 from rest.util.webpyHelper import getParams
 
 urls = (
-    # '/', 'index',
+    '/fang', 'Fang',
     '/simpleCrawler', 'SimpleCrawler'
 )
 
@@ -36,6 +37,13 @@ urls = (
 Handles the GET/POST of image url to OCR result string.
 """
 
+
+class Fang:
+
+    def GET(self):
+        web.header("Content-Type", "text/html; charset=UTF-8")
+        return getChartAsStr()
+        # return self.POST()
 
 class SimpleCrawler:
     # def initialize(self, *args, **kwargs):

@@ -8,6 +8,7 @@
 from Config import ERSHOUFANGREVEIVER_
 from app.baseCrawler import BaseCrawler
 from dao.connFactory import getDushuConnCsor
+from dao.ershoufangService import getChartAsStr, getImgTag
 from util.emailHelper import send_email
 from util.htmlHelper import getSoupByStr
 from util.networkHelper import getContent
@@ -73,7 +74,7 @@ class Ershoufang(BaseCrawler):
 
             print unicode(tds[0].text.replace(' ', '').replace('\n', '').replace(u'存量房网上签约', ''))
 
-            send_email(msg=unicode(section),
+            send_email(msg=unicode(section) + getImgTag(),
                        subject=unicode(tds[0].text.replace(' ', '').replace('\n', '').replace(u'存量房网上签约', ''))
                                + u'网签住宅' + unicode(sign_zhuzai_count) + u'套, 平均'
                                + unicode(float(sign_zhuzai_area) / float(sign_zhuzai_count))
