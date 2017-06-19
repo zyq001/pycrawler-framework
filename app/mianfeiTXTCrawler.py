@@ -128,7 +128,7 @@ def handleByMTID(mid):
 
     # myBookId = bookObj['id']
     #
-    for cid in range(0, count + 1):
+    for cid in range(1, count + 1):
 
         capContentUrl = capContentBaseUrl + str(cid) + '&contentid=' + str(mid)
         capContent = getContentWithUA(capContentUrl,ua)
@@ -175,7 +175,7 @@ def mianfeiSearch(name):
         book = dict()
         book['title'] = bookTag.select_one('.title').get_text()
         book['img'] = bookTag.select_one('.img img')['src']
-        book['author'] = bookTag.select_one('.author').get_text()
+        book['author'] = bookTag.select_one('.author').get_text().replace(' ','').replace('&nbsp;','')
         book['finishwb'] = u'连载'
         if(bookTag.select_one('.finishwb')):
             book['finishwb'] = bookTag.select_one('.finishwb').get_text()
@@ -184,7 +184,7 @@ def mianfeiSearch(name):
         index = href.find('id=')
         if index < 0:
             raise InputException('cant find id in mianfeiTXT')
-        book['id'] = href[index + 3:].replace(',', '').replace(')','')
+        book['id'] = href[index + 3:].replace(',', '').replace(')','').replace('\\','').replace("'",'')
 
         books.append(book)
 

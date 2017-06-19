@@ -56,7 +56,7 @@ class Search:
         response = {'code': 200, 'msg': 'ok'}
         respData = []
         try:
-            params = getParams(web, name="", andCrawl=False, crawlerName = 'mianFeiTXT')
+            params = getParams(web, name="", andCrawl=False, crawler_count=1, output_count=1, crawlerName = 'mianFeiTXT')
 
             if '' == params['name']:
                 raise InputException('no input search name')
@@ -80,7 +80,7 @@ class Search:
             response['msg'] = unicode(e)
 
         response['data'] = respData
-        return response
+        return json.dumps(response)
 
 class Fang:
 
