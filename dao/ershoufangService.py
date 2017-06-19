@@ -10,7 +10,7 @@ import time
 # from selenium.webdriver.phantomjs import webdriver
 from selenium import webdriver
 
-from Config import PHANTOMJS_BIN_PATH
+from Config import PHANTOMJS_BIN_PATH, FANG_HOST
 from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
 from util.timeHelper import getToday
@@ -185,7 +185,7 @@ def getChartAsStr():
     return chartsStr
 
 def getImgTag():
-    return  u'<br><p><b>历史数据(图片可能被邮箱隐藏)：<b></p><img src="' + shanpshot() + u'"/><br><a href="http://123.56.66.33:10008/fang"><p>详情</p></a>'
+    return  u'<br><p><b>历史数据(图片可能被邮箱隐藏)：<b></p><img src="' + shanpshot() + u'"/><br><a href="http://' + FANG_HOST + u'/fang"><p>详情</p></a>'
 
 def shanpshot():
     driver = webdriver.PhantomJS(
