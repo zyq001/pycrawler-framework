@@ -4,6 +4,8 @@
 from bs4 import BeautifulSoup,Comment
 import os
 # import html5lib
+from util.networkHelper import getContent
+
 
 def getSoupByStr(content):
     soup = BeautifulSoup(content, 'lxml')
@@ -11,6 +13,13 @@ def getSoupByStr(content):
         return soup
 
 def getSoupByStrEncode(content, encoding='utf-8'):
+    soup = BeautifulSoup(content, 'lxml', from_encoding=encoding)
+    if soup:
+        return soup
+
+
+def getSoupByUrl(content, encoding='utf-8'):
+    content = getContent(content)
     soup = BeautifulSoup(content, 'lxml', from_encoding=encoding)
     if soup:
         return soup

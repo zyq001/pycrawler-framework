@@ -23,3 +23,4 @@ class BaseCrawler:
     def output(self):
         print 'Persistence'
 
+

@@ -15,6 +15,7 @@ import time
 from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
 from parse.easouParser import getAndParse
+from util.UUIDUtils import getBookDigest
 from util.pyBloomHelper import getBloom, dumpBloomToFile
 
 db_dushu = 'cn_dushu_book'
@@ -62,13 +63,7 @@ def insertBookWithConn(bookObj, conn2 = None,csor2 = None):
 
     updateTime = int(time.time())
 
-    import hashlib
-
-    m2 = hashlib.md5()
-    forDigest = bookObj['title'] + u'#' + bookObj['author']
-    # forDigest = u'总裁我很忙#jxj季'
-    m2.update(forDigest.encode('utf-8'))
-    digest =  m2.hexdigest()
+    digest = getBookDigest(bookObj)
     bookObj['digest'] = digest
 
     if not bookObj.has_key('source'):
@@ -116,6 +111,8 @@ def insertBookWithConn(bookObj, conn2 = None,csor2 = None):
     conn2.close()
 
     return bookObj
+
+
 
 def delBookById(bookId):
     conn2, csor2 = getDushuConnCsor()

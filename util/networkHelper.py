@@ -1,13 +1,18 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-from Config import ERAHOST
+import random
+
+from Config import ERAHOST, ERAPASSWD, EADHOST, EADPASSWD, USER_AGENTS
 
 
-def getContent(url):
+def getContent(url, ua = None):
+
+    if not ua:
+        ua  = random.choice(USER_AGENTS)
 
     import requests
     s = requests.Session()
-    headers = {u'user-agent': u'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0'}
+    headers = {u'user-agent': ua}
 
     try:
         r = s.get(url, headers=headers, timeout=30)

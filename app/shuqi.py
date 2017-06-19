@@ -23,6 +23,7 @@ from dao.connFactory import getDushuConnCsor
 from dao.dushuService import getExistsCapsRawUrlId, insertCapWithCapObj2, insertCapWithCapObj, \
     loadExistsSQId, delBookById, insertBookWithConn
 from local.shuqi.shuqiLocal import loadShuQSeqC, loadShuQC
+from util.UUIDUtils import getBookDigest, getCapDigest
 from util.networkHelper import getContent, getContentWithUA
 from util.pyBloomHelper import getBloom, loadBloomFromFile, dumpBloomToFile
 
@@ -224,12 +225,10 @@ def getBookObjFromSQid(id, shuqCategory):
     bookObj['firstCid'] = firstCid
     bookObj['viewNum'] = 0
 
-    m2 = hashlib.md5()
-    forDigest = title + u'#' + author
-    m2.update(forDigest.encode('utf-8'))
-    digest = m2.hexdigest()
+    digest = getBookDigest(author, title)
     bookObj['digest'] = digest
     return bookObj, digest
+
 
 def getShuqiCapList(bookId):
 
@@ -423,10 +422,7 @@ def getCapObjListByBookId(bookId,shuqCategory2):
         capObj['idx'] = j
         capObj['bookUUID'] = bookObj['digest']
 
-        m2 = hashlib.md5()
-        forDigest = bookObj['digest'] + capObj['title'] + u'#' + str(j)
-        m2.update(forDigest.encode('utf-8'))
-        digest = m2.hexdigest()
+        digest = getCapDigest(bookObj, capObj, j)
         capObj['digest'] = digest
 
         if digest in donedegest:
@@ -453,10 +449,8 @@ def getCapObjListByBookIdIntoQue(bookId, queue, categoryDict, connDoc,csorDoc):
         capObj['idx'] = j
         capObj['bookUUID'] = bookObj['digest']
 
-        m2 = hashlib.md5()
-        forDigest = bookObj['digest'] + capObj['title'] + u'#' + str(j)
-        m2.update(forDigest.encode('utf-8'))
-        digest = m2.hexdigest()
+        digest = getCapDigest(bookObj, capObj, j)
+
         capObj['digest'] = digest
         if digest in donedegest:
             return

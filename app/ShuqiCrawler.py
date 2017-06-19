@@ -19,10 +19,10 @@ class ShuqiCrawler(BaseCrawler):
     def init(self, data = None):
         if not data or not isinstance(data, dict):
             raise InputException("requried dict data with fields: sid")
-        if not data.has_key('sid'):
-            raise InputException("requried field 'sid' in data")
+        if not data.has_key('id'):
+            raise InputException("requried field 'id' in data")
 
-        self.sid = data['sid']
+        self.sid = data['id']
 
     def crawl(self):
         print 'shuqi init'
