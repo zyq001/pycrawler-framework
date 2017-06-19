@@ -56,7 +56,7 @@ class Search:
         response = {'code': 200, 'msg': 'ok'}
         respData = []
         try:
-            params = getParams(web, name="", andCrawl=False, crawlerName = 'mianFeiTXTCrawler')
+            params = getParams(web, name="", andCrawl=False, crawlerName = 'mianFeiTXT')
 
             if '' == params['name']:
                 raise InputException('no input search name')

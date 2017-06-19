@@ -112,8 +112,8 @@ def handleByMTID(mid):
 
     bookObj['bookType'] = BookType
 
-    bookObj['typeCode'] = 2
-    bookObj['categoryCode'] = 1
+    bookObj['typeCode'] = 0
+    bookObj['categoryCode'] = 0
 
     bookObj['viewNum'] = random.randint(500000,1000000)
 
@@ -166,7 +166,7 @@ def handleByMTID(mid):
 def mianfeiSearch(name):
     url = MianFeiTXTSearchBaseUrl + quote(name.encode('utf-8'))
     soup = getSoupByUrl(url)
-    bookTags = soup.select('#J-items')
+    bookTags = soup.select_one('#J-items')
     books = []
     for i in range(0, len(bookTags.select('li'))):
         if i > 4: #只取前五个
@@ -176,7 +176,10 @@ def mianfeiSearch(name):
         book['title'] = bookTag.select_one('.title').get_text()
         book['img'] = bookTag.select_one('.img img')['src']
         book['author'] = bookTag.select_one('.author').get_text()
-        book['finishwb'] = bookTag.select_one('.finishwb').get_text()
+        book['finishwb'] = u'连载'
+        if(bookTag.select_one('.finishwb')):
+            book['finishwb'] = bookTag.select_one('.finishwb').get_text()
+
         href = bookTag.select_one('.title')['href']
         index = href.find('id=')
         if index < 0:
