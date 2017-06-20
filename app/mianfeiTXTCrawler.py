@@ -8,7 +8,7 @@ from urllib import quote
 import MySQLdb
 
 from Config import EADHOST, EADPASSWD, OSSINTERNALENDPOINT, OSSUSER, OSSPASSWD, CapsBaseUrl, MianFeiTXTBookDetailUrl, \
-    MianFeiContentBaseUrl, MianFeiTXTBaseUrl, MianFeiTXTSearchBaseUrl
+    MianFeiContentBaseUrl, MianFeiTXTBaseUrl, MianFeiTXTSearchBaseUrl, MINCHAPNUM
 # from easouCrawl import insertCapWithCapObj
 # from framework.htmlParser import getSoupByStr
 # from networkHelper import getContentWithUA
@@ -77,6 +77,9 @@ def handleByMTID(mid):
     coverUrl = baseData['coverUrl']
     contentUrl = baseData['contentUrl']
     count = baseData['count']
+    if count < MINCHAPNUM:
+        print 'chapNum too small, skip'
+        return
     isOver = baseData['isOver']
     BookType = '连载'
     if isOver == 1:
