@@ -56,7 +56,7 @@ class Search:
         response = {'code': 200, 'msg': 'ok'}
         respData = []
         try:
-            params = getParams(web, name="", andCrawl=False, crawler_count=1, output_count=1, crawlerName = 'mianFeiTXT')
+            params = getParams(web, name="", andCrawl=False, crawler_count=1, top=5, output_count=1, crawlerName = 'mianFeiTXT')
 
             if '' == params['name']:
                 raise InputException('no input search name')
@@ -68,7 +68,7 @@ class Search:
             for crawlerName in params['crawlerName'].split(','):
                 crawler = manager.crawlers[crawlerName]
 
-                searchResult = crawler.search(params['name'])
+                searchResult = crawler.search(params['name'], params['top'])
                 if params['andCrawl']:
                     for book in searchResult:
                         crawler.init(book)

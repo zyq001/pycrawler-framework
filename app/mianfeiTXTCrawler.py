@@ -166,13 +166,13 @@ def handleByMTID(mid):
             continue
         upload2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
 
-def mianfeiSearch(name):
+def mianfeiSearch(name, top = 5):
     url = MianFeiTXTSearchBaseUrl + quote(name.encode('utf-8'))
     soup = getSoupByUrl(url)
     bookTags = soup.select_one('#J-items')
     books = []
     for i in range(0, len(bookTags.select('li'))):
-        if i > 4: #只取前五个
+        if i > (top - 1): #只取前五个
             break
         bookTag = bookTags.select('li')[i]
         book = dict()
@@ -210,8 +210,8 @@ class MianFeiTXTCrawler(BaseCrawler):
     def output(self):
         print 'mianfeiTXT output'
 
-    def search(self, searchInput):
-        return  mianfeiSearch(searchInput)
+    def search(self, searchInput, top = 5):
+        return  mianfeiSearch(searchInput, top)
 
 # def addGroupMembers():
 #     import random
