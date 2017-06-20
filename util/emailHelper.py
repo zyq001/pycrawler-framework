@@ -48,7 +48,7 @@ def send(msg):
         print "Error: 无法发送邮件"
 
 
-def send_email(msg, receivers, fromHeader = 'no-reply', toHeader = '' ,subject = '无主题'):
+def send_email(msg, receivers, fromHeader = NO_REPLY_TATATIMES_COM, toHeader = '' ,subject = '无主题'):
 
     mail_host= SMTP_EXMAIL_QQ_COM  #设置服务器
     mail_user= NO_REPLY_TATATIMES_COM  #用户名
