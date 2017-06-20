@@ -59,7 +59,7 @@ def upload2Bucket(id, obj):
     except Exception as e:
         print id, ' upload faild ',e
 
-def handleByMTID(mid):
+def handleByMTID(mid, allowUpdate = True):
     baseUrl = MianFeiTXTBaseUrl
     capListBaseUrl = CapsBaseUrl + str(mid) \
                      +'&pageindex=1&pagesize=100000000'
@@ -127,7 +127,10 @@ def handleByMTID(mid):
 
     bookObj['digest'] = digest
 
-    bookObj = insertBookWithConn(bookObj)
+    bookObj = insertBookWithConn(bookObj, allowUpdate)
+
+    if not bookObj:
+        return
 
     # myBookId = bookObj['id']
     #

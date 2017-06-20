@@ -54,7 +54,7 @@ def handleWebsiteNoise(begin, end):
     csor2.close()
     conn2.close()
 
-def insertBookWithConn(bookObj, conn2 = None,csor2 = None):
+def insertBookWithConn(bookObj, allowUpdate = True, conn2 = None,csor2 = None):
 
     if not conn2 or not csor2:
         conn2,csor2 = getDushuConnCsor()
@@ -93,6 +93,8 @@ def insertBookWithConn(bookObj, conn2 = None,csor2 = None):
         if u'完结' == bookObj['bookType']:
             updateBookTypeByRawUrl(bookObj['bookType'], bookObj['rawUrl'])
             # return None #有bug
+        if not allowUpdate:
+            return None
         # @TODO 检查数量是否一致即可，数量《=库中 即可跳过
     # sql2 = 'select id from cn_dushu_book where rawUrl = "%s";' % (bookObj['rawUrl'])
 
