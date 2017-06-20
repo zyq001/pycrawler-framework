@@ -6,24 +6,12 @@
 @author: zyq
 '''
 
-import ctypes
 import json
-import os, uuid, StringIO
 
-import cStringIO
-import urllib
-
-# from Pillow import Image
 import web
-# from tesserocr import PyTessBaseAPI
-import tesserocr
-
-from PIL import Image
-
-from app.ershoufang import Ershoufang
 from dao.ershoufangService import getChartAsStr
 from exception.InputException import InputException
-from manager.Manager import Manager, crawlManager
+from manager.Manager import  crawlManager
 from manager.Task import Task
 from rest.util.webpyHelper import getParams
 
