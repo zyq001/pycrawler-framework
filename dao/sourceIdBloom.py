@@ -2,8 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 '''
-单例保存书旗所有的主键id,
-书id，不需要bloom了，dict就够了
+source字段，例：shuqi001、mianfei001
 @author: zyq
 '''
 from dao.connFactory import getDushuConnCsor

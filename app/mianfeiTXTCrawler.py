@@ -24,18 +24,18 @@ ua = 'Mozilla/5.0 (Linux; U; Android 4.0; en-us; Xoom Build/HRI39) AppleWebKit/5
 capListAPIDeviceInfo = '&soft_id=1&ver=110817&platform=an&placeid=1007&imei=862953036746111&cellid=13&lac=-1&sdk=18&wh=720x1280&imsi=460011992901111&msv=3&enc=666501479540451111&sn=1479540459901111&vc=e8f2&mod=M3'
 
 
-from DBUtils.PooledDB import PooledDB
+# from DBUtils.PooledDB import PooledDB
 
-pool2 = PooledDB(creator=MySQLdb, mincached=1, maxcached=1,
-                host=EADHOST, port=3306, user="ead",
-                passwd=EADPASSWD, db="dushu", use_unicode=True, charset='utf8')
-conn2 = pool2.connection()
-csor2 = conn2.cursor()
+# pool2 = PooledDB(creator=MySQLdb, mincached=1, maxcached=1,
+#                 host=EADHOST, port=3306, user="ead",
+#                 passwd=EADPASSWD, db="dushu", use_unicode=True, charset='utf8')
+# conn2 = pool2.connection()
+# csor2 = conn2.cursor()
 
 # conn.set_character_set('utf8')
-csor2.execute('SET NAMES utf8')
-csor2.execute("SET CHARACTER SET utf8")
-csor2.execute("SET character_set_connection=utf8")
+# csor2.execute('SET NAMES utf8')
+# csor2.execute("SET CHARACTER SET utf8")
+# csor2.execute("SET character_set_connection=utf8")
 
 
 def getBucket():
@@ -124,7 +124,7 @@ def handleByMTID(mid):
 
     bookObj['digest'] = digest
 
-    bookObj = insertBookWithConn(bookObj, conn2, csor2)
+    bookObj = insertBookWithConn(bookObj)
 
     # myBookId = bookObj['id']
     #
@@ -158,7 +158,7 @@ def handleByMTID(mid):
 
         capObj['digest'] = digest
 
-        capId = insertCapWithCapObj(capObj, conn2, csor2)
+        capId = insertCapWithCapObj(capObj)
         if not capId:
             continue
         upload2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))

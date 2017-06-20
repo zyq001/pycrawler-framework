@@ -20,7 +20,7 @@ emailTempl = u'''
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>住建委数据</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/3.6.2/echarts.min.js"></script>
 </head>
 <body>

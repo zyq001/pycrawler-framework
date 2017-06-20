@@ -250,7 +250,7 @@ def insertCapWithCapObj2(capObj, conn2 = None, csor2 = None):
     conn2.close()
 
 
-def insertCapWithCapObj(capObj, conn2, csor2):
+def insertCapWithCapObj(capObj, conn2 = None, csor2 = None):
     if not conn2 or not csor2:
         conn2,csor2 = getDushuConnCsor()
 
@@ -264,7 +264,8 @@ def insertCapWithCapObj(capObj, conn2, csor2):
           "(%s,%s,%s,%s,%s,%s)" , (capObj['bookId'], capObj['idx'], capObj['digest'], capObj['bookUUID'], capObj['title'], capObj['size']))
         # csor2.execute("update cn_dushu_acticle set title = %s, size= %s where digest = %s" , (capObj['title'], capObj['size'], capObj['digest'] ))
         conn2.commit()
-        print 'scap， ', capObj['source']+":" + str(capObj['idx']), ', content: ', capObj['content'][0:15]
+        print 'scap， ', capObj['source']+":" + str(capObj['idx'])
+            # , ', content: ', capObj['content'][0:15]
 
 
 
