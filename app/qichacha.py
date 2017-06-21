@@ -2,25 +2,23 @@
 # -*- coding: UTF-8 -*-
 import json
 import random
-import traceback
+# url = 'http://www.tianyancha.com/company/2320040774.json'
+# url = 'http://www.tianyancha.com/IcpList/2320040774.json'
+# url = 'http://www.qichacha.com/company_getinfos?unique=93460e9e2f2eac88d8637759cf3563b8&companyname=%E9%95%BF%E5%9F%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%BD%AF%E4%BB%B6%E4%B8%8E%E7%B3%BB%E7%BB%9F%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&tab=base'
+# from framework.shuqi import ua
+import time
 import urlparse
 from urllib import quote
 
 import MySQLdb
 import requests
 
-# url = 'http://www.tianyancha.com/company/2320040774.json'
-# url = 'http://www.tianyancha.com/IcpList/2320040774.json'
-# url = 'http://www.qichacha.com/company_getinfos?unique=93460e9e2f2eac88d8637759cf3563b8&companyname=%E9%95%BF%E5%9F%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%BD%AF%E4%BB%B6%E4%B8%8E%E7%B3%BB%E7%BB%9F%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&tab=base'
-# from framework.shuqi import ua
-import time
-
-# from htmlParser import getSoupByStrEncode
-
-#统计mysql插入性能
+# 统计mysql插入性能
 from util.htmlHelper import getSoupByStrEncode
 from util.networkHelper import getContentWithUA
 from util.pyBloomHelper import getBloom, loadBloomFromFile, dumpBloomToFile
+
+# from htmlParser import getSoupByStrEncode
 
 staticInsertTotolTime = 0.0
 staticInsertTotolCount = 0
@@ -29,10 +27,10 @@ staticInsertCarry = 100
 
 from selenium.webdriver.phantomjs import webdriver
 
-from Config import phantomPath, USER_AGENTS, minPIPCount, DAVIDPASSWD
+from Config import phantomPath, USER_AGENTS, DAVIDPASSWD
 # from Config import getBloom, loadBloomFromFile, dumpBloomToFile
 # from framework.htmlParser import getSoupByStrEncode
-from proxy.ipproxy import getAvailableIPs, deletByIP
+from proxy.ipproxy import getAvailableIPs, getProxy
 
 ua = 'Mozilla/5.0 (Linux; U; Android 4.0; en-us; Xoom Build/HRI39) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13'
 # from networkHelper import getContentWithUA
@@ -46,39 +44,6 @@ csor = None
 globalProxyCount = 0
 pIPs = getAvailableIPs()
 pipObj = random.choice(pIPs)
-
-def getProxy(renew = False):
-    global pIPs, globalProxyCount,pipObj
-    # while 1:
-    try:
-        # count = 100
-        if len(pIPs) < minPIPCount:
-            # 代理ip太少，重新获取
-            pIPs = getAvailableIPs()
-        globalProxyCount = globalProxyCount + 1
-        if globalProxyCount % 100 == 0 or renew:
-            pipObj = random.choice(pIPs)
-            print 'globalProxyCount:',str(globalProxyCount), ' change proxyIp to ',str(pipObj)
-            pIPs.remove(pipObj)
-            globalProxyCount = 0
-
-        # randomPIpIndex = random.randint(0, len(pIPs) - 1)
-        # pipObj = pIPs[randomPIpIndex]
-        pIp = pipObj[0]
-        pPort = pipObj[1]
-
-        # del pIPs[randomPIpIndex]
-        # pIPs.remove(pipObj)
-
-        # 删除ip
-        # deletByIP(pIp)
-        proxy = {
-            'http': 'http://%s:%s' % (pIp, pPort),
-            'https': 'http://%s:%s' % (pIp, pPort)
-        }
-        return proxy
-    except Exception as e:
-        print 'get proxy exception: ',e
 
 
 def getQichachaHtml(url, proxy=None, ua = None):
