@@ -12,7 +12,7 @@ from app.mianfeiTXTNewFilder import findByIdRange
 if __name__ == '__main__':
 
 
-    st = 190000
+    st = 50000
     end = 500000
     if len(sys.argv) > 1:
         st = int(sys.argv[1])

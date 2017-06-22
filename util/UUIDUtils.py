@@ -24,7 +24,7 @@ def getBookDigest(bookObj, author = None, title = None):
 
 def getCapDigest(bookObj, capObj, j):
     m2 = hashlib.md5()
-    forDigest = bookObj['digest'] + capObj['title'] + u'#' + str(j)
+    forDigest = bookObj['rawUrl'] + capObj['title'] + u'#' + str(j)
     m2.update(forDigest.encode('utf-8'))
     digest = m2.hexdigest()
     return digest

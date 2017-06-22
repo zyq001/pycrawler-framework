@@ -120,12 +120,12 @@ def handleByMTID(mid, allowUpdate = True):
 
     bookObj['viewNum'] = random.randint(500000,1000000)
 
-    m2 = hashlib.md5()
-    forDigest = title + u'#' + author
-    m2.update(forDigest.encode('utf-8'))
-    digest = m2.hexdigest()
-
-    bookObj['digest'] = digest
+    # m2 = hashlib.md5()
+    # forDigest = title + u'#' + author
+    # m2.update(forDigest.encode('utf-8'))
+    # digest = m2.hexdigest()
+    #
+    # bookObj['digest'] = digest
 
     bookObj = insertBookWithConn(bookObj, allowUpdate)
 
