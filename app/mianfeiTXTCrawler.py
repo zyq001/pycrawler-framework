@@ -101,7 +101,11 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid):
         capObj = dict()
         orgContent = capListJsonObj['data']['chapter']
         contentSoup = getSoupByStr(orgContent)
-        del contentSoup.body['style']
+        if not contentSoup or '' == orgContent or len(orgContent) < 1:
+            print 'chap content null ,skip, capId:', str(cid), ' mid: ',str(mid)
+            continue
+        if contentSoup.body['style']:
+            del contentSoup.body['style']
         content = unicode(contentSoup.body).replace(u'<body>', '').replace(u'</body>', '').replace(u'\n\n',
                                                                                                    u'\n').replace(
             u'<br><br>', u'<br>').replace(u'<br\><br\>', u'<br\>')
