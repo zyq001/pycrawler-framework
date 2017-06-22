@@ -82,51 +82,55 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid):
     # myBookId = bookObj['id']
     #
     for cid in range(1, count + 1):
+        try:
 
-        if allowUpdate:
-            if cid in capIdxs:
-                continue  # 该章节已在库中，跳过
+            if allowUpdate:
+                if cid in capIdxs:
+                    continue  # 该章节已在库中，跳过
 
-        capContentUrl = MianFeiContentBaseUrl + str(cid) + '&contentid=' + str(mid)
-        capContent = getContentWithUA(capContentUrl, ua)
-        if not capContent:
+            capContentUrl = MianFeiContentBaseUrl + str(cid) + '&contentid=' + str(mid)
             capContent = getContentWithUA(capContentUrl, ua)
-        # capContent = capContent.replace(r'\r', '').replace(r'\n', '')
-        capListJsonObj = json.loads(capContent, strict=False)
-        if not (capListJsonObj['status'] == 1000):
-            capListJsonObj = json.loads(capContent)
-            if not (capListJsonObj['status'] == 1000 and capListJsonObj['message'] == u'成功'):
+            if not capContent:
+                capContent = getContentWithUA(capContentUrl, ua)
+            # capContent = capContent.replace(r'\r', '').replace(r'\n', '')
+            capListJsonObj = json.loads(capContent, strict=False)
+            if not (capListJsonObj['status'] == 1000):
+                capListJsonObj = json.loads(capContent)
+                if not (capListJsonObj['status'] == 1000 and capListJsonObj['message'] == u'成功'):
+                    continue
+
+            capObj = dict()
+            orgContent = capListJsonObj['data']['chapter']
+            contentSoup = getSoupByStr(orgContent)
+            if not contentSoup or '' == orgContent or len(orgContent) < 1:
+                print 'chap content null ,skip, capId:', str(cid), ' mid: ',str(mid)
                 continue
+            if contentSoup.body['style']:
+                del contentSoup.body['style']
+            content = unicode(contentSoup.body).replace(u'<body>', '').replace(u'</body>', '').replace(u'\n\n',
+                                                                                                       u'\n').replace(
+                u'<br><br>', u'<br>').replace(u'<br\><br\>', u'<br\>')
+            capObj['content'] = content
+            capObj['title'] = unicode(contentSoup.title.get_text())
+            capObj['rawUrl'] = capContentUrl
+            # capObj['size'] = int(WordsCount)
+            capObj['size'] = len(content)
+            capObj['bookId'] = bookObj['id']
+            capObj['source'] = bookObj['source']
+            capObj['idx'] = cid
+            capObj['bookUUID'] = bookObj['digest']
 
-        capObj = dict()
-        orgContent = capListJsonObj['data']['chapter']
-        contentSoup = getSoupByStr(orgContent)
-        if not contentSoup or '' == orgContent or len(orgContent) < 1:
-            print 'chap content null ,skip, capId:', str(cid), ' mid: ',str(mid)
-            continue
-        if contentSoup.body['style']:
-            del contentSoup.body['style']
-        content = unicode(contentSoup.body).replace(u'<body>', '').replace(u'</body>', '').replace(u'\n\n',
-                                                                                                   u'\n').replace(
-            u'<br><br>', u'<br>').replace(u'<br\><br\>', u'<br\>')
-        capObj['content'] = content
-        capObj['title'] = unicode(contentSoup.title.get_text())
-        capObj['rawUrl'] = capContentUrl
-        # capObj['size'] = int(WordsCount)
-        capObj['size'] = len(content)
-        capObj['bookId'] = bookObj['id']
-        capObj['source'] = bookObj['source']
-        capObj['idx'] = cid
-        capObj['bookUUID'] = bookObj['digest']
+            digest = getCapDigest(bookObj, capObj, cid)
 
-        digest = getCapDigest(bookObj, capObj, cid)
+            capObj['digest'] = digest
 
-        capObj['digest'] = digest
+            capId = insertCapWithCapObj(capObj)
+            if not capId:
+                continue
+            upload2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
 
-        capId = insertCapWithCapObj(capObj)
-        if not capId:
-            continue
-        upload2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
+        except Exception as e:
+            print 'crawl', str(mid), ' cap ', str(cid), ' exception: ', str(e)
 
 
 def getBookObj(allowUpdate, mid):
