@@ -7,6 +7,7 @@ import random
 # url = 'http://www.qichacha.com/company_getinfos?unique=93460e9e2f2eac88d8637759cf3563b8&companyname=%E9%95%BF%E5%9F%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%BD%AF%E4%BB%B6%E4%B8%8E%E7%B3%BB%E7%BB%9F%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&tab=base'
 # from framework.shuqi import ua
 import time
+import traceback
 import urlparse
 from urllib import quote
 
@@ -14,6 +15,7 @@ import MySQLdb
 import requests
 
 # 统计mysql插入性能
+from dao.connFactory import getComConnCsor
 from util.htmlHelper import getSoupByStrEncode
 from util.networkHelper import getContentWithUA
 from util.pyBloomHelper import getBloom, loadBloomFromFile, dumpBloomToFile
@@ -27,7 +29,7 @@ staticInsertCarry = 100
 
 from selenium.webdriver.phantomjs import webdriver
 
-from Config import phantomPath, USER_AGENTS, DAVIDPASSWD
+from Config import phantomPath, USER_AGENTS, DAVIDPASSWD, minPIPCount
 # from Config import getBloom, loadBloomFromFile, dumpBloomToFile
 # from framework.htmlParser import getSoupByStrEncode
 from proxy.ipproxy import getAvailableIPs, getProxy
@@ -41,12 +43,9 @@ investBloom = []
 conn = None
 csor = None
 
-globalProxyCount = 0
-pIPs = getAvailableIPs()
-pipObj = random.choice(pIPs)
 
 
-def getQichachaHtml(url, proxy=None, ua = None):
+def getQichachaHtml(url, proxy=None, ua = None, noCookie = False):
 
     if not ua:
         ua  = random.choice(USER_AGENTS)
@@ -74,13 +73,19 @@ def getQichachaHtml(url, proxy=None, ua = None):
 
     s = requests.Session()
     try:
-        r = s.get(url, headers=headers, timeout=30, cookies=cookies,proxies=proxy)
+        if noCookie:
+            r = s.get(url, headers=headers, timeout=30, proxies=proxy)
+        else:
+            r = s.get(url, headers=headers, timeout=30, cookies=cookies,proxies=proxy)
     except Exception as e:
         print 'get with proxy error, retry with'
         proxy = getProxy(True)
 
         try:
-            r = s.get(url, timeout=30, cookies=cookies, proxies=proxy)
+            if noCookie:
+                r = s.get(url, headers=headers, timeout=30, proxies=proxy)
+            else:
+                r = s.get(url, headers=headers, timeout=30, cookies=cookies,proxies=proxy)
         except Exception as e:
             print 'get with proxy error, return none'
             return None
@@ -120,7 +125,7 @@ def getBaseInfoById(prov = None, uid = ''):
 def qichachaFromProvs(provs):
     print 'start: provs', str(provs)
     catBaseIrl = 'http://www.qichacha.com/gongsi_area_prov_'
-    conn, csor = getConnCsor()
+    conn, csor = getComConnCsor()
     for prov in provs:
         pageBaseUrl = catBaseIrl + prov + '_p_'
         for pageCount in range(1, 501):
@@ -135,7 +140,7 @@ def qichachaFromProvs(provs):
 def qichachaFromIndustry(f,t):
     print 'start from ', f, ' to ', t
     indBaseUrl = 'http://www.qichacha.com/gongsi_industry?industryCode='
-    conn, csor = getConnCsor()
+    conn, csor = getComConnCsor()
     for code in range(f, t+1):
         industCode = chr(code + 65)
         industOrder = code
@@ -211,11 +216,11 @@ def insertWithUid(conn2, csor2, prv, uid):
         print 'already crawled uid:',uid
         return
 
-    idBloom.add(uid)
+    # idBloom.add(uid)
 
     global conn,csor
     if not conn or (not csor):
-        conn2,csor2 = getConnCsor()
+        conn2,csor2 = getComConnCsor()
 
 
     com_base_info_str = getBaseInfoById(prv, uid)
@@ -328,7 +333,7 @@ def getConnCsor():
 def crawlBaseInfo(begin, end):
     print 'start from ',begin,' to ',end
     baseUrl = 'http://www.tianyancha.com/IcpList/'
-    conn, csor = getConnCsor()
+    conn, csor = getComConnCsor()
     seq = range(begin, end)
 
     random.shuffle(seq)
@@ -421,7 +426,7 @@ def getQichachaDigests():
         print 'no dump bloom file,  load from db'
         idbloom = getBloom(2000 * 10000)
         # idbloom = getBloom()
-        conn, csor = getConnCsor()
+        conn, csor = getComConnCsor()
         csor.execute('select id from com_base_copy')
         # csor.execute('select id from com_base_copy limit 10')
         ids = csor.fetchall()
@@ -433,7 +438,7 @@ def getQichachaDigests():
 
 def getQichachaInvestDigests():
     idbloom = getBloom()
-    conn, csor = getConnCsor()
+    conn, csor = getComConnCsor()
     csor.execute('select uid from com_invest')
     ids = csor.fetchall()
     [idbloom.add(mid[0]) for mid in ids]
@@ -445,7 +450,7 @@ def getQichachaInvestDigests():
 def insertInvestList(uid, content):
     global conn,csor
     if not conn or (not csor):
-        conn,csor = getConnCsor()
+        conn,csor = getComConnCsor()
     csor.execute('insert ignore com_invest (uid, investList) values (%s, %s)', (uid, content))
     conn.commit()
 
@@ -453,7 +458,7 @@ def fromInvestInt():
 
     global conn,csor
     if not conn or (not csor):
-        conn,csor = getConnCsor()
+        conn,csor = getComConnCsor()
     csor.execute('select id,companyName from com_base_copy where companyName is not Null  limit 10;')
     result = csor.fetchall()
     for comInfo in result:
@@ -509,7 +514,7 @@ def getInvestListByNameId(quid, qCname):
 def loadComNameByLength(nameLength):
     global conn,csor
     if not conn or (not csor):
-        conn,csor = getConnCsor()
+        conn,csor = getComConnCsor()
     csor.execute('select companyName from com_base_copy where length(companyName) = %s ', (nameLength,))
     result = csor.fetchall()
     return result
@@ -520,9 +525,9 @@ def searchAndCrawlByName(comName, proxy=None):
     comName = comName.encode('utf-8')
     # baseUrl = 'http://www.qichacha.com/search?key=' + quote(comName)
     # baseUrl = 'http://www.qichacha.com/firm_CN_ea3a783f0c010fc31a2d75c2c9aa9b75'
-    baseUrl = 'http://www.qichacha.com/firm_c3ece65bad28c17cc7f67168448e50e1.shtml'
+    baseUrl = 'http://www.qichacha.com/search?key=%E5%8C%97%E4%BA%AC'
     ua = random.choice(USER_AGENTS)
-    htmlContent = getContentWithUA(baseUrl, ua, proxy=proxy)
+    htmlContent = getQichachaHtml(baseUrl, noCookie=True)
     if not htmlContent:
         return None
     soup = getSoupByStrEncode(htmlContent)
@@ -576,21 +581,21 @@ if __name__ == '__main__':
     #         provs.append(p)
     #         print 'doneProv,',p
 
-    idBloom = getQichachaDigests()
+    # idBloom = getQichachaDigests()
 
     # investBloom = getQichachaInvestDigests()
 
     # 区域
-    qichachaFromProvs(provs)
-
+    # qichachaFromProvs(provs)
     #
-    f = 0
-    t = 19
-    import sys
-    if len(sys.argv) > 2:
-        f = int(sys.argv[1])
-        t = int(sys.argv[2])
-    qichachaFromIndustry(f,t)
+    # #行业
+    # f = 0
+    # t = 19
+    # import sys
+    # if len(sys.argv) > 2:
+    #     f = int(sys.argv[1])
+    #     t = int(sys.argv[2])
+    # qichachaFromIndustry(f,t)
 
     #从投资接口开始
     # fromInvestInt()
@@ -605,38 +610,18 @@ if __name__ == '__main__':
 
     # 页面推荐入口
     # pIPs = getAvailableIPs()
-    #
-    # while 1:
-    #     try:
-    #         count = 100
-    #         if len(pIPs) < minPIPCount:
-    #             # 代理ip太少，重新获取
-    #             pIPs = getAvailableIPs()
-    #         pipObj = random.choice(pIPs)
-    #         # randomPIpIndex = random.randint(0, len(pIPs) - 1)
-    #         # pipObj = pIPs[randomPIpIndex]
-    #         pIp = pipObj[0]
-    #         pPort = pipObj[1]
-    #
-    #         # del pIPs[randomPIpIndex]
-    #         pIPs.remove(pipObj)
-    #
-    #         # 删除ip
-    #         # deletByIP(pIp)
-    #         proxy = {
-    #             'http': 'http://%s:%s' % (pIp, pPort),
-    #             'https': 'http://%s:%s' % (pIp, pPort)
-    #         }
-    #         try:
-    #             while count > 0:
-    #                 if not searchAndCrawlByName("noName", proxy=proxy):
-    #                     break
-    #                 count = count - 1
-    #         except Exception as e:
-    #             print traceback.format_exc()
-    #
-    #     except Exception as ge:
-    #         print traceback.format_exc()
+
+    while 1:
+        try:
+
+            try:
+                searchAndCrawlByName("noName")
+
+            except Exception as e:
+                print traceback.format_exc()
+
+        except Exception as ge:
+            print traceback.format_exc()
 
 
     # unknown

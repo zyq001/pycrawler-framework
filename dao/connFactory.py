@@ -5,6 +5,7 @@ import MySQLdb
 from Config import EADPASSWD, EADHOST, ERAPASSWD, ERAHOST, DAVIDPASSWD
 
 dushuPool = None
+comPool = None
 tmathPool = None
 
 def getConn():
@@ -48,14 +49,15 @@ def getDushuConn():
 def getComConnCsor():
 
     from DBUtils.PooledDB import PooledDB
-
-    pool2 = PooledDB(creator=MySQLdb, mincached=1, maxcached=3,
-                     host="10.10.1.29", port=3306, user="root",
-                     # host=NODE1IP, port=44408, user="crawler",
-                     # host="10.24.161.94", port=44408, user="crawler",
-                     passwd=DAVIDPASSWD, db="com", use_unicode=True, charset='utf8')
-                     # passwd=NODEPASSWD, db="com_info", use_unicode=True, charset='utf8')
-    conn2 = pool2.connection()
+    global comPool
+    if not comPool:
+        comPool = PooledDB(creator=MySQLdb, mincached=1, maxcached=3,
+                         host="10.10.1.29", port=3306, user="root",
+                         # host=NODE1IP, port=44408, user="crawler",
+                         # host="10.24.161.94", port=44408, user="crawler",
+                         passwd=DAVIDPASSWD, db="com", use_unicode=True, charset='utf8')
+                         # passwd=NODEPASSWD, db="com_info", use_unicode=True, charset='utf8')
+    conn2 = comPool.connection()
     csor2 = conn2.cursor()
 
     # conn.set_character_set('utf8')

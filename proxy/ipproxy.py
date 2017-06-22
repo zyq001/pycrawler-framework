@@ -10,9 +10,11 @@ from Config import ipProxyServerUrl, minPIPCount
 
 def getAvailableIPs(count=-1,types=0,country=u'国内', area=''):
     if count != -1:
-        url = ipProxyServerUrl + "?count=" + str(count) + '&types=' + str(types) + '&country=' + country
+        # url = ipProxyServerUrl + "?count=" + str(count) + '&types=' + str(types) + '&country=' + country
+        url = ipProxyServerUrl + "?count=" + str(count) + '&types=' + str(types)
     else:
-        url = ipProxyServerUrl + '?types=' + str(types) + '&country=' + country
+        # url = ipProxyServerUrl + '?types=' + str(types) + '&country=' + country
+        url = ipProxyServerUrl + '?types=' + str(types)
 
     if area != '':
         url = url + '&area=' + area
@@ -22,6 +24,10 @@ def getAvailableIPs(count=-1,types=0,country=u'国内', area=''):
 
     return ip_ports
 
+
+globalProxyCount = 0
+pIPs = getAvailableIPs()
+pipObj = random.choice(pIPs)
 
 def deletByIP(ip):
     url = ipProxyServerUrl + 'delete?ip=' + ip
