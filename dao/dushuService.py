@@ -115,6 +115,18 @@ def insertBookWithConn(bookObj, allowUpdate = True, conn2 = None,csor2 = None):
     return bookObj
 
 
+def getCapIdxsByBookId(bookId):
+    conn,csor = getDushuConnCsor()
+    idxs = set()
+
+    csor.execute('select idx from ' + db_acticle + " where bookId = %s", (bookId,))
+    conn.commit()
+
+    results = csor.fetchall()
+    for capObj in results:
+        idxs.add(capObj[0])
+
+    return idxs
 
 def delBookById(bookId):
     conn2, csor2 = getDushuConnCsor()

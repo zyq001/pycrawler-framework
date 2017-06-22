@@ -13,7 +13,7 @@ from Config import EADHOST, EADPASSWD, OSSINTERNALENDPOINT, OSSUSER, OSSPASSWD, 
 # from framework.htmlParser import getSoupByStr
 # from networkHelper import getContentWithUA
 from app.baseCrawler import BaseCrawler
-from dao.dushuService import insertCapWithCapObj
+from dao.dushuService import insertCapWithCapObj, getCapIdxsByBookId
 from exception.InputException import InputException
 from shuqi import insertBookWithConn
 from util.UUIDUtils import getCapDigest
@@ -59,97 +59,52 @@ def upload2Bucket(id, obj):
     except Exception as e:
         print id, ' upload faild ',e
 
+
 def handleByMTID(mid, allowUpdate = True):
-    baseUrl = MianFeiTXTBaseUrl
-    capListBaseUrl = CapsBaseUrl + str(mid) \
-                     +'&pageindex=1&pagesize=100000000'
-    capContentBaseUrl = '%s' % MianFeiContentBaseUrl  #2&contentid=171117'
-    bookDetailUrl = MianFeiTXTBookDetailUrl
-    url = baseUrl + str(mid);
-    baseInfoContent = getContentWithUA(url,ua)
-    if not baseInfoContent:
-        baseInfoContent = getContentWithUA(url, ua)
-    baseObj = json.loads(baseInfoContent)
-
-    baseData = baseObj['data']
-    author = baseData['author']
-    title = baseData['name']
-    coverUrl = baseData['coverUrl']
-    contentUrl = baseData['contentUrl']
-    count = baseData['count']
-    if count < MINCHAPNUM:
-        print 'chapNum too small, skip'
-        return
-    isOver = baseData['isOver']
-    BookType = '连载'
-    if isOver == 1:
-        BookType = '完结'
-
-    bookDetailHtml = getContentWithUA(bookDetailUrl + str(mid),ua)
-    bookDetailSoup = getSoupByStr(bookDetailHtml)
-    bookDesc = bookDetailSoup.select_one('#J-desc').get_text().replace('\n','').replace('\t\t','\t')
-
-    bookLabels = []
-    for span in  bookDetailSoup.select('#J-lables-items span'):
-        bookLabels.append(span.get_text())
-
-    bookObj = dict()
-    bookObj['subtitle'] = bookDesc
-    bookObj['source'] = "" + str(mid)
-    bookObj['rawUrl'] = url
-    bookObj['title'] = title
-    bookObj['chapterNum'] = count
-    bookObj['imgUrl'] = coverUrl
-    bookObj['author'] = author
-    bookObj['size'] = count * 1000
-    bookObj['category'] = ''
-    if len(bookLabels) > 0:
-        bookObj['category'] = bookLabels[0]
-
-    bookObj['type'] = ''
-    if len(bookLabels) > 0:
-        bookObj['type'] = bookLabels[0]
-    if len(bookLabels) > 1:
-        bookObj['type'] = bookLabels[1]
-
-
-    bookObj['bookType'] = BookType
-
-    bookObj['typeCode'] = 0
-    bookObj['categoryCode'] = 0
-
-    bookObj['viewNum'] = random.randint(500000,1000000)
-
-    # m2 = hashlib.md5()
-    # forDigest = title + u'#' + author
-    # m2.update(forDigest.encode('utf-8'))
-    # digest = m2.hexdigest()
-    #
-    # bookObj['digest'] = digest
-
-    bookObj = insertBookWithConn(bookObj, allowUpdate)
+    # baseUrl = MianFeiTXTBaseUrl
+    # capListBaseUrl = CapsBaseUrl + str(mid) \
+    #                  +'&pageindex=1&pagesize=100000000'
+    # capContentBaseUrl = '%s' % MianFeiContentBaseUrl  #2&contentid=171117'
+    # bookDetailUrl = MianFeiTXTBookDetailUrl
+    bookObj, count = getBookObj(allowUpdate, mid)
 
     if not bookObj:
         return
+
+    handleCapsByBookObj(allowUpdate, bookObj, count, mid)
+
+
+def handleCapsByBookObj(allowUpdate, bookObj, count, mid):
+    capIdxs = set()
+    if allowUpdate:
+        capIdxs = getCapIdxsByBookId(bookObj['id'])  # 已在库中的章节下标
 
     # myBookId = bookObj['id']
     #
     for cid in range(1, count + 1):
 
-        capContentUrl = capContentBaseUrl + str(cid) + '&contentid=' + str(mid)
-        capContent = getContentWithUA(capContentUrl,ua)
+        if allowUpdate:
+            if cid in capIdxs:
+                continue  # 该章节已在库中，跳过
+
+        capContentUrl = MianFeiContentBaseUrl + str(cid) + '&contentid=' + str(mid)
+        capContent = getContentWithUA(capContentUrl, ua)
         if not capContent:
             capContent = getContentWithUA(capContentUrl, ua)
-        capListJsonObj = json.loads(capContent)
-        if not (capListJsonObj['status'] == 1000 and capListJsonObj['message'] == u'成功'):
+        # capContent = capContent.replace(r'\r', '').replace(r'\n', '')
+        capListJsonObj = json.loads(capContent, strict=False)
+        if not (capListJsonObj['status'] == 1000):
             capListJsonObj = json.loads(capContent)
             if not (capListJsonObj['status'] == 1000 and capListJsonObj['message'] == u'成功'):
                 continue
+
         capObj = dict()
         orgContent = capListJsonObj['data']['chapter']
         contentSoup = getSoupByStr(orgContent)
         del contentSoup.body['style']
-        content = unicode(contentSoup.body).replace(u'<body>', '').replace(u'</body>', '').replace(u'\n\n', u'\n').replace(u'<br><br>', u'<br>').replace(u'<br\><br\>', u'<br\>')
+        content = unicode(contentSoup.body).replace(u'<body>', '').replace(u'</body>', '').replace(u'\n\n',
+                                                                                                   u'\n').replace(
+            u'<br><br>', u'<br>').replace(u'<br\><br\>', u'<br\>')
         capObj['content'] = content
         capObj['title'] = unicode(contentSoup.title.get_text())
         capObj['rawUrl'] = capContentUrl
@@ -168,6 +123,57 @@ def handleByMTID(mid, allowUpdate = True):
         if not capId:
             continue
         upload2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
+
+
+def getBookObj(allowUpdate, mid):
+    url = MianFeiTXTBaseUrl + str(mid)
+    baseInfoContent = getContentWithUA(url, ua)
+    if not baseInfoContent:
+        baseInfoContent = getContentWithUA(url, ua)
+    baseObj = json.loads(baseInfoContent)
+    baseData = baseObj['data']
+    author = baseData['author']
+    title = baseData['name']
+    coverUrl = baseData['coverUrl']
+    contentUrl = baseData['contentUrl']
+    count = baseData['count']
+    if count < MINCHAPNUM:
+        print 'chapNum too small, skip'
+        return None, None
+    isOver = baseData['isOver']
+    BookType = '连载'
+    if isOver == 1:
+        BookType = '完结'
+    bookDetailHtml = getContentWithUA(MianFeiTXTBookDetailUrl + str(mid), ua)
+    bookDetailSoup = getSoupByStr(bookDetailHtml)
+    bookDesc = bookDetailSoup.select_one('#J-desc').get_text().replace('\n', '').replace('\t\t', '\t')
+    bookLabels = []
+    for span in bookDetailSoup.select('#J-lables-items span'):
+        bookLabels.append(span.get_text())
+    bookObj = dict()
+    bookObj['subtitle'] = bookDesc
+    bookObj['source'] = "" + str(mid)
+    bookObj['rawUrl'] = url
+    bookObj['title'] = title
+    bookObj['chapterNum'] = count
+    bookObj['imgUrl'] = coverUrl
+    bookObj['author'] = author
+    bookObj['size'] = count * 1000
+    bookObj['category'] = ''
+    if len(bookLabels) > 0:
+        bookObj['category'] = bookLabels[0]
+    bookObj['type'] = ''
+    if len(bookLabels) > 0:
+        bookObj['type'] = bookLabels[0]
+    if len(bookLabels) > 1:
+        bookObj['type'] = bookLabels[1]
+    bookObj['bookType'] = BookType
+    bookObj['typeCode'] = 0
+    bookObj['categoryCode'] = 0
+    bookObj['viewNum'] = random.randint(500000, 1000000)
+    bookObj = insertBookWithConn(bookObj, allowUpdate)
+    return bookObj, count
+
 
 def mianfeiSearch(name, top = 5):
     url = MianFeiTXTSearchBaseUrl + quote(name.encode('utf-8'))

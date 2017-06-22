@@ -73,7 +73,7 @@ def getDushuConnCsor():
 
     global dushuPool
     if not dushuPool:
-        dushuPool  = PooledDB(creator=MySQLdb, mincached=1, maxcached=3,
+        dushuPool  = PooledDB(creator=MySQLdb, mincached=1, maxcached=5,
                      host=EADHOST, port=3306, user="ead",
                      # host=NODE1IP, port=44408, user="crawler",
                      # host="10.24.161.94", port=44408, user="crawler",
@@ -93,7 +93,7 @@ def getTmathConnCsor():
 
     from DBUtils.PooledDB import PooledDB
 
-    pool2 = PooledDB(creator=MySQLdb, mincached=1, maxcached=3,
+    pool2 = PooledDB(creator=MySQLdb, mincached=1, maxcached=5,
                      host=EADHOST, port=3306, user="ead",
                      # host=NODE1IP, port=44408, user="crawler",
                      # host="10.24.161.94", port=44408, user="crawler",

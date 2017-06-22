@@ -44,6 +44,8 @@ def getContentWithUA(url, ua):
                     r.encoding = 'gbk'
                 else:
                     r.encoding = r.apparent_encoding
+                if r.encoding is None:
+                    r.encoding = 'utf-8'
             return r.text
     except Exception as e:
         print e
