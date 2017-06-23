@@ -21,6 +21,9 @@ class SourceIdBloom:
         ss = csor.fetchall()
         [self.ids.add(sid[0]) for sid in ss]
 
+        csor.close()
+        conn.close()
+
     def contains(self, iid):
         return iid in self.ids
 
