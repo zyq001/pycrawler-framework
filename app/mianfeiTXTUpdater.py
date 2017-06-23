@@ -42,8 +42,10 @@ def mianfeiUpdateById(dbid):
 
 class MianFeiTXTUpdater(BaseCrawler):
 
-    def init(self, data = None):
+    def __init__(self):
         self.bookId = None
+
+    def init(self, data = None):
         if data and isinstance(data, dict) and data.has_key('bookId'):
             self.bookId = data['bookId']
 

@@ -146,11 +146,11 @@ def shuqiTest():
 
 
 if __name__ == '__main__':
-    crawlManager.crawlers['ershoufang'] = Ershoufang()
-    crawlManager.crawlers['shuqiById'] = ShuqiCrawler()
-    crawlManager.crawlers['shuqiFilder'] = ShuqiFilder()
-    crawlManager.crawlers['mianFeiTXT'] = MianFeiTXTCrawler()
-    crawlManager.crawlers['mianFeiTXTUpdater'] = MianFeiTXTUpdater()
+    crawlManager.crawlers['ershoufang'] = Ershoufang
+    crawlManager.crawlers['shuqiById'] = ShuqiCrawler
+    crawlManager.crawlers['shuqiFilder'] = ShuqiFilder
+    crawlManager.crawlers['mianFeiTXT'] = MianFeiTXTCrawler
+    crawlManager.crawlers['mianFeiTXTUpdater'] = MianFeiTXTUpdater
     webApp = WebServer()
     webApp.run(port=10008)
     # manager = Manager()

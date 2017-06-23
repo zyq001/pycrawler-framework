@@ -96,7 +96,7 @@ class SimpleCrawler:
                 response['msg'] = 'no crawler name!'
                 return response
 
-            crawler = manager.crawlers[params['crawlerName']]
+            crawler = manager.crawlers[params['crawlerName']]() #注意最后的小括号，是利用元类创建一个新的实例
 
             if params['data']:
                 crawler.init(params['data'])
