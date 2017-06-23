@@ -66,6 +66,7 @@ class Search:
 
         except Exception as e:
             response['msg'] = unicode(e)
+            response['code'] = 500
 
         response['data'] = respData
         return json.dumps(response)
@@ -104,8 +105,9 @@ class SimpleCrawler:
             task.start()
         except Exception as e:
             response['msg'] = unicode(e)
+            response['code'] = 500
 
-        return response
+        return json.dumps(response)
 
 class WebServer:
 

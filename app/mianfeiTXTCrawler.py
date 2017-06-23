@@ -74,14 +74,15 @@ def handleByMTID(mid, allowUpdate = True):
     handleCapsByBookObj(allowUpdate, bookObj, count, mid)
 
 
-def handleCapsByBookObj(allowUpdate, bookObj, count, mid):
+def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
     capIdxs = set()
     if allowUpdate:
         capIdxs = getCapIdxsByBookId(bookObj['id'])  # 已在库中的章节下标
 
     # myBookId = bookObj['id']
     #
-    for cid in range(1, count + 1):
+    resIdx = count
+    for cid in range(startCapIdx, count + 1):
         try:
 
             if allowUpdate:
@@ -97,6 +98,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid):
             if not (capListJsonObj['status'] == 1000):
                 capListJsonObj = json.loads(capContent)
                 if not (capListJsonObj['status'] == 1000 and capListJsonObj['message'] == u'成功'):
+                    resIdx = min(cid, resIdx)
                     continue
 
             capObj = dict()
@@ -104,6 +106,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid):
             contentSoup = getSoupByStr(orgContent)
             if not contentSoup or '' == orgContent or len(orgContent) < 1:
                 print 'chap content null ,skip, capId:', str(cid), ' mid: ',str(mid)
+                resIdx = min(cid, resIdx)
                 continue
             if contentSoup.body['style']:
                 del contentSoup.body['style']
@@ -131,9 +134,17 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid):
 
         except Exception as e:
             print 'crawl', str(mid), ' cap ', str(cid), ' exception: ', str(e)
-
+            resIdx = min(cid, resIdx)
+    return resIdx
 
 def getBookObj(allowUpdate, mid):
+    bookObj, count = crawlCurrentBookObj(mid)
+
+    bookObj = insertBookWithConn(bookObj, allowUpdate)
+    return bookObj, count
+
+
+def crawlCurrentBookObj(mid):
     url = MianFeiTXTBaseUrl + str(mid)
     baseInfoContent = getContentWithUA(url, ua)
     if not baseInfoContent:
@@ -147,7 +158,7 @@ def getBookObj(allowUpdate, mid):
     count = baseData['count']
     if count < MINCHAPNUM:
         print 'chapNum too small, skip'
-        return None, None
+        # return None, None
     isOver = baseData['isOver']
     BookType = '连载'
     if isOver == 1:
@@ -179,7 +190,6 @@ def getBookObj(allowUpdate, mid):
     bookObj['typeCode'] = 0
     bookObj['categoryCode'] = 0
     bookObj['viewNum'] = random.randint(500000, 1000000)
-    bookObj = insertBookWithConn(bookObj, allowUpdate)
     return bookObj, count
 
 

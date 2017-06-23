@@ -12,6 +12,8 @@ import re
 
 import time
 
+import MySQLdb
+
 from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
 from parse.easouParser import getAndParse
@@ -21,6 +23,21 @@ from util.pyBloomHelper import getBloom, dumpBloomToFile
 db_dushu = 'cn_dushu_book'
 db_acticle = 'cn_dushu_acticle'
 
+def getBookObjById(dbid):
+    '''
+    更加库中主键id获取book对象
+    :param dbid: 
+    :return: 
+    '''
+    conn,csor = getDushuConnCsor()
+    dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
+    try:
+        dictCsor.execute("select * from " + db_dushu + " where id = %s", (dbid,))
+        conn.commit()
+    except Exception as e:
+        print 'update bookType exception: ',e
+    bookObj = dictCsor.fetchoneDict()
+    return bookObj
 
 def updateBookTypeByRawUrl(type, rawUrl):
     conn, csor = getDushuConnCsor()
@@ -30,6 +47,20 @@ def updateBookTypeByRawUrl(type, rawUrl):
     except Exception as e:
         print 'update bookType exception: ',e
 
+    csor.close()
+    conn.close()
+
+def updateOneFieldByOneField(upFieldName, upFieldValue, byFieldName, byFieldValue):
+    conn, csor = getDushuConnCsor()
+    try:
+        csor.execute("update " + db_dushu + " set " + upFieldName + "  = %s "  + " where " + byFieldName + " = %s",
+                     ( upFieldValue, byFieldValue))
+        conn.commit()
+    except Exception as e:
+        print 'update bookType exception: ',e
+
+    csor.close()
+    conn.close()
 
 def handleWebsiteNoise(begin, end):
 
@@ -127,6 +158,9 @@ def getCapIdxsByBookId(bookId):
         idxs.add(capObj[0])
 
     return idxs
+
+    csor.close()
+    conn.close()
 
 def delBookById(bookId):
     conn2, csor2 = getDushuConnCsor()
