@@ -525,7 +525,7 @@ def searchAndCrawlByName(comName, proxy=None):
     comName = comName.encode('utf-8')
     # baseUrl = 'http://www.qichacha.com/search?key=' + quote(comName)
     # baseUrl = 'http://www.qichacha.com/firm_CN_ea3a783f0c010fc31a2d75c2c9aa9b75'
-    baseUrl = 'http://www.qichacha.com/search?key=%E5%8C%97%E4%BA%AC'
+    baseUrl = 'http://www.qichacha.com/search?key=%E5%B0%8F%E7%B1%B3'
     ua = random.choice(USER_AGENTS)
     htmlContent = getQichachaHtml(baseUrl, noCookie=True)
     if not htmlContent:

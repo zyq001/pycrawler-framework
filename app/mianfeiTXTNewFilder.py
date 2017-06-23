@@ -39,7 +39,7 @@ class MianfeiTXTFilder(BaseCrawler):
     def output(self):
         print 'shuqi filder output'
 
-def findByIdRange(st = 10000, end = 7000000):
+def findByIdRange(st = 50000, end = 7000000):
     '''
         永远运行，从数据库中查询出于连载状态的小说，进行更新
     '''

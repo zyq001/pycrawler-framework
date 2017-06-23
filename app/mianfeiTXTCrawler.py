@@ -6,6 +6,7 @@ import random
 from urllib import quote
 
 import MySQLdb
+import time
 
 from Config import EADHOST, EADPASSWD, OSSINTERNALENDPOINT, OSSUSER, OSSPASSWD, CapsBaseUrl, MianFeiTXTBookDetailUrl, \
     MianFeiContentBaseUrl, MianFeiTXTBaseUrl, MianFeiTXTSearchBaseUrl, MINCHAPNUM
@@ -81,6 +82,11 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
 
     # myBookId = bookObj['id']
     #
+    # startCap = time.time()
+    crawlParseSpent = 0
+    insertCap = 0
+    uploadCap = 0
+    succCapTimes = 0
     resIdx = count
     for cid in range(startCapIdx, count + 1):
         try:
@@ -88,6 +94,11 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
             if allowUpdate:
                 if cid in capIdxs:
                     continue  # 该章节已在库中，跳过
+                # else:
+                #     startCap = time.time()
+
+            befCrawl = time.time()
+            succCapTimes = succCapTimes + 1
 
             capContentUrl = MianFeiContentBaseUrl + str(cid) + '&contentid=' + str(mid)
             capContent = getContentWithUA(capContentUrl, ua)
@@ -127,20 +138,37 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
 
             capObj['digest'] = digest
 
+            befInsertCap = time.time()
+            crawlParseSpent = crawlParseSpent + (befInsertCap - befCrawl)
+
             capId = insertCapWithCapObj(capObj)
+
+            aftInsertCap = time.time()
+            insertCap = insertCap + (aftInsertCap - befInsertCap)
+
             if not capId:
                 continue
             upload2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
 
+            aftUploadCap = time.time()
+            uploadCap = uploadCap + (aftUploadCap - aftInsertCap)
+
         except Exception as e:
             print 'crawl', str(mid), ' cap ', str(cid), ' exception: ', str(e)
             resIdx = min(cid, resIdx)
+    print 'crawlParse avg: ', str(float(crawlParseSpent) / float(succCapTimes)),\
+        ' insert avg: ', str(float(insertCap) / float(succCapTimes)),\
+        ' upload avg: ', str(float(uploadCap) / float(succCapTimes))
     return resIdx
 
 def getBookObj(allowUpdate, mid):
+    befBookObj = time.time()
     bookObj, count = crawlCurrentBookObj(mid)
+    aftBookObj = time.time()
 
     bookObj = insertBookWithConn(bookObj, allowUpdate)
+    # aftInsertBookObj = time.time()
+    print 'crawl book spent', str(aftBookObj - befBookObj), ' secs; insert spent ', str(time.time() - aftBookObj)
     return bookObj, count
 
 
