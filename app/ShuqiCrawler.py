@@ -23,9 +23,11 @@ class ShuqiCrawler(BaseCrawler):
             raise InputException("requried field 'id' in data")
 
         self.sid = data['id']
+        self.data = data
 
     def crawl(self):
         print 'shuqi init'
+
         start(self.sid)
 
     def output(self):

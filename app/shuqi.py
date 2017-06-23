@@ -21,7 +21,7 @@ from Config import EADHOST, EADPASSWD, bloomDumpCapsName, MINCHAPNUM
 from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
 from dao.dushuService import getExistsCapsRawUrlId, insertCapWithCapObj2, insertCapWithCapObj, \
-    loadExistsSQId, delBookById, insertBookWithConn
+    loadExistsSQId, delBookById, insertBookWithConn, getCapIdxsByBookId
 from local.shuqi.shuqiLocal import loadShuQSeqC, loadShuQC
 from util.UUIDUtils import getBookDigest, getCapDigest
 from util.networkHelper import getContent, getContentWithUA
@@ -130,7 +130,7 @@ def sizeStr2Int(size):
         print '计算书的大小出错',e
     return int(carry * count)
 
-def handleOneBook(id,shuqCategory):
+def handleOneBook(id,shuqCategory, allowUpdate=True):
 
     # shuqCategory = loadShuQC()
 
@@ -149,7 +149,7 @@ def handleOneBook(id,shuqCategory):
     gBookDict[digest] = bookObj
 
 
-    bookObj = insertBookWithConn(bookObj)
+    bookObj = insertBookWithConn(bookObj, allowUpdate)
 
     return bookObj
 
@@ -381,7 +381,7 @@ def getCapContentObj(bookId, capId,mysqlBKid):
 
 
 
-def start(bookId, shuqCategory2 = None):
+def start(bookId, shuqCategory2 = None , allowUpdate = True):
 
 
     if not shuqCategory2:
@@ -389,7 +389,7 @@ def start(bookId, shuqCategory2 = None):
         shuqCategory2 = shuqCategory
 
     global donedegest
-    capObjList = getCapObjListByBookId(bookId, shuqCategory2)
+    capObjList = getCapObjListByBookId(bookId, shuqCategory2, allowUpdate)
     if not capObjList:
         print 'no capObjList, ',bookId
         return
@@ -403,16 +403,23 @@ def start(bookId, shuqCategory2 = None):
     # existsCaps = getExistsCaps(bookObj['id'])
 
 
-def getCapObjListByBookId(bookId,shuqCategory2):
+def getCapObjListByBookId(bookId,shuqCategory2, allowUpdate = True):
 
-    bookObj = handleOneBook(bookId,shuqCategory2)
+    bookObj = handleOneBook(bookId,shuqCategory2, allowUpdate)
     if (not bookObj ) or not  bookObj.has_key('id'):
         print 'book null', bookId
         return
     capList = getShuqiCapList(bookId)
     capObjList = []
+
+    capIdxs = set()
+    if allowUpdate:
+        capIdxs = getCapIdxsByBookId(bookObj['id'])  # 已在库中的章节下标
+
     global donedegest
     for j in range(0, len(capList)):
+        if j in capIdxs:
+            continue
         capId = capList[j]
         capObj = getCapContentObj(bookId, capId, bookObj['id'])
         if not capObj:
