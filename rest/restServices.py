@@ -54,7 +54,7 @@ class Search:
                 response['msg'] = 'no crawler name!'
                 return response
             for crawlerName in params['crawlerName'].split(','):
-                crawler = manager.crawlers[crawlerName]
+                crawler = manager.crawlers[crawlerName]()
 
                 searchResult = crawler.search(params['name'], params['top'])
                 if params['andCrawl']:
