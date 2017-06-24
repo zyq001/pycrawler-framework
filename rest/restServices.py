@@ -7,6 +7,7 @@
 '''
 
 import json
+import traceback
 
 import web
 from dao.ershoufangService import getChartAsStr
@@ -104,7 +105,7 @@ class SimpleCrawler:
             task = Task(crawler, params['crawler_count'], params['output_count'])
             task.start()
         except Exception as e:
-            response['msg'] = unicode(e)
+            response['msg'] = traceback.format_exc()
             response['code'] = 500
 
         return json.dumps(response)

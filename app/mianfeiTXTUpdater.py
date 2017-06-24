@@ -3,7 +3,7 @@
 from app.baseCrawler import BaseCrawler
 from app.mianfeiTXTCrawler import crawlCurrentBookObj, handleCapsByBookObj
 from dao.dushuMianFeiTXTService import getMianAllBookObjs
-from dao.dushuService import updateOneFieldByOneField, getBookObjById
+from dao.dushuService import updateOneFieldByOneField, getBookObjById, updateBoostWithUpdateTime
 from exception import InputException
 
 
@@ -20,11 +20,13 @@ def mianfeiUpdateByBookObj(bookObj):
     if newChapNum > bookObj['chapterNum']:
         resIdx = handleCapsByBookObj(allowUpdate=True, bookObj=bookObj, count=newBookObj['chapterNum']
                                      , mid=mid, startCapIdx=bookObj['chapterNum'])
-        updateOneFieldByOneField('chapterNum', resIdx, 'id', bookObj['id'])
-        print newBookObj['title'].encode('utf-8') + ' update ' + str(resIdx - bookObj['chapterNum']) + ' chaps'
-        if '连载' != newBookObj['bookType']:
-            updateOneFieldByOneField('bookType', newBookObj['bookType'], 'id', bookObj['id'])
-            print newBookObj['title'].encode('utf-8') + newBookObj['bookType']
+        if resIdx > bookObj['chapterNum']:
+            updateOneFieldByOneField('chapterNum', resIdx, 'id', bookObj['id'])
+            updateBoostWithUpdateTime(bookObj['id'])
+            print newBookObj['title'].encode('utf-8') + ' update ' + str(resIdx - bookObj['chapterNum']) + ' chaps'
+            if '连载' != newBookObj['bookType']:
+                updateOneFieldByOneField('bookType', newBookObj['bookType'], 'id', bookObj['id'])
+                print newBookObj['title'].encode('utf-8') + newBookObj['bookType']
     else:
         print newBookObj['title'].encode('utf-8') + ' no update'
 
@@ -59,5 +61,5 @@ class MianFeiTXTUpdater(BaseCrawler):
 
 
 if __name__ == '__main__':
-    # mianfeiTxtUpdateFromMysql()
-    mianfeiUpdateById(2010194)
+    mianfeiTxtUpdateFromMysql()
+    # mianfeiUpdateById(2010194)

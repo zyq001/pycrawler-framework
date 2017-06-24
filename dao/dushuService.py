@@ -39,6 +39,22 @@ def getBookObjById(dbid):
     bookObj = dictCsor.fetchoneDict()
     return bookObj
 
+def updateBoostWithUpdateTime(dbid):
+    '''
+    更加库中主键id获取book对象
+    :param dbid: 
+    :return: 
+    '''
+    conn,csor = getDushuConnCsor()
+    dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
+    try:
+        dictCsor.execute("update " + db_dushu + " set typeBoost = updateTime where id = %s", (dbid,))
+        conn.commit()
+    except Exception as e:
+        print 'update bookType exception: ',e
+    bookObj = dictCsor.fetchoneDict()
+    return bookObj
+
 def updateBookTypeByRawUrl(type, rawUrl):
     conn, csor = getDushuConnCsor()
     try:

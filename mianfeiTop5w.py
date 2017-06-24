@@ -10,8 +10,6 @@ import time
 
 import requests
 
-from client.shuqiUpdate import updateFromMysql
-from util.timeHelper import getToday
 
 
 if __name__ == '__main__':

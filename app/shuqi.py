@@ -130,11 +130,14 @@ def sizeStr2Int(size):
         print '计算书的大小出错',e
     return int(carry * count)
 
-def handleOneBook(id,shuqCategory, allowUpdate=True):
+def handleOneBook(id,shuqCategory2 = None, allowUpdate=True):
 
+    if not shuqCategory2:
+        global shuqCategory
+        shuqCategory2 = shuqCategory
     # shuqCategory = loadShuQC()
 
-    bookObj, digest = getBookObjFromSQid(id, shuqCategory)
+    bookObj, digest = getBookObjFromSQid(id, shuqCategory2)
 
     if not bookObj or not digest:
         return None
@@ -156,7 +159,18 @@ def handleOneBook(id,shuqCategory, allowUpdate=True):
     # existsCaps = getExistsCaps(bookObj['id'])
 
 
-def getBookObjFromSQid(id, shuqCategory):
+def getBookObjFromSQid(id, shuqCategory2 = None):
+    '''
+    根据书旗的id抓取书的信息
+    :param id: 书旗的id
+    :param shuqCategory2: 类别对照表，可不传 
+    :return: 抓取到的book信息对象和digest
+    '''
+
+    if not shuqCategory2:
+        global shuqCategory
+        shuqCategory2 = shuqCategory
+
     bookInfoAPI = 'http://api.shuqireader.com/reader/bc_cover.php?bookId=' + str(
         id) + '&book=same&book_num=5&bbs=pinglun&bbs_num=8&bbs_rand_num=1&lastchaps=1&ItemCount=3' \
               '&soft_id=1&ver=110817&platform=an&placeid=1007&imei=862953036746111&cellid=13&lac=-1' \
@@ -185,9 +199,9 @@ def getBookObjFromSQid(id, shuqCategory):
     if (not BookType) and (not category) and (not tag) and (not tagId):
         return None,None
     categoryId = 0
-    if shuqCategory.has_key(tag):
-        if shuqCategory[tag]['id'] and len(shuqCategory[tag]['id']) > 0:
-            categoryId = int(shuqCategory[tag]['id'])
+    if shuqCategory2.has_key(tag):
+        if shuqCategory2[tag]['id'] and len(shuqCategory2[tag]['id']) > 0:
+            categoryId = int(shuqCategory2[tag]['id'])
     size = 1
     if root.getiterator('Size') and len(root.getiterator('Size')) > 0:
         strSize = root.getiterator('Size')[0].text
@@ -225,7 +239,7 @@ def getBookObjFromSQid(id, shuqCategory):
     bookObj['firstCid'] = firstCid
     bookObj['viewNum'] = 0
 
-    digest = getBookDigest(author, title)
+    digest = getBookDigest(bookObj,author, title)
     bookObj['digest'] = digest
     return bookObj, digest
 
@@ -388,34 +402,63 @@ def start(bookId, shuqCategory2 = None , allowUpdate = True):
         global shuqCategory
         shuqCategory2 = shuqCategory
 
-    global donedegest
-    capObjList = getCapObjListByBookId(bookId, shuqCategory2, allowUpdate)
-    if not capObjList:
-        print 'no capObjList, ',bookId
+    bookObj = handleOneBook(bookId, shuqCategory2, allowUpdate)
+    if (not bookObj) or not bookObj.has_key('id'):
+        print 'book null', bookId
         return
+
+    crawlCapsWithBookObj(allowUpdate, bookId, bookObj)
+
+
+def crawlCapsWithBookObj(allowUpdate, bookId, bookObj):
+    '''
+    根据book对象处理章节，新增或更新，会判断库中是否已有某章节
+    :param allowUpdate: 是否允许更新
+    :param bookId: shuqi的id
+    :param bookObj: 库中的书信息
+    :return: 
+    '''
+    newChapNum = bookObj['chapterNum']
+
+    global donedegest
+    capObjList = getCapObjsByBookObj(allowUpdate, bookId, bookObj)
+    if not capObjList:
+        print 'no capObjList, ', bookId
+        return None
     for capObj in capObjList:
         capId = insertCapWithCapObj2(capObj)
         donedegest.add(capObj['digest'])
 
         if not capId:
+            newChapNum = min(newChapNum, capObj['idx'] + 1)
             continue
         upload2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
-    # existsCaps = getExistsCaps(bookObj['id'])
+        # existsCaps = getExistsCaps(bookObj['id'])
+    return newChapNum
+
+# def getCapObjListByBookId(bookId,shuqCategory2, allowUpdate = True):
+#
+#     bookObj = handleOneBook(bookId,shuqCategory2, allowUpdate)
+#     if (not bookObj ) or not  bookObj.has_key('id'):
+#         print 'book null', bookId
+#         return
+#
+#     return getCapObjsByBookObj(allowUpdate, bookId, bookObj)
 
 
-def getCapObjListByBookId(bookId,shuqCategory2, allowUpdate = True):
-
-    bookObj = handleOneBook(bookId,shuqCategory2, allowUpdate)
-    if (not bookObj ) or not  bookObj.has_key('id'):
-        print 'book null', bookId
-        return
+def getCapObjsByBookObj(allowUpdate, bookId, bookObj):
+    '''
+    根据book对象获取所有的章节对象，会根据章节下标过滤库中已有章节
+    :param allowUpdate: 是否允许更新
+    :param bookId: shuqi的id
+    :param bookObj: book对象
+    :return: 
+    '''
     capList = getShuqiCapList(bookId)
     capObjList = []
-
     capIdxs = set()
     if allowUpdate:
         capIdxs = getCapIdxsByBookId(bookObj['id'])  # 已在库中的章节下标
-
     global donedegest
     for j in range(0, len(capList)):
         if j in capIdxs:
@@ -423,7 +466,7 @@ def getCapObjListByBookId(bookId,shuqCategory2, allowUpdate = True):
         capId = capList[j]
         capObj = getCapContentObj(bookId, capId, bookObj['id'])
         if not capObj:
-            return
+            continue
         capObj['bookId'] = bookObj['id']
         capObj['source'] = bookObj['source']
         capObj['idx'] = j

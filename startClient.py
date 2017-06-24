@@ -8,7 +8,7 @@
 
 import time
 
-from client.shuqiUpdate import updateFromMysql
+from app.shuqiUpdater import updateFromMysql
 from util.timeHelper import getToday
 
 

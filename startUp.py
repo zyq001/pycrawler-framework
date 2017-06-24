@@ -8,6 +8,7 @@ from app.mianfeiTXTCrawler import MianFeiTXTCrawler
 from app.mianfeiTXTUpdater import MianFeiTXTUpdater
 from app.shuqi import start
 from app.shuqiNewFilder import ShuqiFilder
+from app.shuqiUpdater import ShuqiUpdater
 from dao.dushuService import loadExistsSQId
 from local.shuqi.shuqiLocal import loadShuQC
 from manager.Manager import Manager, crawlManager
@@ -151,6 +152,7 @@ if __name__ == '__main__':
     crawlManager.crawlers['shuqiFilder'] = ShuqiFilder
     crawlManager.crawlers['mianFeiTXT'] = MianFeiTXTCrawler
     crawlManager.crawlers['mianFeiTXTUpdater'] = MianFeiTXTUpdater
+    crawlManager.crawlers['shuqiUpdater'] = ShuqiUpdater
     webApp = WebServer()
     webApp.run(port=10008)
     # manager = Manager()
