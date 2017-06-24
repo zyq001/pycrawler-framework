@@ -14,6 +14,7 @@ from Config import EADHOST, EADPASSWD, OSSINTERNALENDPOINT, OSSUSER, OSSPASSWD, 
 # from framework.htmlParser import getSoupByStr
 # from networkHelper import getContentWithUA
 from app.baseCrawler import BaseCrawler
+from dao.aliyunOss import upload2Bucket
 from dao.dushuService import insertCapWithCapObj, getCapIdxsByBookId
 from exception.InputException import InputException
 from shuqi import insertBookWithConn
@@ -39,26 +40,26 @@ capListAPIDeviceInfo = '&soft_id=1&ver=110817&platform=an&placeid=1007&imei=8629
 # csor2.execute("SET character_set_connection=utf8")
 
 
-def getBucket():
-    import oss2
-
-    # endpoint = OSSINTERNALENDPOINT  # 假设你的Bucket处于杭州区域
-    endpoint = OSSINTERNALENDPOINT  # 假设你的Bucket处于杭州区域
-
-    auth = oss2.Auth(OSSUSER, OSSPASSWD)
-    bucket = oss2.Bucket(auth, endpoint, 'dushu-content')
-
-    return bucket
-
-bucket = getBucket()
-
-def upload2Bucket(id, obj):
-
-    try:
-        bucket.put_object(id, obj)
-        print 'succ upload ',id
-    except Exception as e:
-        print id, ' upload faild ',e
+# def getBucket():
+#     import oss2
+#
+#     # endpoint = OSSINTERNALENDPOINT  # 假设你的Bucket处于杭州区域
+#     endpoint = OSSINTERNALENDPOINT  # 假设你的Bucket处于杭州区域
+#
+#     auth = oss2.Auth(OSSUSER, OSSPASSWD)
+#     bucket = oss2.Bucket(auth, endpoint, 'dushu-content')
+#
+#     return bucket
+#
+# bucket = getBucket()
+#
+# def upload2Bucket(id, obj):
+#
+#     try:
+#         bucket.put_object(id, obj)
+#         # print 'succ upload ',id
+#     except Exception as e:
+#         print id, ' upload faild ',e
 
 
 def handleByMTID(mid, allowUpdate = True):

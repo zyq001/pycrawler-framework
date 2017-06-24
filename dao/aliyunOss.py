@@ -21,6 +21,6 @@ def upload2Bucket(id, obj):
 
     try:
         bucket.put_object(id, obj)
-        print 'succ upload ',id
+        # print 'succ upload ',id
     except Exception as e:
         print id, ' upload faild ',e
