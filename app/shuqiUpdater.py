@@ -13,7 +13,7 @@ from app.baseCrawler import BaseCrawler
 from app.mianFeiFixer import fixUnFinished
 from app.shuqi import getBookObjFromSQid, getCapObjsByBookObj, crawlCapsWithBookObj
 from dao.connFactory import getDushuConnCsor
-from dao.dushuService import updateOneFieldByOneField, updateBoostWithUpdateTime, getBookObjById
+from dao.dushuService import updateOneFieldByOneField, updateBoostWithUpdateTime, getBookObjById, delBookById
 from dao.dushuShuqiService import getShuqiAllLianZaiBookObjs
 from exception.InputException import InputException
 
@@ -61,11 +61,15 @@ def updateByDbBookId(dbid):
 def updateByBookObj(bookObj):
     source = int(bookObj['source'].replace('shuqi', ''))
     newBookObj, digest = getBookObjFromSQid(source)
+    if not newBookObj:
+        delBookById(bookObj['id'])
+        print 'book has been droped, delete id: ', str(bookObj['id']), ' sid: ', str(source)
+        return
     if newBookObj['chapterNum'] > bookObj['chapterNum']:
         newBookObj['id'] = bookObj['id']
         newChapNum = crawlCapsWithBookObj(bookObj=newBookObj, bookId=source, allowUpdate=True)
 
-        if newChapNum > bookObj['chapterNum']:
+        if newChapNum >= bookObj['chapterNum']:
             updateOneFieldByOneField('chapterNum', newChapNum, 'id', bookObj['id'])
             updateBoostWithUpdateTime(bookObj['id'])
             print newBookObj['title'].encode('utf-8') + ' update ' + str(newChapNum - bookObj['chapterNum']) + ' chaps'
@@ -73,6 +77,8 @@ def updateByBookObj(bookObj):
             if u'连载' != newBookObj['bookType']:
                 updateOneFieldByOneField('bookType', newBookObj['bookType'], 'id', bookObj['id'])
                 print newBookObj['title'].encode('utf-8') + newBookObj['bookType']
+        else:
+            print newBookObj['title'].encode('utf-8') + ' has unexcepted, please check.  didnot update'
     else:
         print newBookObj['title'].encode('utf-8') + ' no update'
 

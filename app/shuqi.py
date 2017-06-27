@@ -423,8 +423,8 @@ def crawlCapsWithBookObj(allowUpdate, bookId, bookObj):
     global donedegest
     capObjList = getCapObjsByBookObj(allowUpdate, bookId, bookObj)
     if not capObjList:
-        print 'no capObjList, ', bookId
-        return None
+        print 'no capObjList, sid: ', bookId
+        return newChapNum
     for capObj in capObjList:
         capId = insertCapWithCapObj2(capObj)
         donedegest.add(capObj['digest'])
