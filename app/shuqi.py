@@ -457,12 +457,12 @@ def getCapObjsByBookObj(allowUpdate, bookId, bookObj):
     capList = getShuqiCapList(bookId)
     capObjList = []
     capIdxs = set()
-    # if allowUpdate:
-    #     capIdxs = getCapIdxsByBookId(bookObj['id'])  # 已在库中的章节下标
+    if allowUpdate:
+        capIdxs = getCapIdxsByBookId(bookObj['id'])  # 已在库中的章节下标
     global donedegest
     for j in range(0, len(capList)):
-        # if j in capIdxs:
-        #     continue
+        if j in capIdxs:
+            continue
         capId = capList[j]
         capObj = getCapContentObj(bookId, capId, bookObj['id'])
         if not capObj:

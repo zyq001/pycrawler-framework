@@ -70,7 +70,7 @@ def updateByBookObj(bookObj):
             updateBoostWithUpdateTime(bookObj['id'])
             print newBookObj['title'].encode('utf-8') + ' update ' + str(newChapNum - bookObj['chapterNum']) + ' chaps'
 
-            if '连载' != newBookObj['bookType']:
+            if u'连载' != newBookObj['bookType']:
                 updateOneFieldByOneField('bookType', newBookObj['bookType'], 'id', bookObj['id'])
                 print newBookObj['title'].encode('utf-8') + newBookObj['bookType']
     else:

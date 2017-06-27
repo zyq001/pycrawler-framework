@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/3.6.2/echarts.min.js"></script>
+</head>
+<body>
+
+<p><b>一. 按源中的id抓取</b></p>
+<p>uri:  <span> /simpleCrawler</span></p>
+<p>  参数：</p>
+<p>crawlerName: shuqiById、mianFeiTXT</p>
+<p>data: <span>对象类型</span><span> 属性有：id</span></p>
+<p>示例：</p>
+<pre>{
+"crawlerName": "shuqiById",
+  "data":{
+	"id":7031591
+  }
+}</pre>
+
+<br>
+<br>
+
+<p><b>二. 数据更新</b></p>
+<p>uri:  <span> /simpleCrawler</span></p>
+<p>  参数：</p>
+<p>crawlerName: shuqiUpdater、mianFeiTXTUpdater</p>
+<p>data: <span>对象类型</span>
+    <span> 可选属性：bookId。不提供则为全库更新</span></p>
+<p>示例：</p>
+<pre>{
+"crawlerName": "mianFeiTXTUpdater",
+  "data":{
+	"bookId":2010194
+  }
+}</pre>
+
+<br>
+<br>
+
+
+<p><b>三. 搜索</b></p>
+<p>uri:  <span> /search</span></p>
+<p>  参数：</p>
+<p>name: 搜索输入（书名、作者名等）</p>
+<p>andCrawl: 是否搜索完就抓取，默认False</p>
+<p>top: <span>取搜索结果的前几个，默认5</span></p>
+<p>crawlerName: <span>指定数据源，默认MianfeiTXT</span></p>
+
+<p>示例：</p>
+<pre>{
+    "name": "大主宰",
+    "andCrawl":true,
+    "top":2,
+    "crawlerName":"mianFeiTXT"
+}</pre>
+
+<br><br>
+
+
+<p><b>三. 新书发现</b></p>
+<p>脚本触发</p>
+
+<div id="main"></div>
+</body>
+</html>

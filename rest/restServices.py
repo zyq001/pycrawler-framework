@@ -23,7 +23,7 @@ urls = (
     '/simpleCrawler', 'SimpleCrawler'
 )
 
-# render = web.template.render('templates/')
+render = web.template.render('template/')
 
 """
 Handles the GET/POST of image url to OCR result string.
@@ -31,13 +31,13 @@ Handles the GET/POST of image url to OCR result string.
 
 class Index:
 
-    def Get(self):
-        return 'hello'
+    def GET(self):
+        return render.index()
     def POST(self):
         return 'hello'
 
 class Search:
-    def Get(self):
+    def GET(self):
         return self.POST()
 
     def POST(self):

@@ -69,7 +69,7 @@ def updateBookTypeByRawUrl(type, rawUrl):
 def updateOneFieldByOneField(upFieldName, upFieldValue, byFieldName, byFieldValue):
     conn, csor = getDushuConnCsor()
     try:
-        csor.execute("update " + db_dushu + " set " + upFieldName + "  = %s "  + " where " + byFieldName + " = %s",
+        csor.execute("update " + db_dushu + " set " + upFieldName + "  = %s, updateTime =  " + str(int(time.time()))  + " where " + byFieldName + " = %s",
                      ( upFieldValue, byFieldValue))
         conn.commit()
     except Exception as e:
