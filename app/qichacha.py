@@ -45,7 +45,7 @@ csor = None
 
 
 
-def getQichachaHtml(url, proxy=None, ua = None, noCookie = False):
+def getQichachaHtml(url, proxy=None, ua = None, noCookie = False, cookies = None):
 
     if not ua:
         ua  = random.choice(USER_AGENTS)
@@ -54,22 +54,22 @@ def getQichachaHtml(url, proxy=None, ua = None, noCookie = False):
         'user-agent': ua
         ,'Referer': 'http://www.qichacha.com/gongsi_area.shtml?prov=BJ&p=5'
     }
-
-    cookies = {
-        'PHPSESSID':'3lts0tb4hmk22n5lr1bplpvlk6'
-    #     ,'gr_user_id': '58537bdf-2eb9-4157-8fc9-e3beee9230f4'
-    # ,'_uab_collina': '147877694825876541041818'
-    #     ,'Hm_lvt_3456bee468c83cc63fb5147f119f1075': '1484130443,1484284815'
-    # ,'UM_distinctid': '15aa3129af8446-0224e9475797af-1d396853-13c680-15aa3129af9329'
-    # ,'acw_tc': 'AQAAALCheT3l7QgA4fPycpQ7zt8Lk+II'
-    # ,'_umdata':'65F7F3A2F63DF020BD5BAEC17F01818589001A13C41F0EEA125647CCFC3B7BE56BC852246E45A6C6CD43AD3E795C914C377D710B991EB11AFFD6B8DFEDDEDE1F',
-    # 'hasShow':'1'
-    #     ,'CNZZDATA1254842228': '587110843-1492744708-null%7C1498032091'
-    # ,'gr_session_id_9c1eb7420511f8b2':'6aa0ea5a-83fc-4e27-8fbe-42c710559eee'
-    }
+    if not cookies:
+        cookies = {
+            'PHPSESSID':'3lts0tb4hmk22n5lr1bplpvlk6'
+        #     ,'gr_user_id': '58537bdf-2eb9-4157-8fc9-e3beee9230f4'
+        # ,'_uab_collina': '147877694825876541041818'
+        #     ,'Hm_lvt_3456bee468c83cc63fb5147f119f1075': '1484130443,1484284815'
+        # ,'UM_distinctid': '15aa3129af8446-0224e9475797af-1d396853-13c680-15aa3129af9329'
+        # ,'acw_tc': 'AQAAALCheT3l7QgA4fPycpQ7zt8Lk+II'
+        # ,'_umdata':'65F7F3A2F63DF020BD5BAEC17F01818589001A13C41F0EEA125647CCFC3B7BE56BC852246E45A6C6CD43AD3E795C914C377D710B991EB11AFFD6B8DFEDDEDE1F',
+        # 'hasShow':'1'
+        #     ,'CNZZDATA1254842228': '587110843-1492744708-null%7C1498032091'
+        # ,'gr_session_id_9c1eb7420511f8b2':'6aa0ea5a-83fc-4e27-8fbe-42c710559eee'
+        }
 
     if not proxy:
-        proxy = getProxy()
+        proxy = getProxy(renew=True)
 
     s = requests.Session()
     try:
@@ -459,7 +459,7 @@ def fromInvestInt():
     global conn,csor
     if not conn or (not csor):
         conn,csor = getComConnCsor()
-    csor.execute('select id,companyName from com_base_copy where companyName is not Null  limit 10;')
+    csor.execute("select id,companyName from com_base_copy where id = '6bc7e7ccdb755391651316a0227c059b' and companyName is not Null  limit 10;")
     result = csor.fetchall()
     for comInfo in result:
         uid = comInfo[0]
@@ -470,7 +470,7 @@ def fromInvestInt():
         getInvestListByNameId(uid, cName)
 
 def getInvestListByNameId(quid, qCname):
-    cookies = {'PHPSESSID': 'fohe14r77mbo352g3hofivo9k3'}
+    cookies = {'PHPSESSID': '5dplss3psrev57ad4jk637jph4'}
 
 
     if quid in investBloom:
@@ -478,10 +478,11 @@ def getInvestListByNameId(quid, qCname):
         return None
 
     url = 'http://www.qichacha.com/company_getinfos?unique=' + quid + '&companyname=' + quote(qCname.encode('utf-8')) +  '&tab=touzi'
-    url = 'http://www.qichacha.com/company_touzi?unique=' + quid + '&companyname=' + quote(qCname.encode('utf-8'))
+    # url = 'http://www.qichacha.com/company_touzi?unique=' + quid + '&companyname=' + quote(qCname.encode('utf-8'))
     resList = []
+    while 1:
+        htmlContent = getQichachaHtml(url, cookies=cookies)
 
-    htmlContent = getContentWithUA(url, ua, cookie=cookies)
     soup = getSoupByStrEncode(htmlContent)
 
     for uidTag in soup.select_one('.list-group-item'):
@@ -598,7 +599,7 @@ if __name__ == '__main__':
     # qichachaFromIndustry(f,t)
 
     #从投资接口开始
-    # fromInvestInt()
+    fromInvestInt()
 
     #搜索页面
     # while 1:

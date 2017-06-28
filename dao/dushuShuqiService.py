@@ -38,26 +38,27 @@ def getShuqiAllLianZaiBookObjs():
     conn.commit()
     bookObjs = dictCsor.fetchallDict()
 
-    # bookObjs = []
-    # for book in results:
-    #     bookId = book[0]
-    #     rawUrl = book[1]
-    #     chapterNum = book[2]
-    #     mid = book[3]
-    #     if 'mianfeiTXT' in mid:
-    #         mid = mid.replace('mianfeiTXT', '')
-    #     bookDigest = book[4]
-    #
-    #     bookObj = dict()
-    #     bookObj['id'] = bookId
-    #     bookObj['source'] = mid
-    #     bookObj['digest'] = bookDigest
-    #     bookObj['rawUrl'] = rawUrl
-    #     bookObj['rawUrl'] = rawUrl
-    #     bookObj['chapterNum'] = chapterNum
-    #
-    #     bookObjs.append(bookObj)
+    csor.close()
+    conn.close()
+
     return bookObjs
+
+def getShuqiAllBookObjs():
+    '''
+    获取所有免费TXT的主键和相关信息：id,rawUrl,chapterNum,source,digest
+    :return bookObjs即： [bookObj{"id":"1",,}]: 
+    '''
+
+    conn, csor = getDushuConnCsor()
+    dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
+
+    dictCsor.execute("SELECT id,rawUrl,chapterNum,source,digest from cn_dushu_book where operateStatus = 0  "
+                 " and rawUrl like 'http://api.shuqireader.com/reader/bc_cover.php%' limit 200;")
+    conn.commit()
+    bookObjs = dictCsor.fetchallDict()
 
     csor.close()
     conn.close()
+
+    return bookObjs
+

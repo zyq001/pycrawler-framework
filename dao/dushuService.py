@@ -178,6 +178,27 @@ def getCapIdxsByBookId(bookId):
     csor.close()
     conn.close()
 
+
+
+def delCapById(cid):
+    conn2, csor2 = getDushuConnCsor()
+
+    try:
+        csor2.execute("delete from " + db_acticle + " where id = %s", (cid, ))
+        conn2.commit()
+    except Exception as e:
+        #     # 发生错误时回滚
+        print 'mysql ex: ', e
+        if conn2:
+            try:
+                conn2.rollback()
+            except Exception as ee:
+                print 'rollback error : ', str(cid)
+
+    csor2.close()
+    conn2.close()
+
+
 def delBookById(bookId):
     conn2, csor2 = getDushuConnCsor()
 
@@ -198,9 +219,9 @@ def delBookById(bookId):
 
 
     bookId = int(bookId)
-    sql = "delete from " + db_dushu + " where id = %d" % bookId
+    # sql = "delete from " + db_dushu + " where id = %d" % bookId
     try:
-        csor2.execute(sql)
+        csor2.execute("delete from " + db_dushu + " where id = %s", (bookId, ))
         conn2.commit()
     except Exception as e:
         #     # 发生错误时回滚
