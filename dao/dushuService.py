@@ -181,6 +181,22 @@ def getCapIdxsByBookId(bookId):
 def delBookById(bookId):
     conn2, csor2 = getDushuConnCsor()
 
+    #将删除的书记录到deleted_ids表中
+    csor2.execute('select rawUrl,source from ' + db_dushu + ' where id = %s', (bookId,))
+    conn2.commit()
+    bookObj = csor2.fetchone()
+    if not bookObj:
+        return
+    rawUrl = bookObj[0]
+    source = bookObj[1].replace('shuqi', '')
+    if 'shuqireader' in rawUrl:
+        csor2.execute('insert into shuqi_deleted_ids (id, sid) VALUEs (%s, %s)', (bookId, source))
+        conn2.commit()
+    elif 'yingyangcan' in rawUrl:
+        csor2.execute('insert into mianfei_deleted_ids (id, mid) VALUEs (%s, %s)', (bookId, source))
+        conn2.commit()
+
+
     bookId = int(bookId)
     sql = "delete from " + db_dushu + " where id = %d" % bookId
     try:
@@ -370,3 +386,6 @@ def insertCapWithCapObj(capObj, conn2 = None, csor2 = None):
 
     csor2.close()
     conn2.close()
+
+if __name__ == '__main__':
+    delBookById(227921)
