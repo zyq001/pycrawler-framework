@@ -37,6 +37,8 @@ def getBookObjById(dbid):
     except Exception as e:
         print 'update bookType exception: ',e
     bookObj = dictCsor.fetchoneDict()
+    csor.close()
+    conn.close()
     return bookObj
 
 def updateBoostWithUpdateTime(dbid):
@@ -53,6 +55,8 @@ def updateBoostWithUpdateTime(dbid):
     except Exception as e:
         print 'update bookType exception: ',e
     bookObj = dictCsor.fetchoneDict()
+    csor.close()
+    conn.close()
     return bookObj
 
 def updateBookTypeByRawUrl(type, rawUrl):
@@ -172,13 +176,10 @@ def getCapIdxsByBookId(bookId):
     results = csor.fetchall()
     for capObj in results:
         idxs.add(capObj[0])
-
-    return idxs
-
     csor.close()
     conn.close()
 
-
+    return idxs
 
 def delCapById(cid):
     conn2, csor2 = getDushuConnCsor()
