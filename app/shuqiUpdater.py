@@ -76,7 +76,7 @@ def updateByBookObj(bookObj):
 
             if u'连载' != newBookObj['bookType']:
                 updateOneFieldByOneField('bookType', newBookObj['bookType'], 'id', bookObj['id'])
-                print newBookObj['title'].encode('utf-8') + newBookObj['bookType']
+                print newBookObj['title'].encode('utf-8') + newBookObj['bookType'].encode('utf-8')
         else:
             print newBookObj['title'].encode('utf-8') + ' has unexcepted, please check.  didnot update'
     else:
@@ -102,5 +102,5 @@ class ShuqiUpdater(BaseCrawler):
 
 
 if __name__ == '__main__':
-    fixUnFinished()
-
+    # fixUnFinished()
+    updateFromMysql()
