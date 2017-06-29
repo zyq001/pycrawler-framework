@@ -192,7 +192,7 @@ def dealUIDsBySoup(conn, csor, pageCount, pageSoup, prov):
     for uidTag in uidList:
         try:
             if not uidTag.has_attr('href'):
-                myLogging.error('no com Tag, skip %s page: %s; tag: ', prov, pageCount,  uidTag
+                myLogging.error('no com Tag, skip %s page: %s; tag: %s', prov, pageCount,  uidTag)
                 # continue
                 return
             prv = None
