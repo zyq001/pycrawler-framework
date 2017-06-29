@@ -491,7 +491,7 @@ def getCapObjsByBookObj(allowUpdate, bookId, bookObj):
                 lastNormalChapObj = getChapObjByBookIdChapTitle(bookObj['id'],lastTitle)
                 if lastNormalChapObj:
                     lastIdx = lastNormalChapObj['idx']
-                    myLogging.error('deleted chaps after idx: %s, bookId:', lastIdx, bookObj['id'])
+                    myLogging.error('deleted chaps after idx: %s, bookId: %s', lastIdx, bookObj['id'])
                     #删除章节表中所有大于此idx的
                     deleteChapsLargerThanIdx(bookObj['id'], lastIdx )
 

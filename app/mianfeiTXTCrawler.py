@@ -161,9 +161,9 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
             resIdx = min(cid, resIdx)
     if succCapTimes > 1:
         succCapTimes = succCapTimes - 1
-    myLogging.info( 'crawlParse avg: ', str(float(crawlParseSpent) / float(succCapTimes)),\
-        ' insert avg: ', str(float(insertCap) / float(succCapTimes)),\
-        ' upload avg: ', str(float(uploadCap) / float(succCapTimes)))
+    myLogging.info( 'crawlParse avg: ' + str(float(crawlParseSpent) / float(succCapTimes)) + \
+        ' insert avg: ' + str(float(insertCap) / float(succCapTimes)) + \
+        ' upload avg: ' + str(float(uploadCap) / float(succCapTimes)))
     return resIdx
 
 def getBookObj(allowUpdate, mid):
@@ -225,11 +225,12 @@ def crawlCurrentBookObj(mid):
     bookObj['viewNum'] = random.randint(500000, 1000000)
 
 #获取最新章节下标，作为另一个判断更新的条件
+    bookObj['latestCapIndex'] = 0
     try:
 
         capExamples = bookDetailSoup.select('.J-category-li')
-        if capExamples and len(capExamples) > 0:
-            bookObj['latestCapIndex'] = int(capExamples[len(capExamples) - 1]['id'])
+        if capExamples and len(capExamples) > 2:
+            bookObj['latestCapIndex'] = int(capExamples[2]['id'])#就要第三个，有时候共有3个，有时共有6个
 
     except Exception  :
         myLogging.warning(traceback.format_exc())

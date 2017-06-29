@@ -17,12 +17,15 @@ def mianfeiTxtUpdateFromMysql():
             mianfeiUpdateByBookObj(bookObj)
 
         except Exception as e:
-            myLogging.error('mianTxt update book' + str(bookObj['id']) +' raise exception ')
+            myLogging.error('mianTxt update book ' + str(bookObj['id']) +' raise exception ')
             myLogging.error(traceback.format_exc())
 
 def mianfeiUpdateByBookObj(bookObj):
     mid = bookObj['source']
     newBookObj, newChapNum = crawlCurrentBookObj(mid)
+    if not newBookObj:
+        myLogging.error('mid %s with dbId %s get None currentBookObj, plz check', mid, bookObj['id'])
+        return
     latestCapIndex = newBookObj['latestCapIndex']
     newChapNum = max(newChapNum, latestCapIndex)
     if newChapNum > bookObj['chapterNum'] :
