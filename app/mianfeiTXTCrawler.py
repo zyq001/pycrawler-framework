@@ -3,6 +3,7 @@
 import hashlib
 import json
 import random
+import traceback
 from urllib import quote
 
 import MySQLdb
@@ -87,7 +88,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
     crawlParseSpent = 0
     insertCap = 0
     uploadCap = 0
-    succCapTimes = 0
+    succCapTimes = 1
     resIdx = count
     for cid in range(startCapIdx, count + 1):
         try:
@@ -157,6 +158,8 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
         except Exception as e:
             print 'crawl', str(mid), ' cap ', str(cid), ' exception: ', str(e)
             resIdx = min(cid, resIdx)
+    if succCapTimes > 1:
+        succCapTimes = succCapTimes - 1
     print 'crawlParse avg: ', str(float(crawlParseSpent) / float(succCapTimes)),\
         ' insert avg: ', str(float(insertCap) / float(succCapTimes)),\
         ' upload avg: ', str(float(uploadCap) / float(succCapTimes))
@@ -184,7 +187,7 @@ def crawlCurrentBookObj(mid):
     title = baseData['name']
     coverUrl = baseData['coverUrl']
     contentUrl = baseData['contentUrl']
-    count = baseData['count']
+    count = baseData['count'] #不准，更新不及时
     if count < MINCHAPNUM:
         print 'chapNum too small, skip'
         # return None, None
@@ -203,7 +206,7 @@ def crawlCurrentBookObj(mid):
     bookObj['source'] = "" + str(mid)
     bookObj['rawUrl'] = url
     bookObj['title'] = title
-    bookObj['chapterNum'] = count
+    bookObj['chapterNum'] = count #更新不及时
     bookObj['imgUrl'] = coverUrl
     bookObj['author'] = author
     bookObj['size'] = count * 1000
@@ -219,6 +222,17 @@ def crawlCurrentBookObj(mid):
     bookObj['typeCode'] = 0
     bookObj['categoryCode'] = 0
     bookObj['viewNum'] = random.randint(500000, 1000000)
+
+#获取最新章节下标，作为另一个判断更新的条件
+    try:
+
+        capExamples = bookDetailSoup.select('.J-category-li')
+        if capExamples and len(capExamples) > 0:
+            bookObj['latestCapIndex'] = int(capExamples[len(capExamples) - 1]['id'])
+
+    except Exception  :
+        print traceback.format_exc()
+
     return bookObj, count
 
 

@@ -1,5 +1,7 @@
 ##!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import traceback
+
 from app.baseCrawler import BaseCrawler
 from app.mianfeiTXTCrawler import crawlCurrentBookObj, handleCapsByBookObj
 from dao.dushuMianFeiTXTService import getMianAllBookObjs
@@ -10,25 +12,31 @@ from exception import InputException
 def mianfeiTxtUpdateFromMysql():
     bookObjs = getMianAllBookObjs()
     for bookObj in bookObjs:
+        try:
+            mianfeiUpdateByBookObj(bookObj)
 
-        mianfeiUpdateByBookObj(bookObj)
-
+        except Exception as e:
+            print 'mianTxt update book' + str(bookObj['id']) +' raise exception '
+            traceback.format_exc()
 
 def mianfeiUpdateByBookObj(bookObj):
     mid = bookObj['source']
     newBookObj, newChapNum = crawlCurrentBookObj(mid)
-    if newChapNum > bookObj['chapterNum']:
-        resIdx = handleCapsByBookObj(allowUpdate=True, bookObj=bookObj, count=newBookObj['chapterNum']
+    latestCapIndex = newBookObj['latestCapIndex']
+    newChapNum = max(newChapNum, latestCapIndex)
+    if newChapNum > bookObj['chapterNum'] :
+        resIdx = handleCapsByBookObj(allowUpdate=True, bookObj=bookObj, count=newChapNum
                                      , mid=mid, startCapIdx=bookObj['chapterNum'])
         if resIdx > bookObj['chapterNum']:
             updateOneFieldByOneField('chapterNum', resIdx, 'id', bookObj['id'])
             updateBoostWithUpdateTime(bookObj['id'])
-            print newBookObj['title'].encode('utf-8') + ' update ' + str(resIdx - bookObj['chapterNum']) + ' chaps'
+            print newBookObj['title'].encode('utf-8') + ' update ' \
+                  + str(resIdx - bookObj['chapterNum']) + ' chaps (mianTxt) '
             if '连载' != newBookObj['bookType']:
                 updateOneFieldByOneField('bookType', newBookObj['bookType'], 'id', bookObj['id'])
                 print newBookObj['title'].encode('utf-8') + newBookObj['bookType']
     else:
-        print newBookObj['title'].encode('utf-8') + ' no update'
+        print newBookObj['title'].encode('utf-8') + ' no update (mianTxt)'
 
 def mianfeiUpdateById(dbid):
     '''

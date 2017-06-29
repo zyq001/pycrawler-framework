@@ -1,0 +1,8 @@
+#可以热更新的配置，不需要重启程序
+shuqiUpdater:
+  updateSleep:
+    10
+
+mianFeiTXTUpdater:
+  updateSleep:
+    10
