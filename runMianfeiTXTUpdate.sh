@@ -1,2 +1,2 @@
 #!/bin/bash
-curl http://0.0.0.0:10008/simpleCrawler?crawlerName=mianFeiTXTUpdater
+nohup python -u startMianFeiTXTUpdater.py >> logs/mianfeiTXTUpdater.log 2>&1 &

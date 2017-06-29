@@ -17,6 +17,7 @@ from dao.connFactory import getDushuConnCsor
 from dao.dushuService import updateOneFieldByOneField, updateBoostWithUpdateTime, getBookObjById, delBookById
 from dao.dushuShuqiService import getShuqiAllLianZaiBookObjs
 from exception.InputException import InputException
+from util.logHelper import myLogging
 
 
 def updateFromMysql():
@@ -52,8 +53,8 @@ def updateFromMysql():
         try:
             updateByBookObj(bookObj)
         except Exception as e:
-            print 'update book' + str(bookObj['id']) +' raise exception '
-            traceback.format_exc()
+            myLogging.error('update book' + str(bookObj['id']) +' raise exception ')
+            myLogging.error(traceback.format_exc())
 
 def updateByDbBookId(dbid):
 
@@ -67,7 +68,7 @@ def updateByBookObj(bookObj):
     newBookObj, digest = getBookObjFromSQid(source)
     if not newBookObj:
         delBookById(bookObj['id'])
-        print 'shuqi book has been droped, delete id: ', str(bookObj['id']), ' sid: ', str(source)
+        myLogging.error( 'shuqi book has been droped, delete id: '+ str(bookObj['id'])+ ' sid: '+ str(source))
         return
     if newBookObj['chapterNum'] > bookObj['chapterNum']:
         newBookObj['id'] = bookObj['id']
@@ -76,16 +77,16 @@ def updateByBookObj(bookObj):
         if newChapNum >= bookObj['chapterNum']:
             updateOneFieldByOneField('chapterNum', newChapNum, 'id', bookObj['id'])
             updateBoostWithUpdateTime(bookObj['id'])
-            print newBookObj['title'].encode('utf-8') + ' update ' + str(newChapNum - bookObj['chapterNum'])\
-                  + ' chaps (shuqi)'
+            myLogging.info( newBookObj['title'].encode('utf-8') + ' update ' + str(newChapNum - bookObj['chapterNum'])\
+                  + ' chaps (shuqi)')
 
             if u'连载' != newBookObj['bookType']:
                 updateOneFieldByOneField('bookType', newBookObj['bookType'], 'id', bookObj['id'])
-                print newBookObj['title'].encode('utf-8') + newBookObj['bookType'].encode('utf-8')
+                myLogging.warning(newBookObj['title'].encode('utf-8') + newBookObj['bookType'].encode('utf-8'))
         else:
-            print newBookObj['title'].encode('utf-8') + ' has unexcepted, please check.  didnot update (shuqi)'
+            myLogging.info(newBookObj['title'].encode('utf-8') + ' has unexcepted, please check. didnot update (shuqi)')
     else:
-        print newBookObj['title'].encode('utf-8') + ' no update (shuqi)'
+        myLogging.debug(newBookObj['title'].encode('utf-8') + ' no update (shuqi)')
 
 class ShuqiUpdater(BaseCrawler):
 
