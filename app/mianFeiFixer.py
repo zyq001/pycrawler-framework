@@ -7,6 +7,7 @@
 '''
 from app.mianfeiTXTCrawler import handleByMTID, handleCapsByBookObj
 from dao.connFactory import getDushuConnCsor
+from dao.dushuShuqiService import getShuqiIdRawUrlAsBookObjs
 
 
 def digestFix(st = 200000, end = 2):
@@ -63,6 +64,11 @@ def fixUnFinished():
             handleCapsByBookObj(allowUpdate=True,bookObj=bookObj,count=chapNum, mid=mid )
             # handleByMTID(mid, allowUpdate=True)
 
+# def fixCapDigest():
+#     books = getShuqiIdRawUrlAsBookObjs()
+#     for bookObj in books:
+#         bookId = bookObj['id']
+#
 
 if __name__ == '__main__':
     fixUnFinished()

@@ -45,7 +45,7 @@ def getShuqiAllLianZaiBookObjs():
 
 def getShuqiAllBookObjs():
     '''
-    获取所有免费TXT的主键和相关信息：id,rawUrl,chapterNum,source,digest
+    获取所有Shuqi的主键和相关信息：id,rawUrl,chapterNum,source,digest
     :return bookObjs即： [bookObj{"id":"1",,}]: 
     '''
 
@@ -62,3 +62,36 @@ def getShuqiAllBookObjs():
 
     return bookObjs
 
+
+def getShuqiIdRawUrlAsBookObjs():
+    '''
+    获取所有Shuqi的主键和相关信息：id,rawUrl,chapterNum,source,digest
+    :return bookObjs即： [bookObj{"id":"1",,}]: 
+    '''
+
+    conn, csor = getDushuConnCsor()
+    dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
+
+    dictCsor.execute("SELECT id,rawUrl from cn_dushu_book where operateStatus = 0  "
+                 " and rawUrl like 'http://api.shuqireader.com/reader/bc_cover.php%';")
+    conn.commit()
+    bookObjs = dictCsor.fetchallDict()
+
+    csor.close()
+    conn.close()
+
+    return bookObjs
+
+def getCapObjsById(bookId):
+    conn,csor = getDushuConnCsor()
+
+    dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
+
+    dictCsor.execute("SELECT id,title,idx from " + db_acticle + " where bookId = %s and id < 63017738;", (bookId, ))
+    conn.commit()
+    capObjs = dictCsor.fetchallDict()
+
+    csor.close()
+    conn.close()
+
+    return capObjs

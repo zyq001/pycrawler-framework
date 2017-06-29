@@ -21,9 +21,11 @@ from Config import EADHOST, EADPASSWD, bloomDumpCapsName, MINCHAPNUM
 from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
 from dao.dushuService import getExistsCapsRawUrlId, insertCapWithCapObj2, insertCapWithCapObj, \
-    loadExistsSQId, delBookById, insertBookWithConn, getCapIdxsByBookId
+    loadExistsSQId, delBookById, insertBookWithConn, getCapIdxsByBookId, getChapTitlesByBookId, getLatestChapByBookId, \
+    deleteChapsLargerThanIdx, getChapObjByBookIdChapTitle
 from local.shuqi.shuqiLocal import loadShuQSeqC, loadShuQC
 from util.UUIDUtils import getBookDigest, getCapDigest
+from util.logHelper import myLogging
 from util.networkHelper import getContent, getContentWithUA
 from util.pyBloomHelper import getBloom, loadBloomFromFile, dumpBloomToFile
 
@@ -297,14 +299,18 @@ def getShuqiCapList(bookId):
 
                     for realCap in sonpageRoot.getiterator('Book'):
                         realCapId = realCap.attrib['ChapterId']
+                        chapTitle = realCap.attrib['BookChapter']
+                        chapObj = {"cid": realCapId, 'title': chapTitle}
                         # dealCap(bookId, realCapId)
-                        capList.append(realCapId)
+                        capList.append(chapObj)
 
         else:#没有二级目录，不需要请求信的api，所有不需考虑分页
             for realCap in pageRoot.getiterator('Book'):
                 realCapId = realCap.attrib['ChapterId']
+                chapTitle = realCap.attrib['BookChapter']
+                chapObj = {"cid": realCapId, 'title': chapTitle}
                 # dealCap(bookId, realCapId)
-                capList.append(realCapId)
+                capList.append(chapObj)
 
     return capList
 
@@ -454,19 +460,41 @@ def getCapObjsByBookObj(allowUpdate, bookId, bookObj):
     :param bookObj: book对象
     :return: 
     '''
-    capList = getShuqiCapList(bookId)
+    capList = getShuqiCapList(bookId)# 返回的title过长会自动缩略，不靠谱
     capObjList = []
-    capIdxs = set()
+    chapTitles = set()
+    dbLatestChapObj = None
+    hasDeleted = False #是否 发现遗漏的章节并已清除后面的章节
+    lastTitle = None #遍历章节列表时，记录上一loop的title，需要删除时从此章开始往后删
     if allowUpdate:
-        capIdxs = getCapIdxsByBookId(bookObj['id'])  # 已在库中的章节下标
+        chapTitles = getChapTitlesByBookId(bookObj['id'])  # 已在库中的章节名称，下标不太靠谱
+        dbLatestChapObj = getLatestChapByBookId(bookObj['id'])
+
     global donedegest
     for j in range(0, len(capList)):
-        if j in capIdxs:
-            continue
-        capId = capList[j]
+
+
+        capId = capList[j]['cid']
+
         capObj = getCapContentObj(bookId, capId, bookObj['id'])
         if not capObj:
             continue
+
+        title = capObj['title']
+        if title in chapTitles:
+            lastTitle = title
+            continue
+        if dbLatestChapObj and not hasDeleted:
+            if j < dbLatestChapObj['idx']:#说明此章节是之前遗漏的，加上去就得把后面的章节重新插入一遍，不能用idx删除，太乱了MD，用title
+                hasDeleted = True
+                chapTitles.clear()
+                lastNormalChapObj = getChapObjByBookIdChapTitle(bookObj['id'],lastTitle)
+                if lastNormalChapObj:
+                    lastIdx = lastNormalChapObj['idx']
+                    myLogging.error('deleted chaps after idx: %s, bookId:', lastIdx, bookObj['id'])
+                    #删除章节表中所有大于此idx的
+                    deleteChapsLargerThanIdx(bookObj['id'], lastIdx )
+
         capObj['bookId'] = bookObj['id']
         capObj['source'] = bookObj['source']
         capObj['idx'] = j
@@ -490,7 +518,7 @@ def getCapObjListByBookIdIntoQue(bookId, queue, categoryDict, connDoc,csorDoc):
     capList = getShuqiCapList(bookId)
     # capObjList = []
     for j in range(0, len(capList)):
-        capId = capList[j]
+        capId = capList[j]['cid']
         capObj = getCapContentObj(bookId, capId,bookObj['id'])
         if not capObj:
             return

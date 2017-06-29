@@ -182,6 +182,21 @@ def getCapIdxsByBookId(bookId):
 
     return idxs
 
+def getChapTitlesByBookId(bookId):
+    conn,csor = getDushuConnCsor()
+    titles = set()
+
+    csor.execute('select title from ' + db_acticle + " where bookId = %s", (bookId,))
+    conn.commit()
+
+    results = csor.fetchall()
+    for capObj in results:
+        titles.add(capObj[0])
+    csor.close()
+    conn.close()
+
+    return titles
+
 def delCapById(cid):
     conn2, csor2 = getDushuConnCsor()
 
@@ -408,6 +423,61 @@ def insertCapWithCapObj(capObj, conn2 = None, csor2 = None):
 
     csor2.close()
     conn2.close()
+
+def deleteChapsLargerThanIdx(bookId, idx):
+    '''
+    删除章节表中所有大于此idx的
+    :param bookId: 
+    :param idx: 
+    :return: 
+    '''
+    conn,csor = getDushuConnCsor()
+    try:
+        csor.execute('delete from ' + db_acticle + " where bookId = %s and idx > %s", (bookId, idx))
+        conn.commit()
+    except Exception as e:
+        myLogging.warning(e)
+
+    csor.close()
+    conn.close()
+
+def getChapObjByBookIdChapTitle(bookId, title):
+    '''
+    删除章节表中所有大于此idx的
+    :param bookId: 
+    :param idx: 
+    :return: 
+    '''
+    conn,csor = getDushuConnCsor()
+    dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
+
+    try:
+        dictCsor.execute('select *  from ' + db_acticle + " where bookId = %s and title = %s", (bookId, title))
+        conn.commit()
+    except Exception as e:
+        myLogging.warning(e)
+
+    chapObj = dictCsor.fetchoneDict()
+
+    csor.close()
+    conn.close()
+
+    return chapObj
+
+
+def getLatestChapByBookId(bookId):
+    conn,csor = getDushuConnCsor()
+
+    dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
+    try:
+        dictCsor.execute("select * from " + db_acticle + " where bookId = %s order by id desc limit 1;", (bookId,))
+        conn.commit()
+    except Exception as e:
+        myLogging.warning('getLatestChapByBookId exception: '+ str(e))
+    bookObj = dictCsor.fetchoneDict()
+    csor.close()
+    conn.close()
+    return bookObj
 
 if __name__ == '__main__':
     delBookById(227921)
