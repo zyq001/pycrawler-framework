@@ -18,6 +18,7 @@ from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
 from parse.easouParser import getAndParse
 from util.UUIDUtils import getBookDigest
+from util.logHelper import myLogging
 from util.pyBloomHelper import getBloom, dumpBloomToFile
 
 db_dushu = 'cn_dushu_book'
@@ -35,7 +36,7 @@ def getBookObjById(dbid):
         dictCsor.execute("select * from " + db_dushu + " where id = %s", (dbid,))
         conn.commit()
     except Exception as e:
-        print 'update bookType exception: ',e
+        myLogging.warning('update bookType exception: '+ str(e))
     bookObj = dictCsor.fetchoneDict()
     csor.close()
     conn.close()
@@ -53,7 +54,7 @@ def updateBoostWithUpdateTime(dbid):
         dictCsor.execute("update " + db_dushu + " set typeBoost = updateTime where id = %s", (dbid,))
         conn.commit()
     except Exception as e:
-        print 'update bookType exception: ',e
+        myLogging.warning( 'update bookType exception: ' + str(e))
     bookObj = dictCsor.fetchoneDict()
     csor.close()
     conn.close()
@@ -65,7 +66,7 @@ def updateBookTypeByRawUrl(type, rawUrl):
         csor.execute("update " + db_dushu + " set bookType = %s where rawUrl = %s", (type, rawUrl,))
         conn.commit()
     except Exception as e:
-        print 'update bookType exception: ',e
+        myLogging.warning( 'update bookType exception: '+ str(e))
 
     csor.close()
     conn.close()
@@ -77,7 +78,7 @@ def updateOneFieldByOneField(upFieldName, upFieldValue, byFieldName, byFieldValu
                      ( upFieldValue, byFieldValue))
         conn.commit()
     except Exception as e:
-        print 'update bookType exception: ',e
+        myLogging.warning( 'update bookType exception: ' + str(e))
 
     csor.close()
     conn.close()
@@ -92,7 +93,7 @@ def handleWebsiteNoise(begin, end):
         conn2.commit()
     except Exception as e:
         #     # 发生错误时回滚
-        print e
+        myLogging.warning( e)
 
     res = csor2.fetchall()
     for cap in res:
@@ -131,15 +132,15 @@ def insertBookWithConn(bookObj, allowUpdate = True, conn2 = None,csor2 = None):
         # csorDoc.execute('update cn_dushu_book set subtitle = %s where digest = %s'
         #   , (bookObj['subtitle'],digest))
         conn2.commit()
-        print 'succ book, ',unicode(bookObj['title']).encode('utf-8')
+        myLogging.info( 'succ book, ' + unicode(bookObj['title']).encode('utf-8'))
     except Exception as e:
         #     # 发生错误时回滚
-        print 'update rollback; maybe exists， ', bookObj['rawUrl'],e
+        myLogging.warning( 'update rollback; maybe exists， ' + bookObj['rawUrl'] + str(e))
         if conn2:
             try:
                 conn2.rollback()
             except Exception as ee:
-                print 'rollback error : ',bookObj['rawUrl']
+                myLogging.error('rollback error : ' + bookObj['rawUrl'])
 
         if u'完结' == bookObj['bookType']:
             updateBookTypeByRawUrl(bookObj['bookType'], bookObj['rawUrl'])
@@ -189,12 +190,12 @@ def delCapById(cid):
         conn2.commit()
     except Exception as e:
         #     # 发生错误时回滚
-        print 'mysql ex: ', e
+        myLogging.error( 'mysql ex: ' +  str(e))
         if conn2:
             try:
                 conn2.rollback()
             except Exception as ee:
-                print 'rollback error : ', str(cid)
+                myLogging.error('rollback error : ' + str(cid))
 
     csor2.close()
     conn2.close()
@@ -226,12 +227,12 @@ def delBookById(bookId):
         conn2.commit()
     except Exception as e:
         #     # 发生错误时回滚
-        print 'mysql ex: ', e
+        myLogging.error( e)
         if conn2:
             try:
                 conn2.rollback()
             except Exception as ee:
-                print 'rollback error : ', bookId
+                myLogging.error(e)
 
     csor2.close()
     conn2.close()
@@ -263,13 +264,13 @@ def getExistsCapsRawUrlId(bookId):
         results = csor.fetchall()
 
         if not results or len(results) < 1:
-            print 'no caps,, bookId：', bookId
+            myLogging.warning( 'no caps,, bookId：' + str(bookId))
             return None
         else:
             return results
     except Exception as e:
         #     # 发生错误时回滚
-        print 'check cap count failed ,skip', e
+        myLogging.error(e)
 
     csor.close()
     conn.close()
@@ -283,16 +284,15 @@ def updateContentById(id, content):
     try:
         csor.execute( "update cn_dushu_acticle set content = %s where id = %s ", (content, id))
         conn.commit()
-        print id, ' succ cap, ', content[0: 15]
+        myLogging.info(str(id) + ' succ cap, ' + content[0: 15])
     except Exception as e:
         #     # 发生错误时回滚
-        print 'update error ',e
+        myLogging.error(e)
         if conn:
             try:
                 conn.rollback()
             except Exception as ee:
-                print 'rollback error : '
-
+                myLogging.error(ee)
 
     csor.close()
     conn.close()
@@ -311,16 +311,16 @@ def insertCapWithCapObj2(capObj, conn2 = None, csor2 = None):
           "(%s,%s,%s,%s,%s,%s)" , (capObj['bookId'], capObj['idx'], capObj['digest'], capObj['bookUUID'], capObj['title'], capObj['size']))
         # csor2.execute("update cn_dushu_acticle set title = %s, size= %s where digest = %s" , (capObj['title'], capObj['size'], capObj['digest'] ))
         conn2.commit()
-        print 'scap， ', capObj['source']+":" + str(capObj['idx'])
+        myLogging.info('scap， ' + capObj['source'] + ":" + str(capObj['idx']))
 
     except Exception as e:
         #     # 发生错误时回滚
-        print 'mysql ex: ', e
+        myLogging.error(e)
         if conn2:
             try:
                 conn2.rollback()
             except Exception as ee:
-                print 'rollback error : ', capObj['bookId']
+                myLogging.error(ee)
         return None
     try:
         csor2.execute("select id,bookId from " + db_acticle + " where digest = %s;", (capObj['digest'],))
@@ -340,12 +340,12 @@ def insertCapWithCapObj2(capObj, conn2 = None, csor2 = None):
         return capId
     except Exception as e:
         #     # 发生错误时回滚
-        print 'mysql ex2: ', e
+        myLogging.error(e)
         if conn2:
             try:
                 conn2.rollback()
             except Exception as ee:
-                print 'rollback error : ', capObj['bookId']
+                myLogging.error(ee)
         return None
 
     csor2.close()
@@ -366,19 +366,19 @@ def insertCapWithCapObj(capObj, conn2 = None, csor2 = None):
           "(%s,%s,%s,%s,%s,%s)" , (capObj['bookId'], capObj['idx'], capObj['digest'], capObj['bookUUID'], capObj['title'], capObj['size']))
         # csor2.execute("update cn_dushu_acticle set title = %s, size= %s where digest = %s" , (capObj['title'], capObj['size'], capObj['digest'] ))
         conn2.commit()
-        print 'scap， ', capObj['source']+":" + str(capObj['idx'])
+        myLogging.info('scap， ' + capObj['source'] + ":" + str(capObj['idx']) )
             # , ', content: ', capObj['content'][0:15]
 
 
 
     except Exception as e:
         #     # 发生错误时回滚
-        print 'mysql ex: ', e
+        myLogging.error(e)
         if conn2:
             try:
                 conn2.rollback()
             except Exception as ee:
-                print 'rollback error : ', capObj['bookId']
+                myLogging.error(ee)
         return None
     try:
         csor2.execute("select id,bookId from cn_dushu_acticle where digest = %s;", (capObj['digest'],))
@@ -389,7 +389,7 @@ def insertCapWithCapObj(capObj, conn2 = None, csor2 = None):
         bookId = sqlObj[1]
 
         if bookId != capObj['bookId']:
-            print 'update bookId',capId
+            myLogging.info( 'update bookId' + str(capId))
             # 如果已存在，且bookId不对，更新下，防止错误cap占坑
             csor2.execute("update cn_dushu_acticle set bookId = %s where id = %s;", (capObj['bookId'], capId))
             conn2.commit()
@@ -398,12 +398,12 @@ def insertCapWithCapObj(capObj, conn2 = None, csor2 = None):
         return capId
     except Exception as e:
         #     # 发生错误时回滚
-        print 'mysql ex2: ', e
+        myLogging.error(e)
         if conn2:
             try:
                 conn2.rollback()
             except Exception as ee:
-                print 'rollback error : ', capObj['bookId']
+                myLogging.error(ee)
         return None
 
     csor2.close()

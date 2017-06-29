@@ -8,6 +8,7 @@
 from app.baseCrawler import BaseCrawler
 from app.shuqi import start
 from exception.InputException import InputException
+from util.logHelper import myLogging
 
 
 class ShuqiCrawler(BaseCrawler):
@@ -26,9 +27,9 @@ class ShuqiCrawler(BaseCrawler):
         self.data = data
 
     def crawl(self):
-        print 'shuqi init'
+        myLogging.info('shuqi init')
 
         start(self.sid)
 
     def output(self):
-        print 'shuqi output'
+        myLogging.info('shuqi output')

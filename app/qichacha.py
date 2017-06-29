@@ -17,6 +17,7 @@ import requests
 # 统计mysql插入性能
 from dao.connFactory import getComConnCsor
 from util.htmlHelper import getSoupByStrEncode
+from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
 from util.pyBloomHelper import getBloom, loadBloomFromFile, dumpBloomToFile
 
@@ -78,7 +79,7 @@ def getQichachaHtml(url, proxy=None, ua = None, noCookie = False, cookies = None
         else:
             r = s.get(url, headers=headers, timeout=30, cookies=cookies,proxies=proxy)
     except Exception as e:
-        print 'get with proxy error, retry with'
+        myLogging.error( 'get with proxy error, retry with')
         proxy = getProxy(True)
 
         try:
@@ -87,7 +88,7 @@ def getQichachaHtml(url, proxy=None, ua = None, noCookie = False, cookies = None
             else:
                 r = s.get(url, headers=headers, timeout=30, cookies=cookies,proxies=proxy)
         except Exception as e:
-            print 'get with proxy error, return none'
+            myLogging.error( 'get with proxy error, return none')
             return None
 
     if r.status_code == 200:
@@ -97,8 +98,8 @@ def getQichachaHtml(url, proxy=None, ua = None, noCookie = False, cookies = None
             else:
                 r.encoding = r.apparent_encoding
         return r.text
-    print str(proxy), str(r.status_code)
-    print None
+    myLogging.info( str(proxy)+ str(r.status_code))
+    # print None
 
 
 def getBaseInfoById(prov = None, uid = ''):
@@ -123,7 +124,7 @@ def getBaseInfoById(prov = None, uid = ''):
 
 
 def qichachaFromProvs(provs):
-    print 'start: provs', str(provs)
+    myLogging.info('start: provs %s', str(provs))
     catBaseIrl = 'http://www.qichacha.com/gongsi_area_prov_'
     conn, csor = getComConnCsor()
     for prov in provs:
@@ -135,10 +136,10 @@ def qichachaFromProvs(provs):
                 pageSoup = getSoupByStrEncode(pageContent, 'utf-8')
                 dealUIDsBySoup(conn, csor, pageCount, pageSoup, prov)
             except Exception as ee:
-                print 'page ', str(pageCount), ' error ', ee
+                myLogging.error('page ' + str(pageCount) + ' error %s' ,  ee)
 
 def qichachaFromIndustry(f,t):
-    print 'start from ', f, ' to ', t
+    myLogging.info('start from %s to %s ', f, t)
     indBaseUrl = 'http://www.qichacha.com/gongsi_industry?industryCode='
     conn, csor = getComConnCsor()
     for code in range(f, t+1):
@@ -147,25 +148,25 @@ def qichachaFromIndustry(f,t):
         inductBasePageUrl = indBaseUrl + industCode + '&industryorder=' + str(industOrder)
 
         try:
-            print 'start indust base pages, ',inductBasePageUrl
+            myLogging.info('start indust base pages, %s',inductBasePageUrl)
             # qichachaFromIndustPageUrl(inductBasePageUrl,conn, csor)
-            print 'end indust base pages, ',inductBasePageUrl
+            myLogging.info('end indust base pages, %s',inductBasePageUrl)
 
-            print 'start indust subIndust pages, ',inductBasePageUrl
+            myLogging.info('start indust subIndust pages, %s',inductBasePageUrl)
             pageContent = getQichachaHtml(inductBasePageUrl)
             pageSoup = getSoupByStrEncode(pageContent, 'utf-8')
             subUrlTags = pageSoup.select('.filter-tag')[1]
             if not subUrlTags:
-                print 'no subUrls, skipped,',inductBasePageUrl
+                myLogging.error('no subUrls, skipped, %s',inductBasePageUrl)
             for tag in subUrlTags.select('a'):
                 subUri = tag['href']
                 subUrl = urlparse.urljoin(indBaseUrl,subUri)
 
-                print 'start sub indust base pages, ', subUrl
+                myLogging.info( 'start sub indust base pages, %s', subUrl)
                 qichachaFromIndustPageUrl(subUrl,conn, csor)
-                print 'end sub indust base pages, ', subUrl
+                myLogging.info('end sub indust base pages, %s', subUrl)
         except Exception as e:
-            print 'indust error, industCode:',industCode, ' url:',inductBasePageUrl, ' error:',e
+            myLogging.error('indust error, industCode: %s url: %s; error: ',industCode, inductBasePageUrl, e)
 
 
 def qichachaFromIndustPageUrl(url,conn, csor):
@@ -180,18 +181,18 @@ def qichachaFromIndustPageUrl(url,conn, csor):
             pageSoup = getSoupByStrEncode(pageContent, 'utf-8')
             dealUIDsBySoup(conn, csor, pageCount, pageSoup, 'indust')
         except Exception as e:
-            print 'page error, url:',pageUrl
+            myLogging.error( 'page error, url: %s',pageUrl)
 
 def dealUIDsBySoup(conn, csor, pageCount, pageSoup, prov):
     uidList = pageSoup.select('.list-group-item')
     if len(uidList) < 1:
-        print 'no com list, skip ', prov, ' page:', pageCount
+        myLogging.error('no com list, skip %s page:', prov, pageCount)
         return
         # continue
     for uidTag in uidList:
         try:
             if not uidTag.has_attr('href'):
-                print 'no com Tag, skip ', prov, ' page:', pageCount, ' tag:', uidTag
+                myLogging.error('no com Tag, skip %s page: %s; tag: ', prov, pageCount,  uidTag
                 # continue
                 return
             prv = None
@@ -201,11 +202,11 @@ def dealUIDsBySoup(conn, csor, pageCount, pageSoup, prov):
                 prv = strs[0]
                 uid = strs[1]
             if  uid in idBloom:
-                print 'already crawled, skip uid:',uid
+                myLogging.info( 'already crawled, skip uid: %s',uid)
                 continue
             insertWithUid(conn, csor, prv, uid)
         except Exception as ee:
-            print 'uid:', uid, ' , error:', ee
+            myLogging.error( 'uid: %s error: ' , uid, ee)
             # com_name = com_base_info_json['data']['Company']['Name']
             # com_name = com_base_info_json['data']['Company']['Name']
 
@@ -250,14 +251,14 @@ def insertWithUid(conn2, csor2, prv, uid):
             values (%s,%s,%s,%s,%s,%s,%s);""",
             (uid, companyName, companyType, examineDate, liscense, "qichacha", com_base_info_str))
         conn2.commit()
-        print 'comOk, uid:', uid, ', comName: ', unicode(companyName).encode('utf-8')
+        myLogging.info('comOk, uid: %s, comName: %s', uid, unicode(companyName).encode('utf-8'))
         endTime = time.time()
         thisSpentTime = endTime - startTime
 
         statisMysqlInsert(staticInsertCarry, thisSpentTime)
 
     except Exception as e:
-        print 'insert error, uid', uid, ' ,error', e
+        myLogging.error('insert error, uid: %s, error:', uid,  e)
         #     # 发生错误时回滚
 
 
@@ -420,10 +421,10 @@ def tycFromPage():
 def getQichachaDigests():
     idbloom = loadBloomFromFile('local/qichachaUIDs')
     if idbloom:
-        print 'load bloom from file succ, no need load from db'
+        myLogging.info( 'load bloom from file succ, no need load from db')
         # return idbloom
     else:
-        print 'no dump bloom file,  load from db'
+        myLogging.info( 'no dump bloom file,  load from db')
         idbloom = getBloom(2000 * 10000)
         # idbloom = getBloom()
         conn, csor = getComConnCsor()
@@ -432,7 +433,7 @@ def getQichachaDigests():
         ids = csor.fetchall()
         [idbloom.add(mid[0]) for mid in ids]
         # if ids[0][0] in idbloom:
-        print 'load exists ids ok, generate dump bloom file'
+        myLogging.info( 'load exists ids ok, generate dump bloom file')
         dumpBloomToFile(idbloom,fileName='local/qichachaUIDs')
     return idbloom
 
@@ -443,7 +444,7 @@ def getQichachaInvestDigests():
     ids = csor.fetchall()
     [idbloom.add(mid[0]) for mid in ids]
     # if ids[0][0] in idbloom:
-    print 'load exists ids ok'
+    myLogging.info( 'load exists ids ok')
 
     return idbloom
 
@@ -465,7 +466,7 @@ def fromInvestInt():
         uid = comInfo[0]
         cName = comInfo[1]
         if not cName:
-            print 'no comName skip, uid:',uid
+            myLogging.warning( 'no comName skip, uid: %s',uid)
             continue
         getInvestListByNameId(uid, cName)
 
@@ -474,7 +475,7 @@ def getInvestListByNameId(quid, qCname):
 
 
     if quid in investBloom:
-        print 'invest aready done before, uid:',quid
+        myLogging.warning( 'invest aready done before, uid:',quid)
         return None
 
     url = 'http://www.qichacha.com/company_getinfos?unique=' + quid + '&companyname=' + quote(qCname.encode('utf-8')) +  '&tab=touzi'
@@ -533,12 +534,12 @@ def searchAndCrawlByName(comName, proxy=None):
         return None
     soup = getSoupByStrEncode(htmlContent)
     if not soup.select('ul.list-group a') or len(soup.select('ul.list-group a')) < 1:
-        print htmlContent
+        myLogging.debug(htmlContent)
         return None
     for uidTag in soup.select('ul.list-group a'):
         uid = uidTag['href'].replace('firm_', '')
         if uid == uidTag['href']:
-            print 'not uid, skip',uidTag['href']
+            myLogging.warning( 'not uid, skip',uidTag['href'])
             continue
 
         uid = uid.replace('.shtml', '').replace('/', '')
@@ -556,7 +557,7 @@ def searchAndCrawlByName(comName, proxy=None):
         try:
             insertWithUid(conn, csor, prv, uid)
         except Exception as e:
-            print 'insert with uid fail, uid:',uid
+            myLogging.error('insert with uid fail, uid: %s',uid)
         # print comLink
     return 'ok'
 
@@ -619,13 +620,13 @@ if __name__ == '__main__':
                 searchAndCrawlByName("noName")
 
             except Exception as e:
-                print traceback.format_exc()
+                myLogging.error( traceback.format_exc())
 
         except Exception as ge:
-            print traceback.format_exc()
+            myLogging.error(traceback.format_exc())
 
 
-    # unknown
+            # unknown
             # begin = 7100000
     # end = 7200000
     #

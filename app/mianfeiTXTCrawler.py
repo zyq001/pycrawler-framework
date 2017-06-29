@@ -21,6 +21,7 @@ from exception.InputException import InputException
 from shuqi import insertBookWithConn
 from util.UUIDUtils import getCapDigest
 from util.htmlHelper import getSoupByStr, getSoupByUrl
+from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
 
 ua = 'Mozilla/5.0 (Linux; U; Android 4.0; en-us; Xoom Build/HRI39) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13'
@@ -118,7 +119,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
             orgContent = capListJsonObj['data']['chapter']
             contentSoup = getSoupByStr(orgContent)
             if not contentSoup or '' == orgContent or len(orgContent) < 1:
-                print 'chap content null ,skip, capId:', str(cid), ' mid: ',str(mid)
+                myLogging.error('chap content null ,skip, capId:', str(cid), ' mid: ',str(mid))
                 resIdx = min(cid, resIdx)
                 continue
             if contentSoup.body['style']:
@@ -156,13 +157,13 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
             uploadCap = uploadCap + (aftUploadCap - aftInsertCap)
 
         except Exception as e:
-            print 'crawl', str(mid), ' cap ', str(cid), ' exception: ', str(e)
+            myLogging.error('crawl' + str(mid) + ' cap ' + str(cid) + ' exception: ' + str(e))
             resIdx = min(cid, resIdx)
     if succCapTimes > 1:
         succCapTimes = succCapTimes - 1
-    print 'crawlParse avg: ', str(float(crawlParseSpent) / float(succCapTimes)),\
+    myLogging.info( 'crawlParse avg: ', str(float(crawlParseSpent) / float(succCapTimes)),\
         ' insert avg: ', str(float(insertCap) / float(succCapTimes)),\
-        ' upload avg: ', str(float(uploadCap) / float(succCapTimes))
+        ' upload avg: ', str(float(uploadCap) / float(succCapTimes)))
     return resIdx
 
 def getBookObj(allowUpdate, mid):
@@ -172,7 +173,7 @@ def getBookObj(allowUpdate, mid):
 
     bookObj = insertBookWithConn(bookObj, allowUpdate)
     # aftInsertBookObj = time.time()
-    print 'crawl book spent', str(aftBookObj - befBookObj), ' secs; insert spent ', str(time.time() - aftBookObj)
+    myLogging.info('crawl book spent' + str(aftBookObj - befBookObj) + ' secs; insert spent ' + str(time.time() - aftBookObj))
     return bookObj, count
 
 
@@ -189,7 +190,7 @@ def crawlCurrentBookObj(mid):
     contentUrl = baseData['contentUrl']
     count = baseData['count'] #不准，更新不及时
     if count < MINCHAPNUM:
-        print 'chapNum too small, skip'
+        myLogging.warning( 'chapNum too small, skip %s', str(mid))
         # return None, None
     isOver = baseData['isOver']
     BookType = '连载'
@@ -231,7 +232,7 @@ def crawlCurrentBookObj(mid):
             bookObj['latestCapIndex'] = int(capExamples[len(capExamples) - 1]['id'])
 
     except Exception  :
-        print traceback.format_exc()
+        myLogging.warning(traceback.format_exc())
 
     return bookObj, count
 
@@ -274,11 +275,11 @@ class MianFeiTXTCrawler(BaseCrawler):
         self.mid = data['id']
 
     def crawl(self):
-        print 'mianfeiTXT crawl'
+        myLogging.info('mianfeiTXT crawl')
         handleByMTID(self.mid)
 
     def output(self):
-        print 'mianfeiTXT output'
+        myLogging.info('mianfeiTXT output')
 
     def search(self, searchInput, top = 5):
         return  mianfeiSearch(searchInput, top)

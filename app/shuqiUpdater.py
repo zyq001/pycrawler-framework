@@ -78,15 +78,15 @@ def updateByBookObj(bookObj):
             updateOneFieldByOneField('chapterNum', newChapNum, 'id', bookObj['id'])
             updateBoostWithUpdateTime(bookObj['id'])
             myLogging.info( newBookObj['title'].encode('utf-8') + ' update ' + str(newChapNum - bookObj['chapterNum'])\
-                  + ' chaps (shuqi)')
+                  + ' chaps ')
 
             if u'连载' != newBookObj['bookType']:
                 updateOneFieldByOneField('bookType', newBookObj['bookType'], 'id', bookObj['id'])
                 myLogging.warning(newBookObj['title'].encode('utf-8') + newBookObj['bookType'].encode('utf-8'))
         else:
-            myLogging.info(newBookObj['title'].encode('utf-8') + ' has unexcepted, please check. didnot update (shuqi)')
+            myLogging.info(newBookObj['title'].encode('utf-8') + ' has unexcepted, please check. didnot update ')
     else:
-        myLogging.debug(newBookObj['title'].encode('utf-8') + ' no update (shuqi)')
+        myLogging.info(newBookObj['title'].encode('utf-8') + ' no update ()')
 
 class ShuqiUpdater(BaseCrawler):
 
