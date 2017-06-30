@@ -12,8 +12,11 @@ import re
 
 import time
 
+import MySQLdb
+
 from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
+from exception.InputException import InputException
 from parse.easouParser import getAndParse
 from util.UUIDUtils import getBookDigest
 from util.pyBloomHelper import getBloom, dumpBloomToFile
@@ -54,7 +57,45 @@ def getMianAllBookObjs():
         bookObj['chapterNum'] = chapterNum
 
         bookObjs.append(bookObj)
+
+    csor.close()
+    conn.close()
+
     return bookObjs
+
+def getBookByTitle(title):
+    '''
+    用title获取bookObj
+    :return bookObjs即： [bookObj{"id":"1",,}]: 
+    '''
+
+    conn, csor = getDushuConnCsor()
+    dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
+
+    dictCsor.execute("SELECT *  from cn_dushu_book where rawUrl like"
+                     " 'http://api.yingyangcan.com.cn/interface/ajax/book/getbaseinfo.ajax?%' and title = '" + title + "';")
+    conn.commit()
+    results = dictCsor.fetchallDict()
+
+    # if len(results) > 1:
+    #     raise InputException('more than one book')
+
+    bookObj = results
+
+    csor.close()
+    conn.close()
+
+    return bookObj
+
+
+def deleteNLastChaps(dbBookId, limit):
+    '''
+    删除最新的N个章节
+    :return: 
+    '''
+    conn, csor = getDushuConnCsor()
+    csor.execute('delete from ' + db_acticle  + " where bookId = %s order by id desc limit %s;", (dbBookId, limit))
+    conn.commit()
 
     csor.close()
     conn.close()

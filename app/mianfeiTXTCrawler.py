@@ -91,7 +91,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
     uploadCap = 0
     succCapTimes = 1
     resIdx = count
-    for cid in range(startCapIdx, count + 1):
+    for cid in range(startCapIdx, count + 3):
         try:
 
             if allowUpdate:
@@ -155,7 +155,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
 
             aftUploadCap = time.time()
             uploadCap = uploadCap + (aftUploadCap - aftInsertCap)
-
+            resIdx = max(cid, resIdx)
         except Exception as e:
             myLogging.error('crawl' + str(mid) + ' cap ' + str(cid) + ' exception: ' + str(e))
             resIdx = min(cid, resIdx)

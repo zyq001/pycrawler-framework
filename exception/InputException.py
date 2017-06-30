@@ -9,5 +9,5 @@
 
 class InputException(Exception):
     def __init__(self, msg):
-        super(self)
+        # super(self)
         self.message = msg
