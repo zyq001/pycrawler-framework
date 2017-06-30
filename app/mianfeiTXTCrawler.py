@@ -90,8 +90,8 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
     insertCap = 0
     uploadCap = 0
     succCapTimes = 1
-    resIdx = count
-    for cid in range(startCapIdx, count + 3):
+    resIdx = startCapIdx
+    for cid in range(startCapIdx, count + 1):
         try:
 
             if allowUpdate:
@@ -119,9 +119,10 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
             orgContent = capListJsonObj['data']['chapter']
             contentSoup = getSoupByStr(orgContent)
             if not contentSoup or '' == orgContent or len(orgContent) < 1:
-                myLogging.error('chap content null ,skip, capId:' + str(cid) + ' mid: ' + str(mid))
+                myLogging.error('chap content null ,RETURN, capId:' + str(cid) + ' mid: ' + str(mid))
                 resIdx = min(cid, resIdx)
-                continue
+                return resIdx #原api接口更新不及时，为了配合后来的 无限向前重试方法，在这跳出
+
             if contentSoup.body['style']:
                 del contentSoup.body['style']
             content = unicode(contentSoup.body).replace(u'<body>', '').replace(u'</body>', '').replace(u'\n\n',

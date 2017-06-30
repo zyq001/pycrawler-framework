@@ -2,10 +2,12 @@
 # -*- coding: UTF-8 -*-
 import traceback
 
+import sys
+
 from app.baseCrawler import BaseCrawler
 from app.mianfeiTXTCrawler import crawlCurrentBookObj, handleCapsByBookObj
 from dao.dushuMianFeiTXTService import getMianAllBookObjs
-from dao.dushuService import updateOneFieldByOneField, getBookObjById, updateBoostWithUpdateTime
+from dao.dushuService import updateOneFieldByOneField, getBookObjById, updateBoostWithUpdateTime, getLatestChapByBookId
 from exception import InputException
 from util.logHelper import myLogging
 
@@ -14,20 +16,25 @@ def mianfeiTxtUpdateFromMysql():
     bookObjs = getMianAllBookObjs()
     for bookObj in bookObjs:
         try:
-            mianfeiUpdateByBookObj(bookObj)
+            mianfeiUpdateByBookObj(bookObj, maxChapNum = 1000000)
 
         except Exception as e:
             myLogging.error('mianTxt update book ' + str(bookObj['id']) +' raise exception ')
             myLogging.error(traceback.format_exc())
 
-def mianfeiUpdateByBookObj(bookObj):
+# def mianfeiUpdateByBookObjForwardTry(bookObj):
+#     mid = bookObj['source']
+#     dbBookId = bookObj['id']
+#     latestChapObj = getLatestChapByBookId(dbBookId)
+
+def mianfeiUpdateByBookObj(bookObj, maxChapNum = 0):
     mid = bookObj['source']
     newBookObj, newChapNum = crawlCurrentBookObj(mid)
     if not newBookObj:
         myLogging.error('mid %s with dbId %s get None currentBookObj, plz check', mid, bookObj['id'])
         return
     latestCapIndex = newBookObj['latestCapIndex']
-    newChapNum = max(newChapNum, latestCapIndex)
+    newChapNum = max(newChapNum, latestCapIndex, maxChapNum)
     if newChapNum > bookObj['chapterNum'] :
         resIdx = handleCapsByBookObj(allowUpdate=True, bookObj=bookObj, count=newChapNum
                                      , mid=mid, startCapIdx=bookObj['chapterNum'])
