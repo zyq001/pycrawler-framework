@@ -119,7 +119,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
             orgContent = capListJsonObj['data']['chapter']
             contentSoup = getSoupByStr(orgContent)
             if not contentSoup or '' == orgContent or len(orgContent) < 1:
-                myLogging.error('chap content null ,skip, capId:', str(cid), ' mid: ',str(mid))
+                myLogging.error('chap content null ,skip, capId:' + str(cid) + ' mid: ' + str(mid))
                 resIdx = min(cid, resIdx)
                 continue
             if contentSoup.body['style']:

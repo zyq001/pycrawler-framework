@@ -166,7 +166,7 @@ def qichachaFromIndustry(f,t):
                 qichachaFromIndustPageUrl(subUrl,conn, csor)
                 myLogging.info('end sub indust base pages, %s', subUrl)
         except Exception as e:
-            myLogging.error('indust error, industCode: %s url: %s; error: ',industCode, inductBasePageUrl, e)
+            myLogging.error('indust error, industCode: %s url: %s; error: %s ',industCode, inductBasePageUrl, e)
 
 
 def qichachaFromIndustPageUrl(url,conn, csor):
@@ -186,7 +186,7 @@ def qichachaFromIndustPageUrl(url,conn, csor):
 def dealUIDsBySoup(conn, csor, pageCount, pageSoup, prov):
     uidList = pageSoup.select('.list-group-item')
     if len(uidList) < 1:
-        myLogging.error('no com list, skip %s page:', prov, pageCount)
+        myLogging.error('no com list, skip %s page: %s', prov, pageCount)
         return
         # continue
     for uidTag in uidList:
@@ -206,7 +206,7 @@ def dealUIDsBySoup(conn, csor, pageCount, pageSoup, prov):
                 continue
             insertWithUid(conn, csor, prv, uid)
         except Exception as ee:
-            myLogging.error( 'uid: %s error: ' , uid, ee)
+            myLogging.error( 'uid: %s error: %s' , uid, ee)
             # com_name = com_base_info_json['data']['Company']['Name']
             # com_name = com_base_info_json['data']['Company']['Name']
 
@@ -258,7 +258,7 @@ def insertWithUid(conn2, csor2, prv, uid):
         statisMysqlInsert(staticInsertCarry, thisSpentTime)
 
     except Exception as e:
-        myLogging.error('insert error, uid: %s, error:', uid,  e)
+        myLogging.error('insert error, uid: %s, error:%s', uid,  e)
         #     # 发生错误时回滚
 
 
@@ -475,7 +475,7 @@ def getInvestListByNameId(quid, qCname):
 
 
     if quid in investBloom:
-        myLogging.warning( 'invest aready done before, uid:',quid)
+        myLogging.warning( 'invest aready done before, uid: %s',quid)
         return None
 
     url = 'http://www.qichacha.com/company_getinfos?unique=' + quid + '&companyname=' + quote(qCname.encode('utf-8')) +  '&tab=touzi'
@@ -539,7 +539,7 @@ def searchAndCrawlByName(comName, proxy=None):
     for uidTag in soup.select('ul.list-group a'):
         uid = uidTag['href'].replace('firm_', '')
         if uid == uidTag['href']:
-            myLogging.warning( 'not uid, skip',uidTag['href'])
+            myLogging.warning( 'not uid, skip %s',uidTag['href'])
             continue
 
         uid = uid.replace('.shtml', '').replace('/', '')
