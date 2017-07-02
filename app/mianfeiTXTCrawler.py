@@ -10,7 +10,8 @@ import MySQLdb
 import time
 
 from Config import EADHOST, EADPASSWD, OSSINTERNALENDPOINT, OSSUSER, OSSPASSWD, CapsBaseUrl, MianFeiTXTBookDetailUrl, \
-    MianFeiContentBaseUrl, MianFeiTXTBaseUrl, MianFeiTXTSearchBaseUrl, MINCHAPNUM
+    MianFeiContentBaseUrl, MianFeiTXTBaseUrl, MianFeiTXTSearchBaseUrl, MINCHAPNUM, MianFeiTXTChapBaseUrl, \
+    MianFeiTXTBookBaseUrl
 # from easouCrawl import insertCapWithCapObj
 # from framework.htmlParser import getSoupByStr
 # from networkHelper import getContentWithUA
@@ -23,6 +24,7 @@ from util.UUIDUtils import getCapDigest
 from util.htmlHelper import getSoupByStr, getSoupByUrl
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
+from util.signHelper import paramMap
 
 ua = 'Mozilla/5.0 (Linux; U; Android 4.0; en-us; Xoom Build/HRI39) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13'
 capListAPIDeviceInfo = '&soft_id=1&ver=110817&platform=an&placeid=1007&imei=862953036746111&cellid=13&lac=-1&sdk=18&wh=720x1280&imsi=460011992901111&msv=3&enc=666501479540451111&sn=1479540459901111&vc=e8f2&mod=M3'
@@ -91,7 +93,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
     uploadCap = 0
     succCapTimes = 1
     resIdx = startCapIdx
-    for cid in range(startCapIdx, count + 1):
+    for cid in range(startCapIdx, count + 3):
         try:
 
             if allowUpdate:
@@ -103,20 +105,23 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
             befCrawl = time.time()
             succCapTimes = succCapTimes + 1
 
-            capContentUrl = MianFeiContentBaseUrl + str(cid) + '&contentid=' + str(mid)
+            # capContentUrl = MianFeiContentBaseUrl + str(cid) + '&contentid=' + str(mid)
+            capContentUrl = MianFeiTXTChapBaseUrl + '?' + paramMap().mianfeiTXT().mBookId(bookObj['source']).mChapId(
+                cid).mianfeiTXTSign().toUrl()
+
             capContent = getContentWithUA(capContentUrl, ua)
             if not capContent:
                 capContent = getContentWithUA(capContentUrl, ua)
             # capContent = capContent.replace(r'\r', '').replace(r'\n', '')
             capListJsonObj = json.loads(capContent, strict=False)
-            if not (capListJsonObj['status'] == 1000):
+            if not (capListJsonObj['returnCode'] == '0000'):
                 capListJsonObj = json.loads(capContent)
-                if not (capListJsonObj['status'] == 1000 and capListJsonObj['message'] == u'成功'):
+                if not (capListJsonObj['returnCode'] == '0000' and capListJsonObj['returnMsg'] == u'成功'):
                     resIdx = min(cid, resIdx)
                     continue
 
             capObj = dict()
-            orgContent = capListJsonObj['data']['chapter']
+            orgContent = capListJsonObj['data']['bookChapter']['content']
             contentSoup = getSoupByStr(orgContent)
             if not contentSoup or '' == orgContent or len(orgContent) < 1:
                 myLogging.error('chap content null ,RETURN, capId:' + str(cid) + ' mid: ' + str(mid))
@@ -179,62 +184,66 @@ def getBookObj(allowUpdate, mid):
 
 
 def crawlCurrentBookObj(mid):
-    url = MianFeiTXTBaseUrl + str(mid)
+
+
+    # url = MianFeiTXTBaseUrl + str(mid)
+    url = MianFeiTXTBookBaseUrl + '?' + paramMap().mianfeiTXT().mBookId(mid).mianfeiTXTSign().toUrl()
+
     baseInfoContent = getContentWithUA(url, ua)
     if not baseInfoContent:
         baseInfoContent = getContentWithUA(url, ua)
     baseObj = json.loads(baseInfoContent)
-    baseData = baseObj['data']
+    baseData = baseObj['data']['book']
     author = baseData['author']
     title = baseData['name']
     coverUrl = baseData['coverUrl']
-    contentUrl = baseData['contentUrl']
-    count = baseData['count'] #不准，更新不及时
+    # contentUrl = baseData['contentUrl']
+    count = baseData['latestChapterCount'] #不准，更新不及时
     if count < MINCHAPNUM:
         myLogging.warning( 'chapNum too small, skip %s', str(mid))
         # return None, None
-    isOver = baseData['isOver']
-    BookType = '连载'
-    if isOver == 1:
-        BookType = '完结'
-    bookDetailHtml = getContentWithUA(MianFeiTXTBookDetailUrl + str(mid), ua)
-    bookDetailSoup = getSoupByStr(bookDetailHtml)
-    bookDesc = bookDetailSoup.select_one('#J-desc').get_text().replace('\n', '').replace('\t\t', '\t')
-    bookLabels = []
-    for span in bookDetailSoup.select('#J-lables-items span'):
-        bookLabels.append(span.get_text())
+    # isOver = baseData['isOver']
+    BookType = baseData['serialStatus']
+    # if isOver == 1:
+    #     BookType = '完结'
+    # bookDetailHtml = getContentWithUA(MianFeiTXTBookDetailUrl + str(mid), ua)
+    # bookDetailSoup = getSoupByStr(bookDetailHtml)
+    # bookDesc = bookDetailSoup.select_one('#J-desc').get_text().replace('\n', '').replace('\t\t', '\t')
+    # bookLabels = []
+    # for span in bookDetailSoup.select('#J-lables-items span'):
+    #     bookLabels.append(span.get_text())
     bookObj = dict()
-    bookObj['subtitle'] = bookDesc
+    bookObj['subtitle'] = baseData['summary']
     bookObj['source'] = "" + str(mid)
-    bookObj['rawUrl'] = url
+    bookObj['rawUrl'] = MianFeiTXTBaseUrl + str(mid)
     bookObj['title'] = title
     bookObj['chapterNum'] = count #更新不及时
-    bookObj['imgUrl'] = coverUrl
+    bookObj['imgUrl'] = 'http://oss-public.antehao.cn/' + coverUrl
     bookObj['author'] = author
-    bookObj['size'] = count * 1000
-    bookObj['category'] = ''
-    if len(bookLabels) > 0:
-        bookObj['category'] = bookLabels[0]
-    bookObj['type'] = ''
-    if len(bookLabels) > 0:
-        bookObj['type'] = bookLabels[0]
-    if len(bookLabels) > 1:
-        bookObj['type'] = bookLabels[1]
+    bookObj['size'] = baseData['words']
+    bookObj['category'] = baseData['secondCategory']
+    # if len(bookLabels) > 0:
+    # bookObj['category'] = bookLabels[0]
+    bookObj['type'] = baseData['thirdCategory']
+    # if len(bookLabels) > 0:
+    #     bookObj['type'] = bookLabels[0]
+    # if len(bookLabels) > 1:
+    #     bookObj['type'] = bookLabels[1]
     bookObj['bookType'] = BookType
     bookObj['typeCode'] = 0
     bookObj['categoryCode'] = 0
     bookObj['viewNum'] = random.randint(500000, 1000000)
 
 #获取最新章节下标，作为另一个判断更新的条件
-    bookObj['latestCapIndex'] = 0
-    try:
-
-        capExamples = bookDetailSoup.select('.J-category-li')
-        if capExamples and len(capExamples) > 2:
-            bookObj['latestCapIndex'] = int(capExamples[2]['id'])#就要第三个，有时候共有3个，有时共有6个
-
-    except Exception  :
-        myLogging.warning(traceback.format_exc())
+    bookObj['latestCapIndex'] = baseData['latestChapterId']
+    # try:
+    #
+    #     capExamples = bookDetailSoup.select('.J-category-li')
+    #     if capExamples and len(capExamples) > 2:
+    #         bookObj['latestCapIndex'] = int(capExamples[2]['id'])#就要第三个，有时候共有3个，有时共有6个
+    #
+    # except Exception  :
+    #     myLogging.warning(traceback.format_exc())
 
     return bookObj, count
 

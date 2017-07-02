@@ -63,6 +63,47 @@ def getMianAllBookObjs():
 
     return bookObjs
 
+def getMianAllBookBaseObjs():
+    '''
+    获取所有免费TXT的基础：id,名称作者，等
+    :return bookObjs即： [bookObj{"id":"1",,}]: 
+    '''
+
+    conn, csor = getDushuConnCsor()
+
+    csor.execute("SELECT id,title,author,source from cn_dushu_book where rawUrl like"
+                 " 'http://api.yingyangcan.com.cn/interface/ajax/book/getbaseinfo.ajax?%' and bookType = '连载' limit 10;")
+    conn.commit()
+    results = csor.fetchall()
+
+    bookObjs = []
+    for book in results:
+        bookId = book[0]
+        # chapterNum = book[1]
+        mid = book[3]
+        title = book[1]
+        author = book[2]
+        if 'mianfeiTXT' in mid:
+            mid = mid.replace('mianfeiTXT', '')
+        # bookDigest = book[4]
+
+        bookObj = dict()
+        bookObj['id'] = bookId
+        bookObj['source'] = mid
+        # bookObj['digest'] = bookDigest
+        # bookObj['rawUrl'] = rawUrl
+        # bookObj['rawUrl'] = rawUrl
+        # bookObj['chapterNum'] = chapterNum
+        bookObj['title'] = title
+        bookObj['author'] = author
+
+        bookObjs.append(bookObj)
+
+    csor.close()
+    conn.close()
+
+    return bookObjs
+
 def getBookByTitle(title):
     '''
     用title获取bookObj

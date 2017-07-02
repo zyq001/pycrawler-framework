@@ -30,8 +30,10 @@ def getContent(url, ua = None):
 
     return None
 
-def getContentWithUA(url, ua):
+def getContentWithUA(url, ua = None):
 
+    if not ua:
+        ua  = random.choice(USER_AGENTS)
     import requests
     s = requests.Session()
     headers = {u'user-agent': ua}

@@ -8,6 +8,8 @@
 
 import time
 
+import requests
+
 from app.mianfeiTXTUpdater import mianfeiUpdateByBookObj
 from app.shuqiUpdater import updateFromMysql
 from dao.dushuMianFeiTXTService import getBookByTitle, deleteNLastChaps
@@ -31,7 +33,19 @@ def fixUnuploadMianfeiChaps():
             mianfeiUpdateByBookObj(bookObj)
 
 
+def deleteESDocs():
+    baseUrl = 'http://123.56.66.33:19200/dushu/book/'
+    count = 12000
+    for i in range(2124594, 2100000, -1):
+        url = baseUrl + str(i)
+        r = requests.delete(url)
+        if r.status_code == 200:
+            count = count -1
+            if count < 1:
+                return
+    return count
 if __name__ == '__main__':
+    deleteESDocs()
     fixUnuploadMianfeiChaps()
     lastTime = 0
     while 1:

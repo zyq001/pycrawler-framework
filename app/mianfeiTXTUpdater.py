@@ -43,7 +43,7 @@ def mianfeiUpdateByBookObj(bookObj, maxChapNum = 0):
             updateBoostWithUpdateTime(bookObj['id'])
             myLogging.info( newBookObj['title'].encode('utf-8') + ' update ' \
                   + str(resIdx - bookObj['chapterNum']) + ' chaps (mianTxt) ')
-            if '连载' != newBookObj['bookType']:
+            if u'连载' != newBookObj['bookType']:
                 updateOneFieldByOneField('bookType', newBookObj['bookType'], 'id', bookObj['id'])
                 myLogging.info( newBookObj['title'].encode('utf-8') + newBookObj['bookType'])
     else:
