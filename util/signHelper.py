@@ -82,7 +82,7 @@ class paramMap(dict):
         return self
 
     def toUrl(self):
-        return quote(map2UrlStr(self))
+        return map2UrlStr(self)
 
     def put(self, k, v):
         self[k] = v
