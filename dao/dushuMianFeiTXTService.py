@@ -34,7 +34,8 @@ def getMianAllBookObjs():
     conn, csor = getDushuConnCsor()
 
     csor.execute("SELECT id,rawUrl,chapterNum,source,digest from cn_dushu_book where rawUrl like"
-                 " 'http://api.yingyangcan.com.cn/interface/ajax/book/getbaseinfo.ajax?%' and bookType = '连载';")
+                 " 'http://api.yingyangcan.com.cn/interface/ajax/book/getbaseinfo.ajax?%' "
+                 "and bookType = '连载' and updateTime > 1498924800;")
     conn.commit()
     results = csor.fetchall()
 

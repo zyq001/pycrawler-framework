@@ -16,7 +16,7 @@ def mianfeiTxtUpdateFromMysql():
     bookObjs = getMianAllBookObjs()
     for bookObj in bookObjs:
         try:
-            mianfeiUpdateByBookObj(bookObj, maxChapNum = 1000000)
+            mianfeiUpdateByBookObj(bookObj, maxChapNum = 0)
 
         except Exception as e:
             myLogging.error('mianTxt update book ' + str(bookObj['id']) +' raise exception ')

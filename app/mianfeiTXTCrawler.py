@@ -93,7 +93,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
     uploadCap = 0
     succCapTimes = 1
     resIdx = startCapIdx
-    for cid in range(startCapIdx, count + 3):
+    for cid in range(startCapIdx, count + 1):
         try:
 
             if allowUpdate:
@@ -118,7 +118,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
                 capListJsonObj = json.loads(capContent)
                 if not (capListJsonObj['returnCode'] == '0000' and capListJsonObj['returnMsg'] == u'成功'):
                     resIdx = min(cid, resIdx)
-                    continue
+                    return resIdx  # 原api接口更新不及时，为了配合后来的 无限向前重试方法，在这跳出
 
             capObj = dict()
             orgContent = capListJsonObj['data']['bookChapter']['content']
