@@ -466,12 +466,14 @@ def getCapObjsByBookObj(allowUpdate, bookId, bookObj):
     dbLatestChapObj = None
     hasDeleted = False #是否 发现遗漏的章节并已清除后面的章节
     lastTitle = None #遍历章节列表时，记录上一loop的title，需要删除时从此章开始往后删
+    indexStart = 0
     if allowUpdate:
         chapTitles = getChapTitlesByBookId(bookObj['id'])  # 已在库中的章节名称，下标不太靠谱
         dbLatestChapObj = getLatestChapByBookId(bookObj['id'])
+        indexStart = max(dbLatestChapObj['idx'] - 5, 0)
 
     global donedegest
-    for j in range(0, len(capList)):
+    for j in range(indexStart, len(capList)):
 
 
         capId = capList[j]['cid']
