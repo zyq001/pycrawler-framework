@@ -197,5 +197,5 @@ def shanpshot():
     img = driver.find_element_by_css_selector('#main').screenshot_as_png
 
     upload2Bucket(getToday() + '.png', img)
-
+    driver.quit()
     return 'http://dushu-content.oss-cn-shanghai.aliyuncs.com/' + getToday() + '.png'
