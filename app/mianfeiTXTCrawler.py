@@ -235,7 +235,7 @@ def crawlCurrentBookObj(mid):
     bookObj['viewNum'] = random.randint(500000, 1000000)
 
 #获取最新章节下标，作为另一个判断更新的条件
-    bookObj['latestCapIndex'] = baseData['latestChapterId']
+    bookObj['latestCapIndex'] = min(baseData['latestChapterId'], 200000)
     # try:
     #
     #     capExamples = bookDetailSoup.select('.J-category-li')
