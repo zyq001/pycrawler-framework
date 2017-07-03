@@ -71,8 +71,8 @@ def getMianAllBookBaseObjs():
 
     conn, csor = getDushuConnCsor()
 
-    csor.execute("SELECT id,title,author,source from cn_dushu_book where rawUrl like"
-                 " 'http://api.yingyangcan.com.cn/interface/ajax/book/getbaseinfo.ajax?%' and bookType = '连载' limit 10;")
+    csor.execute("SELECT id,title,author,source from cn_dushu_book where id > 2023244 and  rawUrl like"
+                 " 'http://api.yingyangcan.com.cn/interface/ajax/book/getbaseinfo.ajax?%' and bookType = '连载' ;")
     conn.commit()
     results = csor.fetchall()
 

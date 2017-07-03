@@ -17,7 +17,11 @@ def getMD5(forDigest):
     '''
 
     m2 = hashlib.md5()
-    m2.update(forDigest.encode('utf-8'))
+    if isinstance(forDigest, unicode):
+        m2.update(forDigest.encode('utf-8'))
+    elif isinstance(forDigest, str):
+        m2.update(forDigest)
+
     digest = m2.hexdigest()
     return digest
 

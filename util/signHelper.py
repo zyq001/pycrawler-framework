@@ -6,6 +6,7 @@
 @author: zyq
 '''
 import json
+import urllib
 from urllib import quote
 
 import requests
@@ -18,11 +19,23 @@ from util.timeHelper import getFormatedTimeSec
 
 
 def tup2UrlStr(pMap):
-    return json.dumps(pMap).replace('", "','=').replace('"','').replace('[', '').replace(']', '').replace(', ', '&')
+    res = []
+    for entry in pMap:
+        res.append(entry[0] + '=' + entry[1])
+    return '&'.join(res)
+    # mapstr = unicode(pMap).encode('utf-8')
+    # return mapstr.replace("', '",'=').replace('"','').replace('[', '').replace(']', '')\
+    #     .replace(', ', '&').replace("'", '').replace('(', '').replace(')', '')
 
 def map2UrlStr(pMap):
-    return json.dumps(pMap).replace(',','&').replace('"','').replace('{', '').replace('}', '')\
-        .replace(':', '=').replace(' ', '')
+    res = []
+    for entry in pMap.keys():
+        res.append(entry + '=' + pMap[entry])
+    return '&'.join(res)
+    # return json.dumps(pMap).replace(',','&').replace('"','').replace('{', '').replace('}', '')\
+    mapstr = unicode(pMap).encode('utf-8')
+    return mapstr.replace(',', '&').replace('"', '').replace('{', '').replace('}', '')\
+        .replace(':', '=').replace(' ', '').replace("'", '')
 
 
 def getMianTxtSign(paramMap):
@@ -34,6 +47,9 @@ def getMianTxtSign(paramMap):
     sortedMap.sort()
 
     paramStr = tup2UrlStr(sortedMap)
+    # paramStr = 'algorithm=MD5&apiKey=001&appId=26&bundle=com.mftxtxs.novel&channelId=2&keyword='\
+    #            + '大主宰' + '&nouce=e694501a6cd844a797c98dedfc3c04f1&osType=2&pageNum=1&pageSize=10&sid=SID&timestamp=1498921779533&type=1&userId=201706202002092307744175&userType=0&v=1&version=3.4.0'
+    # paramStr = urllib.urlencode(sortedMap)
 
     return getMD5(paramStr  + "&" + "9dbfbfd095fe6648cbc14a8d19952791")
 
@@ -82,7 +98,7 @@ class paramMap(dict):
         return self
 
     def toUrl(self):
-        return map2UrlStr(self)
+        return urllib.urlencode(self)
 
     def put(self, k, v):
         self[k] = v

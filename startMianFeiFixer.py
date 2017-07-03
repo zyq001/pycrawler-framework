@@ -9,6 +9,7 @@ import json
 from urllib import quote
 
 import requests
+import time
 
 from Config import MianFeiTXTSearchBaseUrl, MianFeiTXTChapBaseUrl
 from app.mianFeiFixer import fixUnFinished
@@ -22,6 +23,7 @@ from util.signHelper import paramMap
 def changeSouceIds():
     bookObjs = getMianAllBookBaseObjs()
     for bookObj in bookObjs:
+        foundNewId = False
         title = bookObj['title']
         author = bookObj['author']
         source = bookObj['source']
@@ -29,11 +31,11 @@ def changeSouceIds():
 
         searchUrl = MianFeiTXTSearchBaseUrl + '?' + paramMap().mianfeiTXT()\
             .put('keyword', (title + author).encode('utf-8'))\
-            .put('pageSize', '5').put('pageNum', '1').put('type', '1')\
+            .put('pageSize', '10').put('pageNum', '1').put('type', '1')\
             .mianfeiTXTSign() \
-            .put('keyword', quote((title + author).encode('utf-8')))\
             .toUrl()
 
+        # time.sleep(random.)
         r = requests.get(searchUrl)
 
         searchRes = json.loads(r.text)
@@ -45,12 +47,15 @@ def changeSouceIds():
             if resAuthor != author:
                 continue
 
-            resId = resBook['bookId']
+            resId = resBook['id']
+
+            if str(resId) == str(source):
+                myLogging.info('WTF: id no change?, bookId: %s, orgSoueceId: %s,  newId: %s', bookId, source, resId)
 
             latestChapObj = getLatestChapByBookId(bookId)
             if not latestChapObj:
                 myLogging.error('no chaps in db yet, bookId: %s, new mid: %s', bookId, resId)
-                # updateOneFieldByOneField('source', resId, 'id', bookId)
+                updateOneFieldByOneField('source', resId, 'id', bookId)
                 break
 
             cid = latestChapObj['idx']
@@ -73,9 +78,11 @@ def changeSouceIds():
             chapterName = capListJsonObj['data']['bookChapter']['chapterName']
             if chapterName == chapTitle:
                 myLogging.info('bookId %s change source  from %s to %s', bookId, source, resId)
-                # updateOneFieldByOneField('source', resId, 'id', bookId)
-
-        myLogging.error('bookId %s did not find new id !!!,title: %s, author: %s, org source: %s', bookId, title, author,source )
+                updateOneFieldByOneField('source', resId, 'id', bookId)
+                foundNewId = True
+                break
+        if not foundNewId:
+            myLogging.error('bookId %s did not find new id !!!,title: %s, author: %s, org source: %s', bookId, title, author,source )
 
 
 
@@ -85,12 +92,13 @@ def changeSouceIds():
 if __name__ == '__main__':
     # fixUnFinished()
 
+    # title = '大主宰'
     # searchUrl = MianFeiTXTSearchBaseUrl + '?' + paramMap().mianfeiTXT() \
-    #     .put('keyword', (u'大主宰').encode('utf-8')) \
+    #     .put('keyword', title) \
     #     .put('pageSize', '10').put('pageNum', '1').put('type', '1') \
     #     .mianfeiTXTSign().toUrl()
     #
     # r = requests.get(searchUrl)
-    #
     # searchRes = json.loads(r.text)
+
     changeSouceIds()
