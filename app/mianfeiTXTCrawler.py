@@ -200,8 +200,8 @@ def crawlCurrentBookObj(mid):
     # contentUrl = baseData['contentUrl']
     count = baseData['latestChapterCount'] #不准，更新不及时
     if count < MINCHAPNUM:
-        myLogging.warning( 'chapNum too small, skip %s', str(mid))
-        # return None, None
+        myLogging.warning( 'chapNum too small, skip %s,  return', str(mid))
+        return None, None
     # isOver = baseData['isOver']
     BookType = baseData['serialStatus']
     # if isOver == 1:
