@@ -118,6 +118,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
                 capListJsonObj = json.loads(capContent)
                 if not (capListJsonObj['returnCode'] == '0000' and capListJsonObj['returnMsg'] == u'成功'):
                     resIdx = min(cid, resIdx)
+                    myLogging.info('chap content null ,RETURN, capId:' + str(cid) + ' mid: ' + str(mid))
                     return resIdx  # 原api接口更新不及时，为了配合后来的 无限向前重试方法，在这跳出
 
             capObj = dict()

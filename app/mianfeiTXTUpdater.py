@@ -47,7 +47,7 @@ def mianfeiUpdateByBookObj(bookObj, maxChapNum = 0):
                 updateOneFieldByOneField('bookType', newBookObj['bookType'], 'id', bookObj['id'])
                 myLogging.info( newBookObj['title'].encode('utf-8') + newBookObj['bookType'])
     else:
-        myLogging.debug(newBookObj['title'].encode('utf-8') + ' no update (mianTxt)')
+        myLogging.info(newBookObj['title'].encode('utf-8') + ' no update (mianTxt)')
 
 def mianfeiUpdateById(dbid):
     '''
