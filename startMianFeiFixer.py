@@ -58,6 +58,7 @@ def changeSouceIds():
                 if not latestChapObj:
                     myLogging.error('no chaps in db yet, bookId: %s, new mid: %s', bookId, resId)
                     updateOneFieldByOneField('source', resId, 'id', bookId)
+                    foundNewId = True
                     break
 
                 cid = latestChapObj['idx']
