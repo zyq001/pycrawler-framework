@@ -49,7 +49,7 @@ def deleteESDocs():
 if __name__ == '__main__':
 
     # ZssqCrawler('56928442c49f3bce42b7f521').crawl(allowUpdate=True)
-    QuanBenCrawler('576908fad48745522ce1fbd7').crawl(allowUpdate=True)
+    QuanBenCrawler('576989a21b341116f654d84a').crawl(allowUpdate=True)
     # deleteESDocs()
     # fixUnuploadMianfeiChaps()
     # lastTime = 0
