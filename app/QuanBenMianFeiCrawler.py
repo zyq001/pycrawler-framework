@@ -13,7 +13,8 @@ from urllib import quote
 
 import time
 
-from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM
+from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, bookInfoBaseUrl, \
+    srcListBaseUrl, chapListBaseUrl
 from app.baseCrawler import BaseCrawler
 from app.shuqi import shuqCategory
 from dao.aliyunOss import upload2Bucket
@@ -114,16 +115,7 @@ def startByQid(zid, srcId = None, allowUpdate=False):
 #                 myLogging.error(traceback.format_exc())
 
 
-def getChapObjs(bookObj):
-    zid = bookObj['zid']
-
-    bocObjs = getBookObjBiQid(zid)
-    for bocIdx in range(0, len(bocObjs)):
-        chapListObj = getChapsByBocId(bocIdx, bocObjs)
-    return chapListObj
-
 def getSourceId(qid):
-    srcListBaseUrl = 'http://api.wubutianxia.com:8090/V1/book/%s/source?version=25&packageName=com.quanben.novel'
     srcUrl = srcListBaseUrl % str(qid)
 
     srcListContent = getContentWithUA(srcUrl)
@@ -160,7 +152,6 @@ def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
 
     categDict = shuqCategory
 
-    bookInfoBaseUrl = 'http://api.wubutianxia.com:8090/V1/book/%s/%s/cover?version=25&packageName=com.quanben.novel'
     bookInfoUrl = bookInfoBaseUrl % (qid, srcId)
     bookInfoContent = getContentWithUA(bookInfoUrl)
     bookInfoObj = json.loads(bookInfoContent)
@@ -187,7 +178,6 @@ def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
 
     bookObj['source'] = qid + '/' + srcId
 
-    chapListBaseUrl = 'http://api.wubutianxia.com:8090/V1/book/%s/%s/chapter?version=25&packageName=com.quanben.novel'
     chapListUrl = chapListBaseUrl % (qid, srcId)
 
     chapListContent = getContentWithUA(chapListUrl)
@@ -238,66 +228,6 @@ def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
 
     # return bocObjs
 
-
-def getChapsByBocId(bocIdx, bocObjs):
-    bocObj = bocObjs[bocIdx]
-    bocId = bocObj['_id']
-    chapListUrl = 'http://api.zhuishushenqi.com/btoc/%s?view=chapters' % (bocId)
-    chapsText = getContentWithUA(chapListUrl)
-    # if not chapsText:
-    # return
-    chapListObj = json.loads(chapsText)
-    return chapListObj
-
-
-def parseInsertBook(allowUpdate, bookObj, zid):
-
-    categDict = shuqCategory
-    zssqStaticUrl = 'http://statics.zhuishushenqi.com/'
-
-    bookObj['zid'] = bookObj['_id']
-
-    bookObj['imgUrl'] = urlparse.urljoin(zssqStaticUrl, bookObj['cover'])
-    bookObj['category'] = bookObj['majorCate']
-    bookObj['type'] = bookObj['minorCate']
-    bookObj['typeCode'] = 0
-    if categDict.has_key(bookObj['type']):
-        if categDict[bookObj['type']]['id'] and len(categDict[bookObj['type']]['id']) > 0:
-            bookObj['typeCode'] = int(categDict[bookObj['type']]['id'])
-    bookObj['category'] = bookObj['majorCate']
-    bookObj['categoryCode'] = 0
-    if categDict.has_key(bookObj['category']):
-        if categDict[bookObj['category']]['id'] and len(categDict[bookObj['category']]['id']) > 0:
-            bookObj['categoryCode'] = int(categDict[bookObj['category']]['id'])
-    bookObj['size'] = bookObj['wordCount']
-    bookObj['chapterNum'] = bookObj['chaptersCount']
-
-
-    if bookObj['chapterNum'] < MINCHAPNUM:
-        myLogging.warning( 'chapNum too small, skip %s,  return', str(zid))
-        return None
-
-    bookObj['subtitle'] = bookObj['longIntro']
-    bookObj['viewNum'] = int(bookObj['latelyFollower']) * 9
-    if bookObj['isSerial']:
-        bookObj['bookType'] = '连载'
-    else:
-        bookObj['bookType'] = '完结'
-    bookObj['source'] = zid
-    bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid)
-
-    bookObj = insertBookWithConn(bookObj, allowUpdate)
-    return bookObj
-
-
-
-def getBookObjBiZid(zid):
-
-    bookInfoUrl = ZSSQBOOKINFOBASEURL + str(zid)
-    bookInfoText = getContentWithUA(bookInfoUrl)
-    if not bookInfoText:
-        return None
-    return json.loads(bookInfoText)
 
 
 class QuanBenCrawler(BaseCrawler):
