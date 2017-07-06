@@ -11,6 +11,7 @@ import random
 import re
 
 import time
+import traceback
 
 import MySQLdb
 
@@ -135,7 +136,7 @@ def insertBookWithConn(bookObj, allowUpdate = True, conn2 = None,csor2 = None):
         myLogging.info( 'succ book, ' + unicode(bookObj['title']).encode('utf-8'))
     except Exception as e:
         #     # 发生错误时回滚
-        myLogging.warning( 'update rollback; maybe exists， ' + bookObj['rawUrl'] + str(e))
+        myLogging.warning( 'update rollback; maybe exists，rawUrl: %s, err:  %s', bookObj['rawUrl'] , traceback.format_exc())
         if conn2:
             try:
                 conn2.rollback()
@@ -165,6 +166,7 @@ def insertBookWithConn(bookObj, allowUpdate = True, conn2 = None,csor2 = None):
     conn2.close()
 
     return bookObj
+
 
 
 def getCapIdxsByBookId(bookId):

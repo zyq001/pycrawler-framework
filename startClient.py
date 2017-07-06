@@ -10,6 +10,8 @@ import time
 
 import requests
 
+from app.QuanBenMianFeiCrawler import QuanBenCrawler
+from app.ZhuiShuShenQiCrawler import ZssqCrawler
 from app.mianfeiTXTUpdater import mianfeiUpdateByBookObj
 from app.shuqiUpdater import updateFromMysql
 from dao.dushuMianFeiTXTService import getBookByTitle, deleteNLastChaps
@@ -45,14 +47,17 @@ def deleteESDocs():
                 return
     return count
 if __name__ == '__main__':
-    deleteESDocs()
-    fixUnuploadMianfeiChaps()
-    lastTime = 0
-    while 1:
-        nowTime = time.time()
-        sinceLastTime = nowTime - lastTime
-        if sinceLastTime < 24 * 3600:
-            print getToday() + ' sleep ' + str(24* 3600 - sinceLastTime) + 's until 24h after last time.'
-            time.sleep(24* 3600 - sinceLastTime)
-        lastTime = time.time()
-        updateFromMysql()
+
+    # ZssqCrawler('56928442c49f3bce42b7f521').crawl(allowUpdate=True)
+    QuanBenCrawler('576908fad48745522ce1fbd7').crawl(allowUpdate=True)
+    # deleteESDocs()
+    # fixUnuploadMianfeiChaps()
+    # lastTime = 0
+    # while 1:
+    #     nowTime = time.time()
+    #     sinceLastTime = nowTime - lastTime
+    #     if sinceLastTime < 24 * 3600:
+    #         print getToday() + ' sleep ' + str(24* 3600 - sinceLastTime) + 's until 24h after last time.'
+    #         time.sleep(24* 3600 - sinceLastTime)
+    #     lastTime = time.time()
+    #     updateFromMysql()

@@ -3,6 +3,7 @@
 import random
 
 from app.ShuqiCrawler import ShuqiCrawler
+from app.ZhuiShuShenQiCrawler import ZssqCrawler
 from app.ershoufang import Ershoufang
 from app.mianfeiTXTCrawler import MianFeiTXTCrawler
 from app.mianfeiTXTUpdater import MianFeiTXTUpdater
@@ -153,6 +154,7 @@ if __name__ == '__main__':
     crawlManager.crawlers['mianFeiTXT'] = MianFeiTXTCrawler
     crawlManager.crawlers['mianFeiTXTUpdater'] = MianFeiTXTUpdater
     crawlManager.crawlers['shuqiUpdater'] = ShuqiUpdater
+    crawlManager.crawlers['zssqCrawler'] = ZssqCrawler
     webApp = WebServer()
     webApp.run(port=10008)
     # manager = Manager()
