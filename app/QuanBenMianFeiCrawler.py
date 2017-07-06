@@ -191,6 +191,9 @@ def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
 
     bookObj = insertBookWithConn(bookObj, allowUpdate)
 
+    if not bookObj:
+        myLogging.error('null bookObj after insert Book to db, bookId %s', qid)
+
     for chapObj in chapListObj['items']:
 
         try:
