@@ -313,7 +313,7 @@ class QuanBenCrawler(BaseCrawler):
         if not data.has_key('id'):
             raise InputException("requried field 'id' in data")
 
-        self.zid = data['id']
+        self.qid = data['id']
 
     def crawl(self, allowUpdate = False):
         print 'quanben crawl'
