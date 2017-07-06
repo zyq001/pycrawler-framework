@@ -120,7 +120,7 @@ def insertBookWithConn(bookObj, allowUpdate = True, conn2 = None,csor2 = None):
     bookObj['digest'] = digest
 
     if not bookObj.has_key('source'):
-        bookObj['source'] = 'yisouxiaoshuo'
+        bookObj['source'] = ''
 
     try:
         csor2.execute('insert  ' + db_dushu +

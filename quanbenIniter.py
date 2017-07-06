@@ -25,7 +25,7 @@ def fromTopNBookIds():
     print 'load to dict uniq ' + str(len(bidsSet))
     for bid in bidsSet:
         try:
-            QuanBenCrawler('576989a21b341116f654d84a').crawl(allowUpdate=False)
+            QuanBenCrawler(bid).crawl(allowUpdate=False)
 
         except Exception as e:
             myLogging.error('bookId %s has exception: ' + traceback.format_exc(), bid)
