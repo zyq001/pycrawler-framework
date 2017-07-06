@@ -1,2 +1,2 @@
 #!/bin/bash
-nohup python -u quanbenIniter.py  >> logs/quanbenTopIniter.log 2>&1 &
+nohup python -u mianfeiTXTIniter.py 190000 200000 >> logs/mianfei200000.log 2>&1 &
