@@ -1,0 +1,2 @@
+http://static.bookapi.cn/static/images/default_3.jpg
+http://image.book.easou.com/i/default/cover.jpg

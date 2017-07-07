@@ -45,7 +45,7 @@ def getBookObjById(dbid):
 
 def updateBoostWithUpdateTime(dbid):
     '''
-    更加库中主键id获取book对象
+    根据库中主键id获取book对象
     :param dbid: 
     :return: 
     '''
@@ -369,7 +369,7 @@ def insertCapWithCapObj2(capObj, conn2 = None, csor2 = None):
     conn2.close()
 
 
-def insertCapWithCapObj(capObj, conn2 = None, csor2 = None):
+def insertCapWithCapObj(capObj, conn2 = None, csor2 = None, allowUpdate = False):
     if not conn2 or not csor2:
         conn2,csor2 = getDushuConnCsor()
 
@@ -396,7 +396,8 @@ def insertCapWithCapObj(capObj, conn2 = None, csor2 = None):
                 conn2.rollback()
             except Exception as ee:
                 myLogging.error(ee)
-        return None
+        if not allowUpdate:
+            return None
     try:
         csor2.execute("select id,bookId from cn_dushu_acticle where digest = %s;", (capObj['digest'],))
         conn2.commit()

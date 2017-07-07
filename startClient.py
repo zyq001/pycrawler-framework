@@ -11,6 +11,7 @@ import time
 import requests
 
 from app.QuanBenMianFeiCrawler import QuanBenCrawler
+from app.QuanbenUpdater import updateByDbBookId
 from app.ZhuiShuShenQiCrawler import ZssqCrawler
 from app.mianfeiTXTUpdater import mianfeiUpdateByBookObj
 from app.shuqiUpdater import updateFromMysql
@@ -47,9 +48,9 @@ def deleteESDocs():
                 return
     return count
 if __name__ == '__main__':
-
+    # updateByDbBookId(2137876)
     # ZssqCrawler('56928442c49f3bce42b7f521').crawl(allowUpdate=True)
-    QuanBenCrawler('576989a21b341116f654d84a').crawl(allowUpdate=True)
+    QuanBenCrawler('57690cb00fca687a1179c3b1').crawl(allowUpdate=True)
     # deleteESDocs()
     # fixUnuploadMianfeiChaps()
     # lastTime = 0

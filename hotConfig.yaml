@@ -6,3 +6,7 @@ shuqiUpdater:
 mianFeiTXTUpdater:
   updateSleep:
     600
+
+QuanBenUpdater:
+  updateSleep:
+    600

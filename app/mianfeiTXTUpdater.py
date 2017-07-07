@@ -35,7 +35,7 @@ def mianfeiUpdateByBookObj(bookObj, maxChapNum = 0):
         return
     latestCapIndex = newBookObj['latestCapIndex']
     newChapNum = max(newChapNum, latestCapIndex, maxChapNum)
-    if newChapNum > bookObj['chapterNum'] :
+    if newChapNum >= bookObj['chapterNum'] :
         resIdx = handleCapsByBookObj(allowUpdate=True, bookObj=bookObj, count=newChapNum
                                      , mid=mid, startCapIdx=bookObj['chapterNum'])
         if resIdx > bookObj['chapterNum']:
@@ -80,5 +80,5 @@ class MianFeiTXTUpdater(BaseCrawler):
 
 
 if __name__ == '__main__':
-    mianfeiTxtUpdateFromMysql()
-    # mianfeiUpdateById(2010194)
+    # mianfeiTxtUpdateFromMysql()
+    mianfeiUpdateById(2000112)

@@ -21,6 +21,7 @@ from dao.aliyunOss import upload2Bucket
 from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getCapIdxsByBookId
 from exception.InputException import InputException
 from util.UUIDUtils import getCapDigest
+from util.defaultImgHelper import checkDefaultImg
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
 
@@ -135,15 +136,15 @@ def getSourceId(qid):
     if srcItems.has_key('api.zhuishuwang.com'):
         return srcItems['api.zhuishuwang.com'][0]['book_source_id']
 
-    updateTIme = 0
-    resId = ''
-    for itmkey in srcItems.keys():
-        if srcItems[itmkey][0]['update_time'] > updateTIme:
-            resId = srcItems[itmkey][0]['57e38f4fb1e618093fded24d']
-            updateTIme = srcItems[itmkey][0]['update_time']
-
-    return resId
-
+    # updateTIme = 0
+    # resId = ''
+    # for itmkey in srcItems.keys():
+    #     if srcItems[itmkey][0]['update_time'] > updateTIme:
+    #         resId = srcItems[itmkey][0]['book_source_id']
+    #         updateTIme = srcItems[itmkey][0]['update_time']
+    #
+    # return resId
+    raise InputException('no zhuishuwang source, skip')
 
 
 def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
@@ -158,7 +159,7 @@ def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
     bookObj = bookInfoObj['items'][0]
     bookObj['title'] = bookObj['name']
     bookObj['subtitle'] = bookObj['desc']
-    bookObj['imgUrl'] = bookObj['img_url']
+    bookObj['imgUrl'] = checkDefaultImg(bookObj['img_url'])
 
     if bookObj['status'] == 'SERIALIZE':
         bookObj['bookType'] = u'连载'
@@ -186,6 +187,10 @@ def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
 
     chapNum = len(chapListObj['items'])
     bookObj['chapterNum'] = chapNum
+
+    if bookObj['chapterNum'] < MINCHAPNUM:
+        myLogging.error('chap num too small skip, bookId %s', qid)
+        return
     bookObj['size'] = chapNum * random.randint(1000, 3000)
     bookObj['viewNum'] = chapNum * random.randint(20000, 30000)
 
@@ -198,40 +203,36 @@ def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
     for chapObj in chapListObj['items']:
 
         try:
-            chapContentUrl = chapObj['url']
-            chapContent = getContentWithUA(chapContentUrl)
-            chapContentObj = json.loads(chapContent)
-            chapObj.update(chapContentObj)
-
-
-            chapObj['title'] = chapObj['name']
-
-            chapObj['rawUrl'] = chapContentUrl
-            chapObj['idx'] = int(chapObj['serialNumber'])
-            del chapObj['serialNumber']
-            chapObj['size'] = len(chapObj['content'])
-            chapObj['bookId'] = bookObj['id']
-            chapObj['source'] = bookObj['source']
-            chapObj['bookUUID'] = bookObj['digest']
-
-            digest = getCapDigest(bookObj, chapObj, chapObj['bookChapterId'])
-            chapObj['digest'] = digest
-
-            capId = insertCapWithCapObj(chapObj)
-
-            # aftInsertCap = time.time()
-            # insertCap = insertCap + (aftInsertCap - befInsertCap)
-
-            if not capId:
-                myLogging.error('no chapId cid %s', chapObj['bookChapterId'])
-                continue
-            upload2Bucket(str(chapObj['id']) + '.json', json.dumps(chapObj))
+            handlChapByBookObjChapObj(allowUpdate, bookObj, chapObj)
 
         except Exception as e:
             myLogging.error(traceback.format_exc())
 
     # return bocObjs
 
+
+def handlChapByBookObjChapObj(allowUpdate, bookObj, chapObj):
+    chapContentUrl = chapObj['url']
+    chapContent = getContentWithUA(chapContentUrl)
+    chapContentObj = json.loads(chapContent)
+    chapObj.update(chapContentObj)
+    chapObj['title'] = chapObj['name']
+    chapObj['rawUrl'] = chapContentUrl
+    chapObj['idx'] = int(chapObj['serialNumber'])
+    del chapObj['serialNumber']
+    chapObj['size'] = len(chapObj['content'])
+    chapObj['bookId'] = bookObj['id']
+    chapObj['source'] = bookObj['source']
+    chapObj['bookUUID'] = bookObj['digest']
+    digest = getCapDigest(bookObj, chapObj, chapObj['bookChapterId'])
+    chapObj['digest'] = digest
+    capId = insertCapWithCapObj(chapObj, allowUpdate=allowUpdate)
+    # aftInsertCap = time.time()
+    # insertCap = insertCap + (aftInsertCap - befInsertCap)
+    if not capId:
+        myLogging.error('no chapId cid %s', chapObj['bookChapterId'])
+        return
+    upload2Bucket(str(chapObj['id']) + '.json', json.dumps(chapObj))
 
 
 class QuanBenCrawler(BaseCrawler):
@@ -252,6 +253,7 @@ class QuanBenCrawler(BaseCrawler):
     def crawl(self, allowUpdate = False):
         print 'quanben crawl'
         if self.qid:
+            print 'bookId : ' + self.qid
             startByQid(self.qid, allowUpdate=allowUpdate)
 
     def output(self):
