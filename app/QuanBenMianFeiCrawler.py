@@ -167,6 +167,7 @@ def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
         bookObj['bookType'] = u'完结'
 
     bookObj['rawUrl'] = bookInfoUrl
+    bookObj['categoryCode'] = 0
 
     bookObj['category'] = bookObj['labels']
     if categDict.has_key(bookObj['category']):
