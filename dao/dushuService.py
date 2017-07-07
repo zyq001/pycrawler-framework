@@ -134,9 +134,9 @@ def insertBookWithConn(bookObj, allowUpdate = True, conn2 = None,csor2 = None):
         #   , (bookObj['subtitle'],digest))
         conn2.commit()
         myLogging.info( 'succ book, ' + unicode(bookObj['title']).encode('utf-8'))
-    except Exception as e:
+    except Exception , e:
         #     # 发生错误时回滚
-        myLogging.warning( 'update rollback; maybe exists，rawUrl: %s, err:  %s', bookObj['rawUrl'] , traceback.format_exc())
+        myLogging.warning( 'update rollback; maybe exists, err:  %s' , traceback.format_exc())
         if conn2:
             try:
                 conn2.rollback()

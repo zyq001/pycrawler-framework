@@ -88,7 +88,7 @@ def updateByBookObj(bookObj):
             handlChapByBookObjChapObj(chapObj=chapObj, bookObj=bookObj, allowUpdate=False)
             resIdx = max(resIdx, chapObj['serial_number'])
         except Exception as e:
-            myLogging.error('bookId %s chap idx %s has exception: ', bookObj['id'], chapObj['serial_number'],
+            myLogging.error('bookId %s chap idx %s has exception: %s', bookObj['id'], chapObj['serial_number'],
                             traceback.format_exc())
 
     if resIdx > bookObj['chapterNum']:
