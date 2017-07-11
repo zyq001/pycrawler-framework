@@ -25,6 +25,60 @@ from util.pyBloomHelper import getBloom, dumpBloomToFile
 db_dushu = 'cn_dushu_book'
 db_acticle = 'cn_dushu_acticle'
 
+def getBookCount():
+    '''
+    获取图书总数
+    :param dbid: 
+    :return: 
+    '''
+    conn,csor = getDushuConnCsor()
+
+    try:
+        csor.execute("select count(*) from " + db_dushu  )
+        conn.commit()
+    except Exception as e:
+        myLogging.warning('update bookType exception: '+ str(e))
+    count = csor.fetchone()[0]
+    csor.close()
+    conn.close()
+    return count
+
+def getOnlineBookCount():
+    '''
+    获取图书总数
+    :param dbid: 
+    :return: 
+    '''
+    conn,csor = getDushuConnCsor()
+
+    try:
+        csor.execute("select count(*) from " + db_dushu + " where operateStatus = 0" )
+        conn.commit()
+    except Exception as e:
+        myLogging.warning('update bookType exception: '+ str(e))
+    count = csor.fetchone()[0]
+    csor.close()
+    conn.close()
+    return count
+
+def getCountDuring(timeStart, timeEnd ):
+    '''
+    获取图书总数
+    :param dbid: 
+    :return: 
+    '''
+    conn,csor = getDushuConnCsor()
+
+    try:
+        csor.execute("select count(*) from " + db_dushu + " where updateTime > %s and updateTime < %s", (timeStart, timeEnd) )
+        conn.commit()
+    except Exception as e:
+        myLogging.warning('update bookType exception: '+ str(e))
+    count = csor.fetchone()[0]
+    csor.close()
+    conn.close()
+    return count
+
 def getBookObjById(dbid):
     '''
     更加库中主键id获取book对象
