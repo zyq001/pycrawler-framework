@@ -323,6 +323,8 @@ def getCapContentObj(bookId, capId,mysqlBKid):
              + '&bg=0' + capListAPIDeviceInfo
     capText = getContentWithUA(capApi, ua)
 
+    capObj = dict()
+    capObj['bookFail'] = True #标识是否整本书不可抓，如果是就没必要抓后面的章节了
     if not (capText and len(capText) > 30):
         print 'cap content too short ,skip and del book'
         # delBookById(mysqlBKid)
@@ -342,7 +344,8 @@ def getCapContentObj(bookId, capId,mysqlBKid):
         if not (capText and len(capText) > 30):
             print 'cap content too short ,skip and del book'
             delBookById(mysqlBKid)
-            return None
+            capObj['bookFail'] = True
+            return capObj
         capRoot = ElementTree.fromstring(capText.encode('utf-8'))
 
         ChapterName = ''
@@ -359,7 +362,8 @@ def getCapContentObj(bookId, capId,mysqlBKid):
     if(ChapterContent.startswith('http') and len(ChapterContent) < 250):
         print 'cap content is url ,skip and del book', bookId, ' : ',ChapterContent
         delBookById(mysqlBKid)
-        return None
+        capObj['bookFail'] = True
+        return capObj
     WordsCount = ''
     if len(capRoot.getiterator('WordsCount')) > 0:
         WordsCount = capRoot.getiterator('WordsCount')[0].text
@@ -382,7 +386,6 @@ def getCapContentObj(bookId, capId,mysqlBKid):
                 ChapterContent2 = capRoot2.getiterator('ChapterContent')[0].text
             ChapterContent = ChapterContent + ChapterContent2
 
-    capObj = dict()
     capObj['content'] = ChapterContent.replace(u'***求收藏***','').replace(u'***（求收藏）***','').replace(u'求收藏','')
     capObj['title'] = ChapterName
     capObj['rawUrl'] = capApi[0:200]
@@ -479,6 +482,8 @@ def getCapObjsByBookObj(allowUpdate, bookId, bookObj):
         capId = capList[j]['cid']
 
         capObj = getCapContentObj(bookId, capId, bookObj['id'])
+        if capObj['bookFail']:
+            break
         if not capObj:
             continue
 

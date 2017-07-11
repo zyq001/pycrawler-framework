@@ -7,7 +7,7 @@
 '''
 import sys
 
-from app.mianfeiTXTNewFilder import findByIdRange
+# from app.mianfeiTXTNewFilder import findByIdRange
 from app.shuqiNewFilder import updateFromMysql
 
 if __name__ == '__main__':

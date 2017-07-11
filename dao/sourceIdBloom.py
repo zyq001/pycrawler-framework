@@ -21,6 +21,11 @@ class SourceIdBloom:
         ss = csor.fetchall()
         [self.ids.add(sid[0]) for sid in ss]
 
+        csor.execute("select sid from shuqi_deleted_ids;")
+        conn.commit()
+        ss = csor.fetchall()
+        [self.ids.add('shuqi' + str(sid[0])) for sid in ss]
+
         csor.close()
         conn.close()
 
