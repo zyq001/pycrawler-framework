@@ -152,7 +152,8 @@ def dushuDailyReport():
 ">搜索情况：</p>
     <div style=" line-height:2px; width:76px; background-color:#02b884; margin-top:8px;">&nbsp;</div>
     
-    <p>搜索总次数：<b>%s</b></p>
+    <p>搜索总次数：<b>%s</b> &nbsp;&nbsp; <a href="http://123.57.36.133:15601/goto/f9e58e060ea3fae708d9c229bb3ad450">查看详情</a>
+    </p>
     
 <table border="1">
   <tr>
