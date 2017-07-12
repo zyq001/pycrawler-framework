@@ -49,8 +49,8 @@ def deleteESDocs():
     return count
 if __name__ == '__main__':
     # updateByDbBookId(2137876)
-    # ZssqCrawler('56928442c49f3bce42b7f521').crawl(allowUpdate=True)
-    QuanBenCrawler('577a74c6d48745631a23962a').crawl(allowUpdate=False)
+    ZssqCrawler('587f57b38602d1eb036492f4').crawl(allowUpdate=True)
+    # QuanBenCrawler('577a74c6d48745631a23962a').crawl(allowUpdate=False)
     # deleteESDocs()
     # fixUnuploadMianfeiChaps()
     # lastTime = 0

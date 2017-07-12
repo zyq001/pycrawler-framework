@@ -68,3 +68,5 @@ def updateFromMysql(st = 10000, end = 7000000):
                 srcIdBloom.add('shuqi' + str(sqBid))
 
         idx = idx + carry
+
+

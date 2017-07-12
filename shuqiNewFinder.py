@@ -8,10 +8,11 @@
 import sys
 
 # from app.mianfeiTXTNewFilder import findByIdRange
+from app.shuqi import start
 from app.shuqiNewFilder import updateFromMysql
 
 if __name__ == '__main__':
-
+    start('55377')
 
     st = 50000
     end = 500000

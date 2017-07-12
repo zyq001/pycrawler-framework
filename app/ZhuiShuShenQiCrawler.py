@@ -44,7 +44,7 @@ def handleChapsByBookObj(bookObj, allowUpdate = False):
 
     bocObjs = getBocObjsByZid(zid)
 
-    for bocIdx in range(0, len(bocObjs)):
+    for bocIdx in range(1, len(bocObjs)):
         chapListObj = getChapsByBocId(bocIdx, bocObjs)
 
     # chapListObj = getChapObjs(bookObj)
@@ -63,7 +63,10 @@ def handleChapsByBookObj(bookObj, allowUpdate = False):
         for idx in range(0, len(chapListObj['chapters'])):
             try:
                 chapObj = chapListObj['chapters'][idx]
-                chapObj['cid'] = chapObj['id']
+
+                chapObj['cid'] = chapObj['link']
+                if chapObj.has_key('id'):
+                    chapObj['cid'] = chapObj['id']
                 chapObj['idx'] = idx
 
                 chapContentUrl = ZSSQCHAPCONTENTBASEURL + quote(chapObj['link'])
@@ -77,10 +80,14 @@ def handleChapsByBookObj(bookObj, allowUpdate = False):
                     myLogging.error('zid: %, dbid: %s, chapId: %s, get no chapter ', bookObj['zid'], bookObj['id'],
                                     chapObj['cid'])
                     continue
+                if u'.' == chapContentObj['chapter']['title'] or len(chapContentObj['chapter']['title']) < 2:
+                    del chapContentObj['chapter']['title']
                 chapObj.update(chapContentObj['chapter'])
 
-                chapObj['content'] = chapObj['cpContent']
-                del chapObj['cpContent']
+                chapObj['content'] = chapObj['body']
+                if chapObj.has_key('cpContent'):
+                    chapObj['content'] = chapObj['cpContent']
+                    del chapObj['cpContent']
                 del chapObj['body']
                 del chapObj['link']
                 chapObj['rawUrl'] = chapContentUrl
