@@ -143,7 +143,7 @@ def dushuDailyReport():
     <div style=" line-height:2px; width:76px; background-color:#02b884; margin-top:8px;">&nbsp;</div>
 
 
-    <p>图书总数：%s, 已上线图书总数：%s, 上周更新图书总数： %s</p>
+    <p>图书总数：%s, 已上线图书总数：%s, 昨日更新图书总数： %s</p>
 <br>
 
         <p class="sample name" style="
