@@ -12,7 +12,7 @@ from urllib import quote
 
 import time
 
-from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, ZSSQSEARCHBASEURL
+from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, ZSSQSEARCHBASEURL, sourceLimit
 from app.baseCrawler import BaseCrawler
 from app.shuqi import shuqCategory
 from dao.aliyunOss import upload2Bucket
@@ -44,11 +44,19 @@ def handleChapsByBookObj(bookObj, allowUpdate = False):
 
     bocObjs = getBocObjsByZid(zid)
 
+    sourceCount = 0
     for bocIdx in range(0, len(bocObjs)):
 
         bocObj = bocObjs[bocIdx]
         bocId = bocObj['_id']
-        handlChapsByBookObjZidBocId(allowUpdate, bocId, bookObj, zid)
+        bocSource = bocObj['source']
+        if 'zhuishuvip' == bocSource:
+            continue
+        handlChapsByBookObjZidBocId(bookObj, zid, bocId,allowUpdate )
+        sourceCount += 1
+        if sourceCount > sourceLimit:
+            myLogging.info('zid: %s crawl source to sourceLimit', zid)
+            break
 
 
 def handlChapsByBookObjZidBocId(bookObj, zid, bocId, allowUpdate= False):
