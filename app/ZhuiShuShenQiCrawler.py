@@ -113,7 +113,7 @@ def handlChapsByBookObjZidBocId(bookObj, zid, bocId, allowUpdate= False):
             # capObj['size'] = int(WordsCount)
             chapObj['size'] = len(chapObj['content'])
             chapObj['bookId'] = bookObj['id']
-            chapObj['source'] = bookObj['source'] + '/' + bocId
+            chapObj['source'] = bookObj['source']
             chapObj['bookUUID'] = bookObj['digest']
 
             digest = getCapDigest(bookObj, chapObj, chapObj['cid'])
@@ -198,7 +198,7 @@ def parseInsertBook(allowUpdate, bookObj, zid):
         bookObj['bookType'] = '连载'
     else:
         bookObj['bookType'] = '完结'
-    bookObj['source'] = zid
+    bookObj['source'] = zid  + '/' + bocId
     bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid)
 
     bookObj = insertBookWithConn(bookObj, allowUpdate)
