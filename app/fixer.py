@@ -3,6 +3,10 @@
 import hashlib
 import json
 
+import requests
+
+from Config import SEARCHHOST
+from app.ZhuiShuShenQiCrawler import searchAndCrawl
 from app.shuqi import getContentByUrl
 from dao.aliyunOss import upload2Bucket, bucket
 from dao.connFactory import getDushuConnCsor
@@ -192,3 +196,34 @@ def uploadCapFromTo(f, t):
         results = csor3.fetchall()
         for cap in results:
             handleCapUpload(cap)
+
+def crawlBySearchHistory():
+    baseUrl = 'http://%s/log/_search'  % SEARCHHOST
+    searchInput = '''
+    {
+"size":0,
+"query": {
+    "range" : {
+        "page" : {
+            "gte" : 1
+        }
+    }
+ },
+ "aggs":{
+ "hist": {
+      "terms": {
+        "field": "word.raw",
+        "size": 1000,
+        "order": {
+          "_count": "desc"
+        }
+      }
+    }
+ }
+ }
+    '''
+    r = requests.post(baseUrl, data = searchInput)
+    resObj = json.loads(r.text)
+    for wordObj in resObj['aggregations']['hist']['buckets']:
+        word = wordObj['key']
+        searchAndCrawl(word)

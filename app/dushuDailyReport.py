@@ -8,9 +8,8 @@ from email.mime.text import MIMEText
 
 import requests
 
-from Config import MAILPASS, NO_REPLY_TATATIMES_COM, SMTP_EXMAIL_QQ_COM, MANAGER_TATATIMES_COM, \
-    NOREPLAYEMAIL, dushuDailyReportReciever
-
+from Config import MAILPASS, NO_REPLY_TATATIMES_COM, SMTP_EXMAIL_QQ_COM, NOREPLAYEMAIL, dushuDailyReportReciever, \
+    SEARCHHOST
 from dao.dushuService import getBookCount, getOnlineBookCount, getCountDuring
 
 yesteday = time.strftime('%Y%m%d', time.localtime(time.time() - 24 * 3600))
@@ -24,7 +23,7 @@ def dushuDailyReport():
     yestedayTime = nowTime - 24*3600
     updateCount = getCountDuring(yestedayTime, nowTime)
 
-    searchTopUrl = 'http://123.56.66.33:19200/log/_search'
+    searchTopUrl = 'http://%s/log/_search' % SEARCHHOST
     countInput = '''
     {
   "query": {
@@ -170,7 +169,7 @@ def dushuDailyReport():
                         ''' % (word, str(topHit['doc_count']))
         htmlTemp = htmlTemp + wordLeft
         searchWordQuery = searchWordQueryTempl % (word)
-        w = requests.post('http://123.56.66.33:19200/dushu/_search', data=searchWordQuery.encode('utf-8'))
+        w = requests.post('http://%s/dushu/_search' % SEARCHHOST, data=searchWordQuery.encode('utf-8'))
         searchWordRes = json.loads(w.text)
         for hit in searchWordRes['hits']['hits']:
             title = hit['_source']['title']

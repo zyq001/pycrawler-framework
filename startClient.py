@@ -10,9 +10,11 @@ import time
 
 import requests
 
+from Config import SEARCHHOST
 from app.QuanBenMianFeiCrawler import QuanBenCrawler
 from app.QuanbenUpdater import updateByDbBookId
 from app.ZhuiShuShenQiCrawler import ZssqCrawler
+from app.fixer import crawlBySearchHistory
 from app.mianfeiTXTUpdater import mianfeiUpdateByBookObj
 from app.shuqiUpdater import updateFromMysql
 from dao.dushuMianFeiTXTService import getBookByTitle, deleteNLastChaps
@@ -37,7 +39,7 @@ def fixUnuploadMianfeiChaps():
 
 
 def deleteESDocs():
-    baseUrl = 'http://123.56.66.33:19200/dushu/book/'
+    baseUrl = 'http://%s/dushu/book/'  % SEARCHHOST
     count = 12000
     for i in range(2124594, 2100000, -1):
         url = baseUrl + str(i)
@@ -48,8 +50,9 @@ def deleteESDocs():
                 return
     return count
 if __name__ == '__main__':
+    crawlBySearchHistory()
     # updateByDbBookId(2137876)
-    ZssqCrawler('587f57b38602d1eb036492f4').crawl(allowUpdate=True)
+    # ZssqCrawler('587f57b38602d1eb036492f4').crawl(allowUpdate=True)
     # QuanBenCrawler('577a74c6d48745631a23962a').crawl(allowUpdate=False)
     # deleteESDocs()
     # fixUnuploadMianfeiChaps()

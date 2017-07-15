@@ -224,10 +224,14 @@ def insertBookWithConn(bookObj, allowUpdate = True, conn2 = None,csor2 = None):
 
 
 def getCapIdxsByBookId(bookId):
+
+    return getFieldByBookId('idx', bookId)
+
+def getFieldByBookId(field, bookId):
     conn,csor = getDushuConnCsor()
     idxs = set()
 
-    csor.execute('select idx from ' + db_acticle + " where bookId = %s", (bookId,))
+    csor.execute('select ' + field + ' from ' + db_acticle + " where bookId = %s", (bookId,))
     conn.commit()
 
     results = csor.fetchall()
@@ -500,7 +504,7 @@ def deleteChapsLargerThanIdx(bookId, idx):
 
 def getChapObjByBookIdChapTitle(bookId, title):
     '''
-    删除章节表中所有大于此idx的
+    按bookId和title获取章节信息对象
     :param bookId: 
     :param idx: 
     :return: 

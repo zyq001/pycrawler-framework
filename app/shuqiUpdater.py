@@ -67,8 +67,8 @@ def updateByBookObj(bookObj):
     source = int(bookObj['source'].replace('shuqi', ''))
     newBookObj, digest = getBookObjFromSQid(source)
     if not newBookObj:
-        delBookById(bookObj['id'])
-        myLogging.error( 'shuqi book has been droped, delete id: '+ str(bookObj['id'])+ ' sid: '+ str(source))
+        # delBookById(bookObj['id'])
+        myLogging.error( 'shuqi book has been droped, plz consider to delete id: '+ str(bookObj['id'])+ ' sid: '+ str(source))
         return
     if newBookObj['chapterNum'] > bookObj['chapterNum']:
         newBookObj['id'] = bookObj['id']
