@@ -113,7 +113,7 @@ def handlChapsByBookObjZidBocId(bookObj, zid, bocId, allowUpdate= False):
             # capObj['size'] = int(WordsCount)
             chapObj['size'] = len(chapObj['content'])
             chapObj['bookId'] = bookObj['id']
-            chapObj['source'] = bookObj['source']
+            chapObj['source'] = bookObj['source'] + '/' + bocId
             chapObj['bookUUID'] = bookObj['digest']
 
             digest = getCapDigest(bookObj, chapObj, chapObj['cid'])
