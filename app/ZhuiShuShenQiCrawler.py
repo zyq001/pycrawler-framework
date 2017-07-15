@@ -54,9 +54,13 @@ def handleChapsByBookObj(bookObj, allowUpdate = False):
             continue
         handlChapsByBookObjZidBocId(bookObj, zid, bocId,allowUpdate )
         sourceCount += 1
-        if sourceCount > sourceLimit:
+        if sourceCount >= sourceLimit:
             myLogging.info('zid: %s crawl source to sourceLimit', zid)
             break
+        else:
+            bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid) + "?source=" + str(bocId)
+            bookObj = parseInsertBook(allowUpdate, bookObj, zid) #重新插入另外一个源的书
+            myLogging.info('zid: %s crawl another source %s', zid, bocId)
 
 
 def handlChapsByBookObjZidBocId(bookObj, zid, bocId, allowUpdate= False):

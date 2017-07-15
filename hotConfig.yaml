@@ -10,3 +10,7 @@ mianFeiTXTUpdater:
 QuanBenUpdater:
   updateSleep:
     600
+
+searchHistoryCrawler:
+  updateSleep:
+    86400
