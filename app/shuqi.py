@@ -153,8 +153,7 @@ def handleOneBook(id,shuqCategory2 = None, allowUpdate=True):
         # return None
     gBookDict[digest] = bookObj
 
-
-    bookObj = insertBookWithConn(bookObj, allowUpdate)
+    bookObj = insertBookWithConn(bookObj, allowUpdate=allowUpdate)
 
     return bookObj
 
@@ -404,7 +403,7 @@ def getCapContentObj(bookId, capId,mysqlBKid):
 
 
 
-def start(bookId, shuqCategory2 = None , allowUpdate = True):
+def start(bookId, shuqCategory2 = None , allowUpdate = False):
 
 
     if not shuqCategory2:
