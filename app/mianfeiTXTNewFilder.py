@@ -13,11 +13,8 @@ import time
 
 from app.baseCrawler import BaseCrawler
 from app.mianfeiTXTCrawler import handleByMTID
-from app.shuqi import start
-from dao.connFactory import getDushuConnCsor
-# from dao.shuqIdBloom import sourceIdBloom
+
 from dao.sourceIdBloom import srcIdBloom
-from util.timeHelper import getToday
 
 class MianfeiTXTFilder(BaseCrawler):
 

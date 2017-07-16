@@ -323,7 +323,7 @@ def getCapContentObj(bookId, capId,mysqlBKid):
     capText = getContentWithUA(capApi, ua)
 
     capObj = dict()
-    capObj['bookFail'] = True #标识是否整本书不可抓，如果是就没必要抓后面的章节了
+    capObj['bookFail'] = False #标识是否整本书不可抓，如果是就没必要抓后面的章节了
     if not (capText and len(capText) > 30):
         print 'cap content too short ,skip and del book'
         # delBookById(mysqlBKid)
@@ -415,7 +415,7 @@ def start(bookId, shuqCategory2 = None , allowUpdate = False):
         print 'book null', bookId
         return
 
-    crawlCapsWithBookObj(allowUpdate, bookId, bookObj)
+    return crawlCapsWithBookObj(allowUpdate, bookId, bookObj)
 
 
 def crawlCapsWithBookObj(allowUpdate, bookId, bookObj):

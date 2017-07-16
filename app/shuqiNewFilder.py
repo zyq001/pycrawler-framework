@@ -58,14 +58,15 @@ def updateFromMysql(st = 10000, end = 7000000):
             #     continue
             if not srcIdBloom.contains('shuqi' + str(sqBid)) :
                 try:
-                    start(sqBid, allowUpdate=False)
+                    num = start(sqBid, allowUpdate=False)
+                    if num and num > 0:
+                        srcIdBloom.add('shuqi' + str(sqBid))
                     # start(17043)
                 except Exception as e:
                     print sqBid, ':  ', e
                 except IOError as e2:
                     print sqBid, ':  ', e2
 
-                srcIdBloom.add('shuqi' + str(sqBid))
 
         idx = idx + carry
 
