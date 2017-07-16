@@ -1,2 +1,2 @@
 #!/bin/bash
-nohup python -u shuqiNewFinder.py >> logs/shuqiNewFinder.log 2>&1 &
+nohup python -u startShuqiNewFinder.py >> logs/shuqiNewFinder.log 2>&1 &
