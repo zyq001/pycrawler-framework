@@ -16,7 +16,7 @@ from local.hotConfigHelper import getHotConfigDict
 from util.logHelper import myLogging
 
 if __name__ == '__main__':
-    # start('55377')
+    # start('10650', allowUpdate=False)
 
     st = 50000
     end = 500000

@@ -403,7 +403,7 @@ def getCapContentObj(bookId, capId,mysqlBKid):
 
 
 
-def start(bookId, shuqCategory2 = None , allowUpdate = False):
+def start(bookId, shuqCategory2 = None , allowUpdate = True):
 
 
     if not shuqCategory2:
@@ -472,7 +472,8 @@ def getCapObjsByBookObj(allowUpdate, bookId, bookObj):
     if allowUpdate:
         chapTitles = getChapTitlesByBookId(bookObj['id'])  # 已在库中的章节名称，下标不太靠谱
         dbLatestChapObj = getLatestChapByBookId(bookObj['id'])
-        indexStart = max(dbLatestChapObj['idx'] - 5, 0)
+        if dbLatestChapObj:
+            indexStart = max(dbLatestChapObj['idx'] - 5, 0)
 
     global donedegest
     for j in range(indexStart, len(capList)):
@@ -482,7 +483,7 @@ def getCapObjsByBookObj(allowUpdate, bookId, bookObj):
 
         capObj = getCapContentObj(bookId, capId, bookObj['id'])
         if capObj['bookFail']:
-            break
+            return None
         if not capObj:
             continue
 

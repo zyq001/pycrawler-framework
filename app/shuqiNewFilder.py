@@ -7,6 +7,7 @@
 '''
 import json
 import random
+import traceback
 
 import requests
 import time
@@ -16,6 +17,7 @@ from app.shuqi import start
 from dao.connFactory import getDushuConnCsor
 # from dao.shuqIdBloom import sourceIdBloom
 from dao.sourceIdBloom import srcIdBloom
+from util.logHelper import myLogging
 from util.timeHelper import getToday
 
 class ShuqiFilder(BaseCrawler):
@@ -63,9 +65,9 @@ def updateFromMysql(st = 10000, end = 7000000):
                         srcIdBloom.add('shuqi' + str(sqBid))
                     # start(17043)
                 except Exception as e:
-                    print sqBid, ':  ', e
+                    myLogging.error('shuqi sid: %s , has exception %s', str(sqBid), traceback.format_exc())
                 except IOError as e2:
-                    print sqBid, ':  ', e2
+                    myLogging.error('shuqi sid: %s , has exception %s', str(sqBid), traceback.format_exc())
 
 
         idx = idx + carry
