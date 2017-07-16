@@ -112,12 +112,12 @@ def handlChapsByBookObjZidBocId(bookObj, zid,chapListObj, allowUpdate= False):
             chapContentUrl = ZSSQCHAPCONTENTBASEURL + quote(chapObj['link'])
             chapContentText = getContentWithUA(chapContentUrl)
             if not chapContentText:
-                myLogging.error('zid: %, dbid: %s, chapId: %s, get chapContent null ', bookObj['zid'], bookObj['id'],
+                myLogging.error('zid: %s, dbid: %s, chapId: %s, get chapContent null ', bookObj['zid'], bookObj['id'],
                                 chapObj['cid'])
                 continue
             chapContentObj = json.loads(chapContentText)
             if not chapContentObj or not chapContentObj.has_key('chapter'):
-                myLogging.error('zid: %, dbid: %s, chapId: %s, get no chapter ', bookObj['zid'], bookObj['id'],
+                myLogging.error('zid: %5, dbid: %s, chapId: %s, get no chapter ', bookObj['zid'], bookObj['id'],
                                 chapObj['cid'])
                 continue
             if u'.' == chapContentObj['chapter']['title'] or len(chapContentObj['chapter']['title']) < 2:
@@ -248,14 +248,14 @@ def search(searchInput):
     return searchResObj
 
 
-def searchAndCrawl(searchInput, limit = 3):
+def searchAndCrawl(searchInput, limit = 5):
 
     searchResObj = search(searchInput)
     count = 0
     for bookObj in searchResObj['books']:
         digest = getBookDigest(bookObj)
         if bookDigestBloom.contains(digest):
-            myLogging.info('has book with same author, skip')
+            myLogging.info('has book %s, with same author %s, skip', bookObj['title'].encode('utf-8'), bookObj['author'].encode('utf-8'))
             continue
         zid = bookObj['_id']
         startByZid(zid, allowUpdate=False)
