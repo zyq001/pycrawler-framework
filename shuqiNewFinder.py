@@ -8,8 +8,12 @@
 import sys
 
 # from app.mianfeiTXTNewFilder import findByIdRange
+import time
+
 from app.shuqi import start
 from app.shuqiNewFilder import updateFromMysql
+from local.hotConfigHelper import getHotConfigDict
+from util.logHelper import myLogging
 
 if __name__ == '__main__':
     start('55377')
@@ -21,3 +25,6 @@ if __name__ == '__main__':
         end = int(sys.argv[2])
 
     updateFromMysql()
+    sleepTime = getHotConfigDict()['shuqiNewFinder']['updateSleep']
+    myLogging.info(' done one loop, now sleep ' + str(sleepTime) + ' secs')
+    time.sleep(int(sleepTime))

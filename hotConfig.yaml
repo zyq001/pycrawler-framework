@@ -5,12 +5,18 @@ shuqiUpdater:
 
 mianFeiTXTUpdater:
   updateSleep:
-    600
+    3600
 
-QuanBenUpdater:
+quanBenUpdater:
   updateSleep:
-    600
+    18000
 
 searchHistoryCrawler:
   updateSleep:
     86400
+
+
+shuqiNewFinder:
+  updateSleep:
+    186400
+
