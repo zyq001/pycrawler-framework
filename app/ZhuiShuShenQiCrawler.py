@@ -194,8 +194,13 @@ def parseBook(allowUpdate, bookObj, zid):
     bookObj['zid'] = bookObj['_id']
 
     bookObj['imgUrl'] = urlparse.urljoin(zssqStaticUrl, bookObj['cover'])
-    bookObj['category'] = bookObj['majorCate']
-    bookObj['type'] = bookObj['minorCate']
+    bookObj['category'] = ''
+    if bookObj.has_key('majorCate'):
+        bookObj['category'] = bookObj['majorCate']
+    bookObj['type'] = ''
+    if bookObj.has_key('minorCate'):
+        bookObj['type'] = bookObj['minorCate']
+    # bookObj['type'] = bookObj['minorCate']
     bookObj['typeCode'] = 0
     if categDict.has_key(bookObj['type']):
         if categDict[bookObj['type']]['id'] and len(categDict[bookObj['type']]['id']) > 0:
@@ -258,7 +263,10 @@ def searchAndCrawl(searchInput, limit = 5):
             myLogging.info('has book %s, with same author %s, skip', bookObj['title'].encode('utf-8'), bookObj['author'].encode('utf-8'))
             continue
         zid = bookObj['_id']
-        startByZid(zid, allowUpdate=False)
+        try:
+            startByZid(zid, allowUpdate=False)
+        except Exception as e:
+            myLogging.error('zid %s has exception: %s', zid, traceback.format_exc())
         count += 1
         if count > limit:
             break
