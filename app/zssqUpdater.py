@@ -50,7 +50,7 @@ def updateByBookObj(bookObj):
     currentChapNum = len(currentChapsObj['chapters'])
     if currentChapNum > bookObj['chapterNum']:
 
-        newIdx = handlChapsByBookObjZidBocId(bookObj, zid, zBocId, allowUpdate=True)
+        newIdx = handlChapsByBookObjZidBocId(bookObj, zid, currentChapsObj, allowUpdate=True)
 
         if newIdx  > bookObj['chapterNum']:
             updateOneFieldByOneField('chapterNum', newIdx, 'id', bookObj['id'])

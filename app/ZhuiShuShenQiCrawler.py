@@ -15,10 +15,11 @@ import time
 from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, ZSSQSEARCHBASEURL, sourceLimit
 from app.baseCrawler import BaseCrawler
 from app.shuqi import shuqCategory
+from dao.BookDigestBloom import bookDigestBloom
 from dao.aliyunOss import upload2Bucket
-from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getCapIdxsByBookId
+from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getCapIdxsByBookId, getChapTitlesByBookId
 from exception.InputException import InputException
-from util.UUIDUtils import getCapDigest
+from util.UUIDUtils import getCapDigest, getBookDigest
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
 
@@ -30,17 +31,25 @@ def startByZid(zid, allowUpdate=False):
         myLogging.error('zid %s get bookObj null', zid)
         return
 
-    bookObj = parseInsertBook(allowUpdate, bookObj, zid)
+    bookObj = parseBook(allowUpdate, bookObj, zid)
+
+
+    # bocObjs = getBocObjsByZid(zid)
+
+    # bookObj['source'] = zid + '/' + bocId
+    # bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid)
+
+    # bookObj = insertBookWithConn(bookObj, allowUpdate)
     if not bookObj:
         myLogging.error('zid %s parse and insert bookObj null', zid)
         return
 
-    handleChapsByBookObj(bookObj, allowUpdate)
+    handleChapsByBookObj(bookObj, zid, allowUpdate)
 
 
-def handleChapsByBookObj(bookObj, allowUpdate = False):
+def handleChapsByBookObj(bookObj, zid, allowUpdate = False):
 
-    zid = bookObj['source']
+    # zid = bookObj['source']
 
     bocObjs = getBocObjsByZid(zid)
 
@@ -49,22 +58,31 @@ def handleChapsByBookObj(bookObj, allowUpdate = False):
 
         bocObj = bocObjs[bocIdx]
         bocId = bocObj['_id']
+
         bocSource = bocObj['source']
         if 'zhuishuvip' == bocSource:
             continue
-        handlChapsByBookObjZidBocId(bookObj, zid, bocId,allowUpdate )
+
+        bookObj['source'] = zid + '/' + bocId
+        bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid) + "?source=" + str(bocId)
+        chapListObj = getChapsByBocId(bocId)
+        bookObj['chapterNum'] = min(bookObj['chapterNum'], len(chapListObj['chapters']))
+
+        bookObj = insertBookWithConn(bookObj, allowUpdate)
+
+        handlChapsByBookObjZidBocId(bookObj, zid, chapListObj,allowUpdate )
         sourceCount += 1
         if sourceCount >= sourceLimit:
             myLogging.info('zid: %s crawl source to sourceLimit', zid)
             break
         else:
-            bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid) + "?source=" + str(bocId)
-            bookObj = parseInsertBook(allowUpdate, bookObj, zid) #重新插入另外一个源的书
+            # bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid) + "?source=" + str(bocId)
+            # bookObj = parseInsertBook(allowUpdate, bookObj, zid) #重新插入另外一个源的书
             myLogging.info('zid: %s crawl another source %s', zid, bocId)
 
 
-def handlChapsByBookObjZidBocId(bookObj, zid, bocId, allowUpdate= False):
-    chapListObj = getChapsByBocId(bocId)
+def handlChapsByBookObjZidBocId(bookObj, zid,chapListObj, allowUpdate= False):
+    # chapListObj = getChapsByBocId(bocId)
     resInx = 0 #保存最终更新到的下标
     # chapListObj = getChapObjs(bookObj)
     if not chapListObj:
@@ -75,13 +93,16 @@ def handlChapsByBookObjZidBocId(bookObj, zid, bocId, allowUpdate= False):
         return resInx
     capIdxs = set()
     if allowUpdate:
-        capIdxs = getCapIdxsByBookId(bookObj['id'])  # 已在库中的章节下标
+        capIdxs = getChapTitlesByBookId(bookObj['id'])  # 已在库中的章节下标
     for idx in range(0, len(chapListObj['chapters'])):
         try:
-            if idx in capIdxs:
-                continue
+            # if idx in capIdxs:
+            #     continue
 
             chapObj = chapListObj['chapters'][idx]
+
+            if chapObj['title'] in capIdxs:
+                continue
 
             chapObj['cid'] = chapObj['link']
             if chapObj.has_key('id'):
@@ -165,7 +186,7 @@ def getChapsByBocId(bocId):
     return chapListObj
 
 
-def parseInsertBook(allowUpdate, bookObj, zid):
+def parseBook(allowUpdate, bookObj, zid):
 
     categDict = shuqCategory
     zssqStaticUrl = 'http://statics.zhuishushenqi.com/'
@@ -198,10 +219,7 @@ def parseInsertBook(allowUpdate, bookObj, zid):
         bookObj['bookType'] = '连载'
     else:
         bookObj['bookType'] = '完结'
-    bookObj['source'] = zid  + '/' + bocId
-    bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid)
 
-    bookObj = insertBookWithConn(bookObj, allowUpdate)
     return bookObj
 
 
@@ -235,6 +253,10 @@ def searchAndCrawl(searchInput, limit = 3):
     searchResObj = search(searchInput)
     count = 0
     for bookObj in searchResObj['books']:
+        digest = getBookDigest(bookObj)
+        if bookDigestBloom.contains(digest):
+            myLogging.info('has book with same author, skip')
+            continue
         zid = bookObj['_id']
         startByZid(zid, allowUpdate=False)
         count += 1

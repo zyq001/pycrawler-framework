@@ -80,7 +80,12 @@ def dushuDailyReport():
                   "format": "epoch_millis"
                 }
               }
-            }
+            },
+            {
+		    "term" : {
+		        "page" : 0
+	    	    }
+	        }
           ],
           "must_not": []
         }
