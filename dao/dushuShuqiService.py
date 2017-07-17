@@ -53,8 +53,8 @@ def getShuqiAllBookObjs():
     conn, csor = getDushuConnCsor()
     dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
 
-    dictCsor.execute("SELECT id,rawUrl,chapterNum,source,digest from cn_dushu_book where operateStatus = 0  "
-                 " and rawUrl like 'http://api.shuqireader.com/reader/bc_cover.php%';")
+    dictCsor.execute("SELECT id,rawUrl,chapterNum,source,digest from cn_dushu_book where  "
+                 " rawUrl like 'http://api.shuqireader.com/reader/bc_cover.php%';")
     conn.commit()
     bookObjs = dictCsor.fetchallDict()
 
