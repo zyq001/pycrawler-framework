@@ -16,9 +16,10 @@ from parse.easouParser import getAndParse
 from util.networkHelper import getERAConn
 
 
-def crawlByDailySearchHistory():
+def crawlByDailySearchHistory(timeStart = None):
     baseUrl = 'http://%s/log/_search'  % SEARCHHOST
-    timeStart = int(time.time() * 1000) - 24 * 3600 * 1000
+    if not timeStart:
+        timeStart = int(time.time() * 1000) - 24 * 3600 * 1000
     searchInput = '''
     {
 "size":0,

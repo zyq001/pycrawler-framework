@@ -26,6 +26,11 @@ class BookDiBloom:
         conn.close()
 
     def contains(self, iid):
+        '''
+        是否包含
+        :param iid: id
+        :return: true or false
+        '''
         return iid in self.ids
 
     def add(self, iid):

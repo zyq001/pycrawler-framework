@@ -256,9 +256,13 @@ def search(searchInput):
 def searchAndCrawl(searchInput, limit = 5):
 
     searchResObj = search(searchInput)
+    succcount = 0
     count = 0
     for bookObj in searchResObj['books']:
         digest = getBookDigest(bookObj)
+        count += 1
+        if count > 5: #只要搜索结果的前N个，后面的就算了
+            break
         if bookDigestBloom.contains(digest):
             myLogging.info('has book %s, with same author %s, skip', bookObj['title'].encode('utf-8'), bookObj['author'].encode('utf-8'))
             continue
@@ -267,8 +271,8 @@ def searchAndCrawl(searchInput, limit = 5):
             startByZid(zid, allowUpdate=False)
         except Exception as e:
             myLogging.error('zid %s has exception: %s', zid, traceback.format_exc())
-        count += 1
-        if count > limit:
+        succcount += 1
+        if succcount > limit: #最多抓取图书数量
             break
 
 
