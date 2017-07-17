@@ -53,37 +53,41 @@ def handleChapsByBookObj(bookObj, zid, allowUpdate = False):
 
     sourceCount = 0
     for bocIdx in range(0, len(bocObjs)):
-
         bocObj = bocObjs[bocIdx]
         bocId = bocObj['_id']
 
-        bocSource = bocObj['source']
-        if 'zhuishuvip' == bocSource:
-            continue
+        try:
 
-        bookObj['source'] = zid + '/' + bocId
-        bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid) + "?source=" + str(bocId)
-        chapListObj = getChapsByBocId(bocId)
-        bookObj['chapterNum'] = min(bookObj['chapterNum'], len(chapListObj['chapters']))
+            bocSource = bocObj['source']
+            if 'zhuishuvip' == bocSource:
+                continue
 
-        if bookObj['chapterNum'] <= MINCHAPNUM:
-            continue
+            bookObj['source'] = zid + '/' + bocId
+            bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid) + "?source=" + str(bocId)
+            chapListObj = getChapsByBocId(bocId)
+            bookObj['chapterNum'] = min(bookObj['chapterNum'], len(chapListObj['chapters']))
 
-        bookObj = insertBookWithConn(bookObj, allowUpdate)
+            if bookObj['chapterNum'] <= MINCHAPNUM:
+                continue
 
-        resInx = handlChapsByBookObjZidBocId(bookObj, zid, chapListObj,allowUpdate )
-        if resInx <= MINCHAPNUM:
-            myLogging.info('zid %s dbid %s crawl too small chapNum, delete ', zid, bookObj['id'])
-            delBookById(bookObj['id'])
+            bookObj = insertBookWithConn(bookObj, allowUpdate)
 
-        sourceCount += 1
-        if sourceCount >= sourceLimit:
-            myLogging.info('zid: %s crawl source to sourceLimit', zid)
-            break
-        else:
-            # bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid) + "?source=" + str(bocId)
-            # bookObj = parseInsertBook(allowUpdate, bookObj, zid) #重新插入另外一个源的书
-            myLogging.info('zid: %s crawl another source %s', zid, bocId)
+            resInx = handlChapsByBookObjZidBocId(bookObj, zid, chapListObj,allowUpdate )
+            if resInx <= MINCHAPNUM:
+                myLogging.info('zid %s dbid %s crawl too small chapNum, delete ', zid, bookObj['id'])
+                delBookById(bookObj['id'])
+
+            sourceCount += 1
+            if sourceCount >= sourceLimit:
+                myLogging.info('zid: %s crawl source to sourceLimit', zid)
+                break
+            else:
+                # bookObj['rawUrl'] = ZSSQBOOKINFOBASEURL + str(zid) + "?source=" + str(bocId)
+                # bookObj = parseInsertBook(allowUpdate, bookObj, zid) #重新插入另外一个源的书
+                myLogging.info('zid: %s crawl another source %s', zid, bocId)
+        except Exception as e:
+            myLogging.error('zid: % ,bocId %s get exception ', zid,bocId)
+            myLogging.error(traceback.format_exc())
 
 
 def handlChapsByBookObjZidBocId(bookObj, zid,chapListObj, allowUpdate= False):
