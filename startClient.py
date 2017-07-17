@@ -49,6 +49,8 @@ def deleteESDocs():
             if count < 1:
                 return
     return count
+
+
 if __name__ == '__main__':
     crawlBySearchHistory()
     # updateByDbBookId(2137876)

@@ -14,7 +14,8 @@ from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, sour
 from app.baseCrawler import BaseCrawler
 from app.shuqi import shuqCategory
 from dao.aliyunOss import upload2Bucket
-from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getChapTitlesByBookId, getCapIdxsByBookId
+from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getChapTitlesByBookId, getCapIdxsByBookId, \
+    delBookById
 from exception.InputException import InputException
 from util.UUIDUtils import getCapDigest
 from util.logHelper import myLogging
@@ -70,7 +71,11 @@ def handleChapsByBookObj(bookObj, zid, allowUpdate = False):
 
         bookObj = insertBookWithConn(bookObj, allowUpdate)
 
-        handlChapsByBookObjZidBocId(bookObj, zid, chapListObj,allowUpdate )
+        resInx = handlChapsByBookObjZidBocId(bookObj, zid, chapListObj,allowUpdate )
+        if resInx <= MINCHAPNUM:
+            myLogging.info('zid %s dbid %s crawl too small chapNum, delete ', zid, bookObj['id'])
+            delBookById(bookObj['id'])
+
         sourceCount += 1
         if sourceCount >= sourceLimit:
             myLogging.info('zid: %s crawl source to sourceLimit', zid)

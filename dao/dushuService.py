@@ -309,6 +309,8 @@ def delBookById(bookId):
             except Exception as ee:
                 myLogging.error(e)
 
+    deleteChapsLargerThanIdx(bookId, -1)#删除所有章节
+
     csor2.close()
     conn2.close()
 
