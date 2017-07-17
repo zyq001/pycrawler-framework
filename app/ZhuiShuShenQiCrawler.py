@@ -86,7 +86,7 @@ def handleChapsByBookObj(bookObj, zid, allowUpdate = False):
                 # bookObj = parseInsertBook(allowUpdate, bookObj, zid) #重新插入另外一个源的书
                 myLogging.info('zid: %s crawl another source %s', zid, bocId)
         except Exception as e:
-            myLogging.error('zid: % ,bocId %s get exception ', zid,bocId)
+            myLogging.error('zid: %s ,bocId %s get exception ', zid,bocId)
             myLogging.error(traceback.format_exc())
 
 
