@@ -65,6 +65,9 @@ def handleChapsByBookObj(bookObj, zid, allowUpdate = False):
         chapListObj = getChapsByBocId(bocId)
         bookObj['chapterNum'] = min(bookObj['chapterNum'], len(chapListObj['chapters']))
 
+        if bookObj['chapterNum'] <= MINCHAPNUM:
+            continue
+
         bookObj = insertBookWithConn(bookObj, allowUpdate)
 
         handlChapsByBookObjZidBocId(bookObj, zid, chapListObj,allowUpdate )
