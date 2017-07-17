@@ -10,16 +10,13 @@ import traceback
 import urlparse
 from urllib import quote
 
-import time
-
-from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, ZSSQSEARCHBASEURL, sourceLimit
+from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, sourceLimit
 from app.baseCrawler import BaseCrawler
 from app.shuqi import shuqCategory
-from dao.BookDigestBloom import bookDigestBloom
 from dao.aliyunOss import upload2Bucket
-from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getCapIdxsByBookId, getChapTitlesByBookId
+from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getChapTitlesByBookId, getCapIdxsByBookId
 from exception.InputException import InputException
-from util.UUIDUtils import getCapDigest, getBookDigest
+from util.UUIDUtils import getCapDigest
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
 
@@ -92,8 +89,10 @@ def handlChapsByBookObjZidBocId(bookObj, zid,chapListObj, allowUpdate= False):
         myLogging.error('zid %s chaps list no data', zid)
         return resInx
     capIdxs = set()
+    capTitles = set()
     if allowUpdate:
-        capIdxs = getChapTitlesByBookId(bookObj['id'])  # 已在库中的章节下标
+        capIdxs = getCapIdxsByBookId(bookObj['id'])  # 已在库中的章节下标
+        capTitles = getChapTitlesByBookId(bookObj['id'])  # 已在库中的章节下标
     for idx in range(0, len(chapListObj['chapters'])):
         try:
             # if idx in capIdxs:
@@ -101,9 +100,10 @@ def handlChapsByBookObjZidBocId(bookObj, zid,chapListObj, allowUpdate= False):
 
             chapObj = chapListObj['chapters'][idx]
 
-            if chapObj['title'] in capIdxs:
+            if chapObj['title'] in capTitles:
                 continue
-
+            if idx in capIdxs:
+                continue
             chapObj['cid'] = chapObj['link']
             if chapObj.has_key('id'):
                 chapObj['cid'] = chapObj['id']
@@ -112,12 +112,12 @@ def handlChapsByBookObjZidBocId(bookObj, zid,chapListObj, allowUpdate= False):
             chapContentUrl = ZSSQCHAPCONTENTBASEURL + quote(chapObj['link'])
             chapContentText = getContentWithUA(chapContentUrl)
             if not chapContentText:
-                myLogging.error('zid: %s, dbid: %s, chapId: %s, get chapContent null ', bookObj['zid'], bookObj['id'],
+                myLogging.error('zid: %s, dbid: %s, chapId: %s, get chapContent null ', zid, bookObj['id'],
                                 chapObj['cid'])
                 continue
             chapContentObj = json.loads(chapContentText)
             if not chapContentObj or not chapContentObj.has_key('chapter'):
-                myLogging.error('zid: %5, dbid: %s, chapId: %s, get no chapter ', bookObj['zid'], bookObj['id'],
+                myLogging.error('zid: %5, dbid: %s, chapId: %s, get no chapter ', zid, bookObj['id'],
                                 chapObj['cid'])
                 continue
             if u'.' == chapContentObj['chapter']['title'] or len(chapContentObj['chapter']['title']) < 2:
@@ -153,7 +153,7 @@ def handlChapsByBookObjZidBocId(bookObj, zid,chapListObj, allowUpdate= False):
             # aftUploadCap = time.time()
             # uploadCap = uploadCap + (aftUploadCap - aftInsertCap)
         except Exception as e:
-            myLogging.error('zid: %, dbid: %s, idx: %s, get exception ', bookObj['zid'], bookObj['id'],
+            myLogging.error('zid: %, dbid: %s, idx: %s, get exception ', zid, bookObj['id'],
                             idx)
             myLogging.error(traceback.format_exc())
     return resInx
@@ -236,46 +236,6 @@ def getBookObjBiZid(zid):
     if not bookInfoText:
         return None
     return json.loads(bookInfoText)
-
-def search(searchInput):
-
-    if isinstance(searchInput, unicode):
-        searchInput = searchInput.encode('utf-8')
-
-
-    url = ZSSQSEARCHBASEURL + quote(searchInput)
-    searchResContent = getContentWithUA(url)
-    if not searchResContent:
-        return None
-    searchResObj = json.loads(searchResContent)
-    if not searchResObj or not searchResObj.has_key('books'):
-        return
-    return searchResObj
-
-
-def searchAndCrawl(searchInput, limit = 5):
-
-    searchResObj = search(searchInput)
-    succcount = 0
-    count = 0
-    for bookObj in searchResObj['books']:
-        digest = getBookDigest(bookObj)
-        count += 1
-        if count > 5: #只要搜索结果的前N个，后面的就算了
-            break
-        if bookDigestBloom.contains(digest):
-            myLogging.info('has book %s, with same author %s, skip', bookObj['title'].encode('utf-8'), bookObj['author'].encode('utf-8'))
-            continue
-        zid = bookObj['_id']
-        try:
-            startByZid(zid, allowUpdate=False)
-        except Exception as e:
-            myLogging.error('zid %s has exception: %s', zid, traceback.format_exc())
-        succcount += 1
-        if succcount > limit: #最多抓取图书数量
-            break
-
-
 
 
 class ZssqCrawler(BaseCrawler):

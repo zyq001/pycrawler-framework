@@ -7,13 +7,7 @@ import requests
 import time
 
 from Config import SEARCHHOST
-from app.ZhuiShuShenQiCrawler import searchAndCrawl
-from app.shuqi import getContentByUrl
-from dao.aliyunOss import upload2Bucket, bucket
-from dao.connFactory import getDushuConnCsor
-from dao.dushuService import updateContentById
-from parse.easouParser import getAndParse
-from util.networkHelper import getERAConn
+from app.ZssqSearcher import searchAndCrawl
 
 
 def crawlByDailySearchHistory(timeStart = None):

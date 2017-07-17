@@ -5,7 +5,7 @@
 
 @author: zyq
 '''
-import json
+
 import traceback
 
 
@@ -52,10 +52,10 @@ def updateByBookObj(bookObj):
 
         newIdx = handlChapsByBookObjZidBocId(bookObj, zid, currentChapsObj, allowUpdate=True)
 
-        if newIdx  > bookObj['chapterNum']:
-            updateOneFieldByOneField('chapterNum', newIdx, 'id', bookObj['id'])
+        if newIdx  >= bookObj['chapterNum']: #newIdx下标从1开始的
+            updateOneFieldByOneField('chapterNum', newIdx + 1, 'id', bookObj['id'])
             updateBoostWithUpdateTime(bookObj['id'])
-            myLogging.info('zid: %s, bookId: %s  update %s chaps ', zid, bookObj['id'], str(newIdx - bookObj['chapterNum']) )
+            myLogging.info('zid: %s, bookId: %s  update %s chaps ', zid, bookObj['id'], str(newIdx + 1 - bookObj['chapterNum']) )
 
     else:
         myLogging.info('zid: %s, bookId: %s no update ()', zid, bookObj['id'])

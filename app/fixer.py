@@ -6,7 +6,7 @@ import json
 import requests
 
 from Config import SEARCHHOST
-from app.ZhuiShuShenQiCrawler import searchAndCrawl
+from app.ZssqSearcher import searchAndCrawl
 from app.shuqi import getContentByUrl
 from dao.aliyunOss import upload2Bucket, bucket
 from dao.connFactory import getDushuConnCsor
