@@ -39,10 +39,11 @@ def searchAndCrawl(searchInput, limit = 5):
     succcount = 0
     count = 0
     for bookObj in searchResObj['books']:
-        digest = getBookDigest(bookObj)
         count += 1
         if count > 5: #只要搜索结果的前N个，后面的就算了
             break
+
+        digest = getBookDigest(bookObj)
         if bookDigestBloom.contains(digest):
             myLogging.info('has book %s, with same author %s, skip', bookObj['title'].encode('utf-8'), bookObj['author'].encode('utf-8'))
             continue
