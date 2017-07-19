@@ -207,7 +207,7 @@
   - {TypeName: "领主贵族", cid: 303}
   - {TypeName: "亡灵异族", cid: 304}
   - {TypeName: "其他奇幻", cid: 305}
-  id: '135'
+  id: '452'
 "孕产":
   children:
   - {TypeName: "孕产知识", cid: 571}
@@ -454,7 +454,7 @@
 "现代":
   children:
   - {TypeName: "现代诗词", cid: 544}
-  id: '93'
+  id: '459'
 "现言":
   children:
   - {TypeName: "现言小说", cid: 510}

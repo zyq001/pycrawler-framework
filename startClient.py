@@ -11,14 +11,16 @@ import time
 import requests
 
 from Config import SEARCHHOST
-from app.QuanBenMianFeiCrawler import QuanBenCrawler
-from app.QuanbenUpdater import updateByDbBookId
-from app.ZhuiShuShenQiCrawler import ZssqCrawler
-from app.fixer import crawlBySearchHistory
+# from app.QuanBenMianFeiCrawler import QuanBenCrawler
+# from app.QuanbenUpdater import updateByDbBookId
+# from app.ZhuiShuShenQiCrawler import ZssqCrawler
+# from app.fixer import crawlBySearchHistory
 from app.mianfeiTXTUpdater import mianfeiUpdateByBookObj
-from app.shuqiUpdater import updateFromMysql
+# from app.shuqiUpdater import updateFromMysql
+from app.shuqi import start
 from dao.dushuMianFeiTXTService import getBookByTitle, deleteNLastChaps
-from util.timeHelper import getToday
+from util.categoryHelper import getClassifyCodeByName
+# from util.timeHelper import getToday
 
 
 
@@ -52,7 +54,14 @@ def deleteESDocs():
 
 
 if __name__ == '__main__':
-    crawlBySearchHistory()
+    start(2490339)
+    # print getClassifyCodeByName('魔法')
+    # print getClassifyCodeByName('魔法')['typeCode']
+    # print getClassifyCodeByName('魔法')['categoryCode']
+    # print getClassifyCodeByName(u'魔法')['categoryCode']
+    # print getClassifyCodeByName('校园魔法')['categoryCode']
+    # print getClassifyCodeByName('校园魔法')['typeCode']
+    # crawlBySearchHistory()
     # updateByDbBookId(2137876)
     # ZssqCrawler('587f57b38602d1eb036492f4').crawl(allowUpdate=True)
     # QuanBenCrawler('577a74c6d48745631a23962a').crawl(allowUpdate=False)

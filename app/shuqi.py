@@ -25,6 +25,7 @@ from dao.dushuService import getExistsCapsRawUrlId, insertCapWithCapObj2, insert
     deleteChapsLargerThanIdx, getChapObjByBookIdChapTitle
 from local.shuqi.shuqiLocal import loadShuQSeqC, loadShuQC
 from util.UUIDUtils import getBookDigest, getCapDigest
+from util.categoryHelper import getClassifyCodeByName
 from util.logHelper import myLogging
 from util.networkHelper import getContent, getContentWithUA
 from util.pyBloomHelper import getBloom, loadBloomFromFile, dumpBloomToFile
@@ -37,7 +38,7 @@ capListAPIDeviceInfo = '&soft_id=1&ver=110817&platform=an&placeid=1007&imei=8629
 
 donedegest = getBloom(1500 * 10000)
 
-shuqCategory = loadShuQC()
+# shuqCategory = loadShuQC()
 
 gBookDict = dict()
 
@@ -132,14 +133,14 @@ def sizeStr2Int(size):
         print '计算书的大小出错',e
     return int(carry * count)
 
-def handleOneBook(id,shuqCategory2 = None, allowUpdate=True):
+def handleOneBook(id, allowUpdate=True):
 
-    if not shuqCategory2:
-        global shuqCategory
-        shuqCategory2 = shuqCategory
+    # if not shuqCategory2:
+    #     global shuqCategory
+    #     shuqCategory2 = shuqCategory
     # shuqCategory = loadShuQC()
 
-    bookObj, digest = getBookObjFromSQid(id, shuqCategory2)
+    bookObj, digest = getBookObjFromSQid(id)
 
     if not bookObj or not digest:
         return None
@@ -160,7 +161,7 @@ def handleOneBook(id,shuqCategory2 = None, allowUpdate=True):
     # existsCaps = getExistsCaps(bookObj['id'])
 
 
-def getBookObjFromSQid(id, shuqCategory2 = None):
+def getBookObjFromSQid(id):
     '''
     根据书旗的id抓取书的信息
     :param id: 书旗的id
@@ -168,9 +169,9 @@ def getBookObjFromSQid(id, shuqCategory2 = None):
     :return: 抓取到的book信息对象和digest
     '''
 
-    if not shuqCategory2:
-        global shuqCategory
-        shuqCategory2 = shuqCategory
+    # if not shuqCategory2:
+    #     global shuqCategory
+    #     shuqCategory2 = shuqCategory
 
     bookInfoAPI = 'http://api.shuqireader.com/reader/bc_cover.php?bookId=' + str(
         id) + '&book=same&book_num=5&bbs=pinglun&bbs_num=8&bbs_rand_num=1&lastchaps=1&ItemCount=3' \
@@ -183,26 +184,35 @@ def getBookObjFromSQid(id, shuqCategory2 = None):
     BookType = ''
     if len(root.getiterator('BookType')) > 0:
         BookType = root.getiterator('BookType')[0].text
-    category = ''
-    if len(root.getiterator('NickName')) > 0:
-        category = root.getiterator('NickName')[0].text
-    tag = ''
-    if len(root.getiterator('ShortNickName')) > 0:
-        tag = root.getiterator('ShortNickName')[0].text
-    tagId = 0
-    if root.getiterator('NickId') and len(root.getiterator('NickId')) > 0 and root.getiterator('NickId')[0].text:
-        tagId = int(root.getiterator('NickId')[0].text)
     firstCid = 0
     if root.getiterator('ChapteridFirst') and len(root.getiterator('ChapteridFirst')) > 0 \
             and root.getiterator('ChapteridFirst')[0].text:
         firstCid = int(root.getiterator('ChapteridFirst')[0].text)
 
-    if (not BookType) and (not category) and (not tag) and (not tagId):
+    if not BookType :
         return None,None
+
+    tag = ''
+    if len(root.getiterator('NickName')) > 0:
+        tag = root.getiterator('NickName')[0].text
+    category = ''
+    if len(root.getiterator('ShortNickName')) > 0:
+        category = root.getiterator('ShortNickName')[0].text
     categoryId = 0
-    if shuqCategory2.has_key(tag):
-        if shuqCategory2[tag]['id'] and len(shuqCategory2[tag]['id']) > 0:
-            categoryId = int(shuqCategory2[tag]['id'])
+    if root.getiterator('NickId') and len(root.getiterator('NickId')) > 0 and root.getiterator('NickId')[0].text:
+        categoryId = int(root.getiterator('NickId')[0].text)
+
+    categoryId = getClassifyCodeByName(category, default=categoryId)['typeCode']
+
+    mappedCategoryObj = getClassifyCodeByName(tag)
+    if 0 != mappedCategoryObj['categoryCode']:
+        tagId = mappedCategoryObj['typeCode']
+        category = mappedCategoryObj['category']
+        categoryId = mappedCategoryObj['categoryCode']
+
+    # if shuqCategory2.has_key(tag):
+    #     if shuqCategory2[tag]['id'] and len(shuqCategory2[tag]['id']) > 0:
+    #         categoryId = int(shuqCategory2[tag]['id'])
     size = 1
     if root.getiterator('Size') and len(root.getiterator('Size')) > 0:
         strSize = root.getiterator('Size')[0].text
@@ -324,10 +334,14 @@ def getCapContentObj(bookId, capId,mysqlBKid):
 
     capObj = dict()
     capObj['bookFail'] = False #标识是否整本书不可抓，如果是就没必要抓后面的章节了
-    if not (capText and len(capText) > 30):
-        print 'cap content too short ,skip and del book'
-        # delBookById(mysqlBKid)
+    if not capText :
+        print 'cap content none'
         return None
+    if not len(capText) > 30:
+        print 'cap content too short ,skip and del book'
+        delBookById(mysqlBKid)
+        capObj['bookFail'] = True
+        return capObj
     capRoot = ElementTree.fromstring(capText.encode('utf-8'))
 
     ChapterName = ''
@@ -340,11 +354,15 @@ def getCapContentObj(bookId, capId,mysqlBKid):
     if not ChapterContent:
         capText = getContentWithUA(capApi, ua)
 
-        if not (capText and len(capText) > 30):
+        if not capText:
+            print 'cap content none'
+            return None
+        if not len(capText) > 30:
             print 'cap content too short ,skip and del book'
             delBookById(mysqlBKid)
             capObj['bookFail'] = True
             return capObj
+
         capRoot = ElementTree.fromstring(capText.encode('utf-8'))
 
         ChapterName = ''
@@ -403,14 +421,14 @@ def getCapContentObj(bookId, capId,mysqlBKid):
 
 
 
-def start(bookId, shuqCategory2 = None , allowUpdate = True):
+def start(bookId , allowUpdate = True):
 
 
-    if not shuqCategory2:
-        global shuqCategory
-        shuqCategory2 = shuqCategory
+    # if not shuqCategory2:
+    #     global shuqCategory
+    #     shuqCategory2 = shuqCategory
 
-    bookObj = handleOneBook(bookId, shuqCategory2, allowUpdate)
+    bookObj = handleOneBook(bookId, allowUpdate)
     if (not bookObj) or not bookObj.has_key('id'):
         print 'book null', bookId
         return
@@ -482,10 +500,10 @@ def getCapObjsByBookObj(allowUpdate, bookId, bookObj):
         capId = capList[j]['cid']
 
         capObj = getCapContentObj(bookId, capId, bookObj['id'])
-        if capObj['bookFail']:
-            return None
         if not capObj:
             continue
+        if capObj['bookFail']:
+            return None
 
         title = capObj['title']
         if title in chapTitles:
@@ -518,8 +536,8 @@ def getCapObjsByBookObj(allowUpdate, bookId, bookObj):
     return capObjList
 
 
-def getCapObjListByBookIdIntoQue(bookId, queue, categoryDict, connDoc,csorDoc):
-    bookObj = handleOneBook(bookId,categoryDict, connDoc,csorDoc)
+def getCapObjListByBookIdIntoQue(bookId, queue, connDoc,csorDoc):
+    bookObj = handleOneBook(bookId, connDoc,csorDoc)
     if (not bookObj or not bookId ) or not  bookObj.has_key('id'):
         return
     capList = getShuqiCapList(bookId)
@@ -528,7 +546,9 @@ def getCapObjListByBookIdIntoQue(bookId, queue, categoryDict, connDoc,csorDoc):
         capId = capList[j]['cid']
         capObj = getCapContentObj(bookId, capId,bookObj['id'])
         if not capObj:
-            return
+            continue
+        if capObj['bookFail']:
+            return None
         capObj['bookId'] = bookObj['id']
         capObj['source'] = bookObj['source']
         capObj['idx'] = j
@@ -665,7 +685,7 @@ def dealBookListUrlContentMT(p, queue, shuqCategory2, urlContent):
         time.sleep(5)
 
 
-def startByXmlDoc(capRoot, queue,shuqCategory2):
+def startByXmlDoc(capRoot, queue):
     # shuqCategory2 = loadShuQC()
 
     from DBUtils.PooledDB import PooledDB
@@ -684,7 +704,7 @@ def startByXmlDoc(capRoot, queue,shuqCategory2):
     for book in capRoot.getiterator('Book'):
         bookId = book.attrib['BookId']
         try:
-            getCapObjListByBookIdIntoQue(bookId, queue,shuqCategory2, connDoc,csorDoc)
+            getCapObjListByBookIdIntoQue(bookId, queue, connDoc,csorDoc)
         except Exception as e:
             print 'bookId: ', bookId, e
         # capObjList = getCapObjListByBookId(bookId)
@@ -917,7 +937,7 @@ if __name__ == '__main__':
 
     bloom = loadExistsSQId()
 
-    shuqCategory2 = loadShuQC()
+    # shuqCategory2 = loadShuQC()
 
     st = 10000
     end = 7000000
@@ -964,7 +984,7 @@ if __name__ == '__main__':
             #     continue
             if not 'shuqi' + str(sqBid) in bloom:
                 try:
-                    start(3648845,shuqCategory2)
+                    start(3648845)
                 except Exception as e:
                     print sqBid, ':  ',e
                 except IOError as e2:

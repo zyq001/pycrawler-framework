@@ -10,7 +10,7 @@ from app.ershoufang import Ershoufang
 from app.mianfeiTXTCrawler import MianFeiTXTCrawler
 from app.mianfeiTXTUpdater import MianFeiTXTUpdater
 from app.shuqi import start
-from app.shuqiNewFilder import ShuqiFilder
+# from app.shuqiNewFilder import ShuqiFilder
 from app.shuqiUpdater import ShuqiUpdater
 from dao.dushuService import loadExistsSQId
 from local.shuqi.shuqiLocal import loadShuQC
@@ -26,7 +26,7 @@ def shuqiTest():
 
     bloom = loadExistsSQId()
 
-    shuqCategory2 = loadShuQC()
+    # shuqCategory2 = loadShuQC()
 
     db_dushu = 'default'
     db_acticle = 'default'
@@ -78,7 +78,7 @@ def shuqiTest():
             #     continue
             if not 'shuqi' + str(sqBid) in bloom:
                 try:
-                    start(3648845, shuqCategory2)
+                    start(3648845)
                 except Exception as e:
                     print sqBid, ':  ', e
                 except IOError as e2:
@@ -152,7 +152,7 @@ def shuqiTest():
 if __name__ == '__main__':
     crawlManager.crawlers['ershoufang'] = Ershoufang
     crawlManager.crawlers['shuqiById'] = ShuqiCrawler
-    crawlManager.crawlers['shuqiFilder'] = ShuqiFilder
+    # crawlManager.crawlers['shuqiFilder'] = ShuqiFilder
     crawlManager.crawlers['mianFeiTXT'] = MianFeiTXTCrawler
     crawlManager.crawlers['mianFeiTXTUpdater'] = MianFeiTXTUpdater
     crawlManager.crawlers['shuqiUpdater'] = ShuqiUpdater
