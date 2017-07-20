@@ -207,13 +207,13 @@ def parseBook(allowUpdate, bookObj, zid):
     bookObj['zid'] = bookObj['_id']
 
     bookObj['imgUrl'] = urlparse.urljoin(zssqStaticUrl, bookObj['cover'])
-    bookObj['category'] = ''
+    bookObj['category'] = '其他'
     if bookObj.has_key('majorCate'):
         bookObj['category'] = bookObj['majorCate']
 
     bookObj['categoryCode'] = getClassifyCodeByName(bookObj['category'])['categoryCode']
 
-    bookObj['type'] = ''
+    bookObj['type'] = '其他'
     if bookObj.has_key('minorCate'):
         bookObj['type'] = bookObj['minorCate']
     # bookObj['type'] = bookObj['minorCate']
