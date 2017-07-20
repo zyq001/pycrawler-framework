@@ -8,9 +8,11 @@ import time
 
 from Config import SEARCHHOST
 from app.ZssqSearcher import searchAndCrawl
+from util.logHelper import myLogging
 
 
 def crawlByDailySearchHistory(timeStart = None):
+    myLogging.info('timeStart: %s', timeStart)
     baseUrl = 'http://%s/log/_search'  % SEARCHHOST
     if not timeStart:
         timeStart = int(time.time() * 1000) - 24 * 3600 * 1000

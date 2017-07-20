@@ -17,8 +17,9 @@ if __name__ == '__main__':
     timeStart = int(time.time() * 1000) - 24 * 3600 * 1000
     while 1:
         myLogging.info('begin searchHistoryCrawler')
+        timeBeforeSearch = int(time.time() * 1000)
         crawlByDailySearchHistory(timeStart)
-        timeStart = int(time.time() * 1000)
+        timeStart = timeBeforeSearch
         sleepTime = getHotConfigDict()['searchHistoryCrawler']['updateSleep']
         myLogging.info(' done one loop, now sleep '+ str(sleepTime) + ' secs')
         time.sleep(int(sleepTime))

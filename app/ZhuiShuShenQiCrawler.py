@@ -12,12 +12,13 @@ from urllib import quote
 
 from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, sourceLimit
 from app.baseCrawler import BaseCrawler
-from app.shuqi import shuqCategory
+# from app.shuqi import shuqCategory
 from dao.aliyunOss import upload2Bucket
 from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getChapTitlesByBookId, getCapIdxsByBookId, \
     delBookById
 from exception.InputException import InputException
 from util.UUIDUtils import getCapDigest
+from util.categoryHelper import getClassifyCodeByName
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
 
@@ -200,7 +201,7 @@ def getChapsByBocId(bocId):
 
 def parseBook(allowUpdate, bookObj, zid):
 
-    categDict = shuqCategory
+    # categDict = shuqCategory
     zssqStaticUrl = 'http://statics.zhuishushenqi.com/'
 
     bookObj['zid'] = bookObj['_id']
@@ -209,19 +210,19 @@ def parseBook(allowUpdate, bookObj, zid):
     bookObj['category'] = ''
     if bookObj.has_key('majorCate'):
         bookObj['category'] = bookObj['majorCate']
+
+    bookObj['categoryCode'] = getClassifyCodeByName(bookObj['category'])['categoryCode']
+
     bookObj['type'] = ''
     if bookObj.has_key('minorCate'):
         bookObj['type'] = bookObj['minorCate']
     # bookObj['type'] = bookObj['minorCate']
     bookObj['typeCode'] = 0
-    if categDict.has_key(bookObj['type']):
-        if categDict[bookObj['type']]['id'] and len(categDict[bookObj['type']]['id']) > 0:
-            bookObj['typeCode'] = int(categDict[bookObj['type']]['id'])
-    bookObj['category'] = bookObj['majorCate']
-    bookObj['categoryCode'] = 0
-    if categDict.has_key(bookObj['category']):
-        if categDict[bookObj['category']]['id'] and len(categDict[bookObj['category']]['id']) > 0:
-            bookObj['categoryCode'] = int(categDict[bookObj['category']]['id'])
+    classfyObj = getClassifyCodeByName(bookObj['type'])
+    if 0 != classfyObj['typeCode']:#二级分类命中的话 一级分类也可以更新掉了
+        bookObj['typeCode'] = classfyObj['typeCode']
+        bookObj['categoryCode'] = classfyObj['categoryCode']
+
     bookObj['size'] = bookObj['wordCount']
     bookObj['chapterNum'] = bookObj['chaptersCount']
 
