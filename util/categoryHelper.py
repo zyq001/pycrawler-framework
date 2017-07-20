@@ -26,6 +26,9 @@ def getClassifyCodeByName(name, default = 0):
         'url': ''
     }
 
+    if not name:
+        return resObj
+
     if isinstance(name, str):
         name = name.decode('utf-8')
 

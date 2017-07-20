@@ -54,13 +54,13 @@ def deleteESDocs():
 
 
 if __name__ == '__main__':
-    start(2490339)
-    # print getClassifyCodeByName('魔法')
-    # print getClassifyCodeByName('魔法')['typeCode']
-    # print getClassifyCodeByName('魔法')['categoryCode']
-    # print getClassifyCodeByName(u'魔法')['categoryCode']
-    # print getClassifyCodeByName('校园魔法')['categoryCode']
-    # print getClassifyCodeByName('校园魔法')['typeCode']
+    # start(2490339)
+    print getClassifyCodeByName(None)
+    print getClassifyCodeByName('魔法')['typeCode']
+    print getClassifyCodeByName('魔法')['categoryCode']
+    print getClassifyCodeByName(u'魔法')['categoryCode']
+    print getClassifyCodeByName('校园魔法')['categoryCode']
+    print getClassifyCodeByName('校园魔法')['typeCode']
     # crawlBySearchHistory()
     # updateByDbBookId(2137876)
     # ZssqCrawler('587f57b38602d1eb036492f4').crawl(allowUpdate=True)

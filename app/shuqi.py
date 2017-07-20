@@ -205,6 +205,7 @@ def getBookObjFromSQid(id):
     categoryId = getClassifyCodeByName(category, default=categoryId)['typeCode']
 
     mappedCategoryObj = getClassifyCodeByName(tag)
+    tagId = 0
     if 0 != mappedCategoryObj['categoryCode']:
         tagId = mappedCategoryObj['typeCode']
         category = mappedCategoryObj['category']
