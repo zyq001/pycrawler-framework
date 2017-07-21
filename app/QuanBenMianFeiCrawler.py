@@ -16,11 +16,12 @@ import time
 from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, bookInfoBaseUrl, \
     srcListBaseUrl, chapListBaseUrl
 from app.baseCrawler import BaseCrawler
-from app.shuqi import shuqCategory
+# from app.shuqi import shuqCategory
 from dao.aliyunOss import upload2Bucket
 from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getCapIdxsByBookId
 from exception.InputException import InputException
 from util.UUIDUtils import getCapDigest
+from util.categoryHelper import getClassifyCodeByName
 from util.defaultImgHelper import checkDefaultImg
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
@@ -151,7 +152,7 @@ def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
     if not srcId:
         srcId = getSourceId(qid)
 
-    categDict = shuqCategory
+    # categDict = shuqCategory
 
     bookInfoUrl = bookInfoBaseUrl % (qid, srcId)
     bookInfoContent = getContentWithUA(bookInfoUrl)
@@ -167,16 +168,20 @@ def getBookObjBiQid(qid, srcId = None, allowUpdate=False):
         bookObj['bookType'] = u'完结'
 
     bookObj['rawUrl'] = bookInfoUrl
-    bookObj['categoryCode'] = 0
 
     bookObj['category'] = bookObj['labels']
-    if categDict.has_key(bookObj['category']):
-        if categDict[bookObj['category']]['id'] and len(categDict[bookObj['category']]['id']) > 0:
-            bookObj['categoryCode'] = int(categDict[bookObj['category']]['id'])
+    bookObj['categoryCode'] = getClassifyCodeByName(bookObj['category'])['categoryCode']
+
+    # if categDict.has_key(bookObj['category']):
+    #     if categDict[bookObj['category']]['id'] and len(categDict[bookObj['category']]['id']) > 0:
+    #         bookObj['categoryCode'] = int(categDict[bookObj['category']]['id'])
 
     bookObj['type'] = bookObj['category']
     bookObj['typeCode'] = 0
-
+    classObj = getClassifyCodeByName(bookObj['type'])
+    if 0 != classObj['typeCode']:
+        bookObj['typeCode'] = classObj['typeCode']
+        bookObj['categoryCode'] = classObj['categoryCode']
 
     bookObj['source'] = qid + '/' + srcId
 
