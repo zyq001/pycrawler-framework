@@ -24,12 +24,15 @@ import hashlib
 
 from Config import EADHOST, EADPASSWD
 from dao.connFactory import getDushuConnCsor
+from util.logHelper import myLogging
 
 ua = 'Mozilla/5.0 (Linux; U; Android 4.0; en-us; Xoom Build/HRI39) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13'
 capListAPIDeviceInfo = '&soft_id=1&ver=110817&platform=an&placeid=1007&imei=862953036746111&cellid=13&lac=-1&sdk=18&wh=720x1280&imsi=460011992901111&msv=3&enc=666501479540451111&sn=1479540459901111&vc=e8f2&mod=M3'
 
 
 def indexBookSuggest(st = 200000):
+    myLogging.info('st: %s', st)
+
     conn2, csor2 = getDushuConnCsor()
 
     csor2.execute("select id,title,author from cn_dushu_book where id >= %s", (st,))
