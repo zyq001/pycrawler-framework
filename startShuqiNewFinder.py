@@ -24,7 +24,7 @@ if __name__ == '__main__':
         st = int(sys.argv[1])
         end = int(sys.argv[2])
 
-    updateFromMysql()
+    updateFromMysql(st, end)
     sleepTime = getHotConfigDict()['shuqiNewFinder']['updateSleep']
     myLogging.info(' done one loop, now sleep ' + str(sleepTime) + ' secs')
     time.sleep(int(sleepTime))

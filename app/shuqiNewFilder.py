@@ -47,6 +47,7 @@ def updateFromMysql(st = 10000, end = 7000000):
 
     idx = st
     carry = 10000
+    myLogging.info('start from %s to %s ', st, end)
 
     while idx < end:
         # seq = range(5000, 6000)

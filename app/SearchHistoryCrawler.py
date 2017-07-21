@@ -42,7 +42,7 @@ def crawlByDailySearchHistory(timeStart = None):
  "hist": {
       "terms": {
         "field": "word.raw",
-        "size": 100,
+        "size": 1000,
         "order": {
           "_count": "desc"
         }
