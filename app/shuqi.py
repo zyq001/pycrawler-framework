@@ -17,7 +17,7 @@ from xml.etree import ElementTree
 import MySQLdb
 import yaml
 
-from Config import EADHOST, EADPASSWD, bloomDumpCapsName, MINCHAPNUM
+from Config import EADHOST, EADPASSWD, bloomDumpCapsName, MINCHAPNUM, Shuqi_MINCHAPNUM
 from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
 from dao.dushuService import getExistsCapsRawUrlId, insertCapWithCapObj2, insertCapWithCapObj, \
@@ -222,7 +222,7 @@ def getBookObjFromSQid(id):
     if root.getiterator('NumChapter') and len(root.getiterator('NumChapter')) > 0 and root.getiterator('NumChapter')[0].text:
         NumChapter = int(root.getiterator('NumChapter')[0].text)
 
-    if NumChapter < MINCHAPNUM:
+    if NumChapter < Shuqi_MINCHAPNUM:
         return None,None
     source = 'shuqi' + str(id)
     subtitle = root.getiterator('Description')[0].text
