@@ -93,7 +93,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
     uploadCap = 0
     succCapTimes = 1
     resIdx = startCapIdx
-    for cid in range(startCapIdx, count + 1):
+    for cid in range(0, count + 1):
         try:
 
             if allowUpdate:
