@@ -6,7 +6,7 @@ import traceback
 
 import requests
 
-from Config import SEARCHHOST
+from Config import SEARCHHOST, ossBaseUrl
 # from app.ZssqSearcher import searchAndCrawl
 from app.shuqi import getContentByUrl
 from dao.aliyunOss import upload2Bucket, bucket
@@ -234,8 +234,6 @@ def uploadCapFromTo(f, t):
 
 def newLineFixer():
 
-    ossBaseUrl = 'http://dushu-content.oss-cn-shanghai-internal.aliyuncs.com/'
-    # ossBaseUrl = 'http://dushu-content.oss-cn-shanghai.aliyuncs.com/'
     quanBenObjs = getQuanBenAllBookIds()
     fixNewLineByBookObjs(ossBaseUrl, quanBenObjs)
 
