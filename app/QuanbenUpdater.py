@@ -85,8 +85,8 @@ def updateByBookObj(bookObj):
         if chapObj['serial_number'] <= chapIdx and tempIdx in chapIdxs and tempTitle in chapTitles:
             continue
         try:
-            chapIdx = handlChapByBookObjChapObj(chapObj=chapObj, bookObj=bookObj, allowUpdate=True)
-            resIdx = max(resIdx, chapIdx)
+            rewChapIdx = handlChapByBookObjChapObj(chapObj=chapObj, bookObj=bookObj, allowUpdate=True)
+            resIdx = max(resIdx, rewChapIdx)
         except Exception as e:
             myLogging.error('bookId %s chap idx %s has exception: %s', bookObj['id'], chapObj['serial_number'],
                             traceback.format_exc())
