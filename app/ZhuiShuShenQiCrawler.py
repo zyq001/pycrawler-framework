@@ -19,6 +19,7 @@ from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getChapTit
 from exception.InputException import InputException
 from util.UUIDUtils import getCapDigest
 from util.categoryHelper import getClassifyCodeByName
+from util.contentHelper import textClean
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
 
@@ -141,6 +142,7 @@ def handlChapsByBookObjZidBocId(bookObj, zid,chapListObj, allowUpdate= False):
             if chapObj.has_key('cpContent'):
                 chapObj['content'] = chapObj['cpContent']
                 del chapObj['cpContent']
+            chapObj['content'] = textClean(chapObj['content'])
             del chapObj['body']
             del chapObj['link']
             chapObj['rawUrl'] = chapContentUrl

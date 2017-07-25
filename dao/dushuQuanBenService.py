@@ -44,17 +44,17 @@ def getQuanBenAllLianZaiBookObjs():
 
     return bookObjs
 
-def getShuqiAllBookObjs():
+def getQuanBenAllBookIds():
     '''
-    获取所有Shuqi的主键和相关信息：id,rawUrl,chapterNum,source,digest
+    获取所有全本免费阅读器的主键和相关信息：id,rawUrl,chapterNum,source,digest
     :return bookObjs即： [bookObj{"id":"1",,}]: 
     '''
 
     conn, csor = getDushuConnCsor()
     dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
 
-    dictCsor.execute("SELECT id,rawUrl,chapterNum,source,digest from cn_dushu_book where operateStatus = 0  "
-                 " and rawUrl like 'http://api.shuqireader.com/reader/bc_cover.php%';")
+    dictCsor.execute("SELECT id from cn_dushu_book where   "
+                 "  rawUrl like 'http://api.wubutianxia.com:8090/V1/book/%';")
     conn.commit()
     bookObjs = dictCsor.fetchallDict()
 

@@ -2,16 +2,20 @@
 # -*- coding: UTF-8 -*-
 import hashlib
 import json
+import traceback
 
 import requests
 
 from Config import SEARCHHOST
-from app.ZssqSearcher import searchAndCrawl
+# from app.ZssqSearcher import searchAndCrawl
 from app.shuqi import getContentByUrl
 from dao.aliyunOss import upload2Bucket, bucket
 from dao.connFactory import getDushuConnCsor
-from dao.dushuService import updateContentById
+from dao.dushuQuanBenService import getQuanBenAllBookIds
+from dao.dushuService import updateContentById, getCapIdsByBookId, delCapById
+from dao.dushuZssqService import getZssqAllBookObjs
 from parse.easouParser import getAndParse
+from util.logHelper import myLogging
 from util.networkHelper import getERAConn
 
 
@@ -197,33 +201,71 @@ def uploadCapFromTo(f, t):
         for cap in results:
             handleCapUpload(cap)
 
-def crawlBySearchHistory():
-    baseUrl = 'http://%s/log/_search'  % SEARCHHOST
-    searchInput = '''
-    {
-"size":0,
-"query": {
-    "range" : {
-        "page" : {
-            "gte" : 1
-        }
-    }
- },
- "aggs":{
- "hist": {
-      "terms": {
-        "field": "word.raw",
-        "size": 1000,
-        "order": {
-          "_count": "desc"
-        }
-      }
-    }
- }
- }
-    '''
-    r = requests.post(baseUrl, data = searchInput)
-    resObj = json.loads(r.text)
-    for wordObj in resObj['aggregations']['hist']['buckets']:
-        word = wordObj['key']
-        searchAndCrawl(word)
+# def crawlBySearchHistory():
+#     baseUrl = 'http://%s/log/_search'  % SEARCHHOST
+#     searchInput = '''
+#     {
+# "size":0,
+# "query": {
+#     "range" : {
+#         "page" : {
+#             "gte" : 1
+#         }
+#     }
+#  },
+#  "aggs":{
+#  "hist": {
+#       "terms": {
+#         "field": "word.raw",
+#         "size": 1000,
+#         "order": {
+#           "_count": "desc"
+#         }
+#       }
+#     }
+#  }
+#  }
+#     '''
+#     r = requests.post(baseUrl, data = searchInput)
+#     resObj = json.loads(r.text)
+#     for wordObj in resObj['aggregations']['hist']['buckets']:
+#         word = wordObj['key']
+#         searchAndCrawl(word)
+
+def newLineFixer():
+
+    ossBaseUrl = 'http://dushu-content.oss-cn-shanghai-internal.aliyuncs.com/'
+    # ossBaseUrl = 'http://dushu-content.oss-cn-shanghai.aliyuncs.com/'
+    quanBenObjs = getQuanBenAllBookIds()
+    fixNewLineByBookObjs(ossBaseUrl, quanBenObjs)
+
+    zssqObjs = getZssqAllBookObjs()
+    fixNewLineByBookObjs(ossBaseUrl, zssqObjs)
+
+
+def fixNewLineByBookObjs(ossBaseUrl, quanBenObjs):
+
+    from util.contentHelper import textClean
+    for quanBenObj in quanBenObjs:
+        bookId = quanBenObj['id']
+        chapIds = getCapIdsByBookId(bookId)
+        for chapId in chapIds:
+            try:
+                url = ossBaseUrl + str(chapId) + '.json'
+                r = requests.get(url)
+
+                obj = json.loads(r.text)
+
+                if not obj or not obj.has_key('content'):
+                    delCapById(chapId)
+                    myLogging.info('chap id %s, has no oss obj, delete', chapId)
+                    continue
+
+                content = textClean(obj['content'])
+                obj['content'] = content
+
+                upload2Bucket(str(chapId) + '.json', json.dumps(obj))
+            except Exception as e:
+                myLogging.error('chap id %s, with exception: %s', chapId, traceback.format_exc())
+if __name__ == '__main__':
+    newLineFixer()

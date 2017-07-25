@@ -227,6 +227,10 @@ def getCapIdxsByBookId(bookId):
 
     return getFieldByBookId('idx', bookId)
 
+def getCapIdsByBookId(bookId):
+
+    return getFieldByBookId('id', bookId)
+
 def getFieldByBookId(field, bookId):
     conn,csor = getDushuConnCsor()
     idxs = set()

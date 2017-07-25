@@ -21,6 +21,7 @@ from dao.dushuService import insertCapWithCapObj, getCapIdxsByBookId
 from exception.InputException import InputException
 from shuqi import insertBookWithConn
 from util.UUIDUtils import getCapDigest
+from util.contentHelper import textClean
 from util.htmlHelper import getSoupByStr, getSoupByUrl
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
@@ -134,7 +135,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
             content = unicode(contentSoup.body).replace(u'<body>', '').replace(u'</body>', '').replace(u'\n\n',
                                                                                                        u'\n').replace(
                 u'<br><br>', u'<br>').replace(u'<br\><br\>', u'<br\>')
-            capObj['content'] = content
+            capObj['content'] = textClean(content)
             capObj['title'] = unicode(contentSoup.title.get_text())
             capObj['rawUrl'] = capContentUrl
             # capObj['size'] = int(WordsCount)
