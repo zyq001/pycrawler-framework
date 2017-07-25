@@ -7,6 +7,7 @@
 '''
 import requests
 
+from Config import ossBaseUrl
 from app.mianfeiTXTCrawler import handleByMTID, handleCapsByBookObj
 from app.shuqiUpdater import updateByBookObj
 from dao.connFactory import getDushuConnCsor
@@ -86,7 +87,7 @@ def fixUnuploadedCaps():
         deleteCount = 0
         for cidL in cids:
             cid = cidL[0]
-            ossUrl = 'http://dushu-content.oss-cn-shanghai.aliyuncs.com/' + str(cid) + '.json'
+            ossUrl =     ossBaseUrl  + str(cid) + '.json'
             r = requests.head(ossUrl)
             if r.status_code > 200:
                 print 'bookId' + str(bookObj['id']) + ' cid: ' + str(cid) + ' status_code: ' + str(r.status_code)
