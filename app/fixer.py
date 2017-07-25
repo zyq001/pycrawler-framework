@@ -263,6 +263,7 @@ def fixNewLineByBookObjs(ossBaseUrl, quanBenObjs):
                 obj['content'] = content
 
                 upload2Bucket(str(chapId) + '.json', json.dumps(obj))
+                myLogging.info('succ cid %s', chapId)
             except Exception as e:
                 myLogging.error('chap id %s, with exception: %s', chapId, traceback.format_exc())
 if __name__ == '__main__':
