@@ -93,7 +93,9 @@ def updateByBookObj(bookObj):
 
     if resIdx > bookObj['chapterNum']:
         updateOneFieldByOneField('chapterNum', resIdx, 'id', bookObj['id'])
+
         updateBoostWithUpdateTime(bookObj['id'])
+
         myLogging.info(str(bookObj['id']) + respJson['book']['name'].encode('utf-8') + ' update ' + str(
             resIdx - bookObj['chapterNum']) \
                        + ' chaps ')

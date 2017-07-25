@@ -14,7 +14,7 @@ from urllib import quote
 import time
 
 from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, bookInfoBaseUrl, \
-    srcListBaseUrl, chapListBaseUrl
+    srcListBaseUrl, chapListBaseUrl, MinChapContentLength
 from app.baseCrawler import BaseCrawler
 # from app.shuqi import shuqCategory
 from dao.aliyunOss import upload2Bucket
@@ -22,6 +22,7 @@ from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getCapIdxs
 from exception.InputException import InputException
 from util.UUIDUtils import getCapDigest
 from util.categoryHelper import getClassifyCodeByName
+from util.contentHelper import textClean
 from util.defaultImgHelper import checkDefaultImg
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
@@ -221,6 +222,10 @@ def handlChapByBookObjChapObj(allowUpdate, bookObj, chapObj):
     chapContentUrl = chapObj['url']
     chapContent = getContentWithUA(chapContentUrl)
     chapContentObj = json.loads(chapContent)
+    if not chapContentObj or not chapContentObj['content'] or len(chapContentObj['content']) < MinChapContentLength:
+        myLogging.error('zid %s content too small skip, chapContentUrl %s', bookObj['id'], chapContentUrl)
+        return
+
     chapObj.update(chapContentObj)
     chapObj['title'] = chapObj['name']
     chapObj['rawUrl'] = chapContentUrl
@@ -232,6 +237,7 @@ def handlChapByBookObjChapObj(allowUpdate, bookObj, chapObj):
     chapObj['bookUUID'] = bookObj['digest']
     digest = getCapDigest(bookObj, chapObj, chapObj['bookChapterId'])
     chapObj['digest'] = digest
+    chapObj['content'] = textClean(chapObj['content'])
     capId = insertCapWithCapObj(chapObj, allowUpdate=allowUpdate)
     # aftInsertCap = time.time()
     # insertCap = insertCap + (aftInsertCap - befInsertCap)

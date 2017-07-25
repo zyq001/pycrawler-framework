@@ -45,7 +45,7 @@ def updateByBookObj(bookObj):
     currentChapsObj = getChapsByBocId(zBocId)
     if not currentChapsObj or not currentChapsObj.has_key('chapters') or len(currentChapsObj['chapters']) < 1:
         # delBookById(bookObj['id'])
-        myLogging.error( 'shuqi book has been droped, plz consider to delete id: '+ str(bookObj['id'])+ ' sid: '+ str(source))
+        myLogging.error( 'zssq  book maybe have been droped, plz consider to delete id: '+ str(bookObj['id'])+ ' sid: '+ str(source))
         return
     currentChapNum = len(currentChapsObj['chapters'])
     if currentChapNum > bookObj['chapterNum']:

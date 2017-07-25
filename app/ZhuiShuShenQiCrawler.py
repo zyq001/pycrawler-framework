@@ -10,7 +10,7 @@ import traceback
 import urlparse
 from urllib import quote
 
-from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, sourceLimit
+from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, sourceLimit, MinChapContentLength
 from app.baseCrawler import BaseCrawler
 # from app.shuqi import shuqCategory
 from dao.aliyunOss import upload2Bucket
@@ -143,6 +143,11 @@ def handlChapsByBookObjZidBocId(bookObj, zid,chapListObj, allowUpdate= False):
                 chapObj['content'] = chapObj['cpContent']
                 del chapObj['cpContent']
             chapObj['content'] = textClean(chapObj['content'])
+
+            if len(chapObj['content']) < MinChapContentLength:
+                myLogging.error('zid %s cid %s content too small skip', zid,chapObj['cid'])
+                continue
+
             del chapObj['body']
             del chapObj['link']
             chapObj['rawUrl'] = chapContentUrl
