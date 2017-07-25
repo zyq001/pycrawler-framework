@@ -224,7 +224,7 @@ def handlChapByBookObjChapObj(allowUpdate, bookObj, chapObj):
     chapContentObj = json.loads(chapContent)
     if not chapContentObj or not chapContentObj['content'] or len(chapContentObj['content']) < MinChapContentLength:
         myLogging.error('zid %s content too small skip, chapContentUrl %s', bookObj['id'], chapContentUrl)
-        return
+        return 0
 
     chapObj.update(chapContentObj)
     chapObj['title'] = chapObj['name']
@@ -243,9 +243,10 @@ def handlChapByBookObjChapObj(allowUpdate, bookObj, chapObj):
     # insertCap = insertCap + (aftInsertCap - befInsertCap)
     if not capId:
         myLogging.error('no chapId cid %s', chapObj['bookChapterId'])
-        return
+        return 0
     upload2Bucket(str(chapObj['id']) + '.json', json.dumps(chapObj))
 
+    return chapObj['idx']
 
 class QuanBenCrawler(BaseCrawler):
 
