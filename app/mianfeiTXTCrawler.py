@@ -16,7 +16,7 @@ from Config import EADHOST, EADPASSWD, OSSINTERNALENDPOINT, OSSUSER, OSSPASSWD, 
 # from framework.htmlParser import getSoupByStr
 # from networkHelper import getContentWithUA
 from app.baseCrawler import BaseCrawler
-from dao.aliyunOss import upload2Bucket
+from dao.aliyunOss import upload2Bucket, uploadJson2Bucket
 from dao.dushuService import insertCapWithCapObj, getCapIdxsByBookId
 from exception.InputException import InputException
 from shuqi import insertBookWithConn
@@ -159,7 +159,7 @@ def handleCapsByBookObj(allowUpdate, bookObj, count, mid, startCapIdx = 1):
 
             if not capId:
                 continue
-            upload2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
+            uploadJson2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
 
             aftUploadCap = time.time()
             uploadCap = uploadCap + (aftUploadCap - aftInsertCap)

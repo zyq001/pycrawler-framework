@@ -9,7 +9,7 @@ import requests
 from Config import SEARCHHOST, ossBaseUrl
 # from app.ZssqSearcher import searchAndCrawl
 from app.shuqi import getContentByUrl
-from dao.aliyunOss import upload2Bucket, bucket
+from dao.aliyunOss import upload2Bucket, bucket, uploadJson2Bucket
 from dao.connFactory import getDushuConnCsor
 from dao.dushuQuanBenService import getQuanBenAllBookIds
 from dao.dushuService import updateContentById, getCapIdsByBookId, delCapById
@@ -37,7 +37,7 @@ def handleCapUpload(cap):
     capObj['bookUUID'] = cap[9]
     content = unclearContent
     if unclearContent and not (u'        言情小说_打造最新原创' in unclearContent or unclearContent == 'None'):
-        upload2Bucket(str(cid) + '.json', json.dumps(capObj))
+        uploadJson2Bucket(str(cid) + '.json', json.dumps(capObj))
     else:
         try:
             if not capUrl or len(capUrl) < 1:
@@ -262,7 +262,7 @@ def fixNewLineByBookObjs(ossBaseUrl, quanBenObjs):
                 content = textClean(obj['content'])
                 obj['content'] = content
 
-                upload2Bucket(str(chapId) + '.json', json.dumps(obj))
+                uploadJson2Bucket(str(chapId) + '.json', json.dumps(obj))
                 myLogging.info('succ cid %s', chapId)
             except Exception as e:
                 myLogging.error('chap id %s, with exception: %s', chapId, traceback.format_exc())

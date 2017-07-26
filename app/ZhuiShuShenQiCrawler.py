@@ -13,7 +13,7 @@ from urllib import quote
 from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, sourceLimit, MinChapContentLength
 from app.baseCrawler import BaseCrawler
 # from app.shuqi import shuqCategory
-from dao.aliyunOss import upload2Bucket
+from dao.aliyunOss import upload2Bucket, uploadJson2Bucket
 from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getChapTitlesByBookId, getCapIdxsByBookId, \
     delBookById
 from exception.InputException import InputException
@@ -167,7 +167,7 @@ def handlChapsByBookObjZidBocId(bookObj, zid,chapListObj, allowUpdate= False):
 
             if not capId:
                 continue
-            upload2Bucket(str(capId) + '.json', json.dumps(chapObj))
+            uploadJson2Bucket(str(capId) + '.json', json.dumps(chapObj))
 
             resInx = max(resInx, idx)
             # aftUploadCap = time.time()

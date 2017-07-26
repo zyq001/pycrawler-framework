@@ -17,10 +17,18 @@ def getBucket():
 
 bucket = getBucket()
 
-def upload2Bucket(id, obj):
+def uploadJson2Bucket(id,obj):
+    headers={'Content-Type': 'application/json; charset=utf-8'}
+    upload2Bucket(id, obj,headers=headers)
+
+def upload2Bucket(id, obj,headers = None):
 
     try:
-        bucket.put_object(id, obj)
+        if not headers:
+            bucket.put_object(id, obj)
+        else:
+            bucket.put_object(id, obj, headers=headers)
+
         # print 'succ upload ',id
     except Exception as e:
         print id, ' upload faild ',e

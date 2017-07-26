@@ -17,7 +17,7 @@ from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, book
     srcListBaseUrl, chapListBaseUrl, MinChapContentLength
 from app.baseCrawler import BaseCrawler
 # from app.shuqi import shuqCategory
-from dao.aliyunOss import upload2Bucket
+from dao.aliyunOss import upload2Bucket, uploadJson2Bucket
 from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getCapIdxsByBookId
 from exception.InputException import InputException
 from util.UUIDUtils import getCapDigest
@@ -244,7 +244,7 @@ def handlChapByBookObjChapObj(allowUpdate, bookObj, chapObj):
     if not capId:
         myLogging.error('no chapId cid %s', chapObj['bookChapterId'])
         return 0
-    upload2Bucket(str(chapObj['id']) + '.json', json.dumps(chapObj))
+    uploadJson2Bucket(str(chapObj['id']) + '.json', json.dumps(chapObj))
 
     return chapObj['idx']
 

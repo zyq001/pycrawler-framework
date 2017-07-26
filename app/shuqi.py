@@ -18,7 +18,7 @@ import MySQLdb
 import yaml
 
 from Config import EADHOST, EADPASSWD, bloomDumpCapsName, MINCHAPNUM, Shuqi_MINCHAPNUM
-from dao.aliyunOss import upload2Bucket
+from dao.aliyunOss import upload2Bucket, uploadJson2Bucket
 from dao.connFactory import getDushuConnCsor
 from dao.dushuService import getExistsCapsRawUrlId, insertCapWithCapObj2, insertCapWithCapObj, \
     loadExistsSQId, delBookById, insertBookWithConn, getCapIdxsByBookId, getChapTitlesByBookId, getLatestChapByBookId, \
@@ -459,7 +459,7 @@ def crawlCapsWithBookObj(allowUpdate, bookId, bookObj):
         if not capId:
             newChapNum = min(newChapNum, capObj['idx'] + 1)
             continue
-        upload2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
+        uploadJson2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
         # existsCaps = getExistsCaps(bookObj['id'])
     return newChapNum
 
@@ -850,7 +850,7 @@ def onlyInsertCap(queue):
             capId = insertCapWithCapObj(capObj, conn3, csor3)
             if not capId:
                 continue
-            upload2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
+            uploadJson2Bucket(str(capObj['id']) + '.json', json.dumps(capObj))
             global donedegest
             donedegest.add(capObj['digest'])
         except Exception as e:
