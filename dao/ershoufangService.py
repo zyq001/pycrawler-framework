@@ -10,7 +10,7 @@ import time
 # from selenium.webdriver.phantomjs import webdriver
 from selenium import webdriver
 
-from Config import PHANTOMJS_BIN_PATH, FANG_HOST, ossBaseUrl
+from Config import PHANTOMJS_BIN_PATH, FANG_HOST, ossBaseUrl, ossOpenBaseUrl
 from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
 from util.timeHelper import getToday
@@ -198,4 +198,4 @@ def shanpshot():
 
     upload2Bucket(getToday() + '.png', img)
     driver.quit()
-    return  ossBaseUrl  + getToday() + '.png'
+    return  ossOpenBaseUrl  + getToday() + '.png'
