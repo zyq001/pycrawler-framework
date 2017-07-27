@@ -1,27 +1,22 @@
 ##!/usr/bin/python
 # -*- coding: UTF-8 -*-
-import hashlib
 import json
 import random
-import traceback
+import time
 from urllib import quote
 
-import MySQLdb
-import time
-
-from Config import EADHOST, EADPASSWD, OSSINTERNALENDPOINT, OSSUSER, OSSPASSWD, CapsBaseUrl, MianFeiTXTBookDetailUrl, \
-    MianFeiContentBaseUrl, MianFeiTXTBaseUrl, MianFeiTXTSearchBaseUrl, MINCHAPNUM, MianFeiTXTChapBaseUrl, \
+from Config import MianFeiTXTBaseUrl, MianFeiTXTSearchBaseUrl, MINCHAPNUM, MianFeiTXTChapBaseUrl, \
     MianFeiTXTBookBaseUrl
 # from easouCrawl import insertCapWithCapObj
 # from framework.htmlParser import getSoupByStr
 # from networkHelper import getContentWithUA
 from app.baseCrawler import BaseCrawler
-from dao.aliyunOss import upload2Bucket, uploadJson2Bucket
+from dao.aliyunOss import uploadJson2Bucket
 from dao.dushuService import insertCapWithCapObj, getCapIdxsByBookId
 from exception.InputException import InputException
+from parse.contentHelper import textClean
 from shuqi import insertBookWithConn
 from util.UUIDUtils import getCapDigest
-from util.contentHelper import textClean
 from util.htmlHelper import getSoupByStr, getSoupByUrl
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA

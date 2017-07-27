@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-import re
 import time
 from urlparse import urlparse
 
@@ -9,10 +8,11 @@ from bs4 import Comment
 from readability import Document
 
 from local.easou.easouLocal import loadRules, loadIgnores
+from parse.contentHelper import cleanTailHead, sitesRules
 from util.htmlHelper import getSoupByStrEncode
 from util.networkHelper import getRedictedUrl, getContentAndRedictedUrl
 
-rules = loadRules()
+rules = sitesRules
 ignores = loadIgnores()
 
 def update(csor, conn, id,host, content):
@@ -46,51 +46,6 @@ def removeNodesFromSoup(rule, soup):
         if r:
             r.extract()
 
-
-def cleanTailHead(urlhost, content):
-    # rules = loadRules()
-    if not rules.has_key(urlhost):
-        return content
-    host = rules[urlhost]
-    head = host['head']
-    if head and len(head) > 0:
-        index = content.find(head)
-        if index > 0:
-            content = content[index + len(head):]
-    tail = host['tail']
-    if tail and len(tail) > 0:
-        index = content.find(tail)
-        if index > 0:
-            content = content[:index]
-
-    noise = host['noise']
-    if noise and len(noise) > 0:
-        for n in noise:
-            content = re.sub(n, "", content)
-
-    #清理通用噪声
-    common = rules['common']
-    head = common['head']
-    if head and len(head) > 0:
-        index = content.find(head)
-        if index > 0:
-            content = content[index + len(head):]
-    tails = common['tail']
-    if tails and len(tails) > 0:
-        for tail in tails:
-            index2 = content.find(tail)
-            if index2 > 0:
-                content = content[:index2]
-
-    noise = common['noise']
-    if noise and len(noise) > 0:
-        for n in noise:
-            content = re.sub(n, "", content)
-
-    #清理多余的回车和换行
-    content = content.replace(u'\n\n', u'\n').replace(u'<br><br>', u'<br>').replace(u'<br\><br\>', u'<br\>')
-
-    return content
 
 def getAndParse(url):
     # 跳过的host

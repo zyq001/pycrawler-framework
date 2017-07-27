@@ -54,7 +54,7 @@ def getQuanBenAllBookIds():
     dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
 
     dictCsor.execute("SELECT id from cn_dushu_book where   "
-                 "  rawUrl like 'http://api.wubutianxia.com%';")
+                 "  rawUrl like 'http://api.wubutianxia.com%' ORDER by id limit 10;")
     conn.commit()
     bookObjs = dictCsor.fetchallDict()
 

@@ -8,21 +8,17 @@
 import json
 import random
 import traceback
-import urlparse
-from urllib import quote
 
-import time
-
-from Config import ZSSQBOOKINFOBASEURL, ZSSQCHAPCONTENTBASEURL, MINCHAPNUM, bookInfoBaseUrl, \
+from Config import MINCHAPNUM, bookInfoBaseUrl, \
     srcListBaseUrl, chapListBaseUrl, MinChapContentLength
 from app.baseCrawler import BaseCrawler
 # from app.shuqi import shuqCategory
-from dao.aliyunOss import upload2Bucket, uploadJson2Bucket
-from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getCapIdxsByBookId
+from dao.aliyunOss import uploadJson2Bucket
+from dao.dushuService import insertBookWithConn, insertCapWithCapObj
 from exception.InputException import InputException
+from parse.contentHelper import textClean
 from util.UUIDUtils import getCapDigest
 from util.categoryHelper import getClassifyCodeByName
-from util.contentHelper import textClean
 from util.defaultImgHelper import checkDefaultImg
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA

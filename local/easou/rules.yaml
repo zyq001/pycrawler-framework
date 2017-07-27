@@ -12,7 +12,7 @@ common:
   head:
 
   tail:
-  -  （~~~~~~故事连载中~~~~~~~）
+  -  '（~~~~~~故事连载中~~~~~~~）'
   -  '小提示：按'
   -  '上一章'
   -  '上一页'
@@ -20,6 +20,9 @@ common:
 
   noise:
   -  'www{0,15}com'
+  -  '一秒记住.{0,35}www.630book.cc】'
+  -  '最快更新.{1,20}最新章节'
+  -  '更新快，无弹窗，免费读'
 
 
 www.iqingdou.net:
@@ -46,8 +49,37 @@ read.qidian.com:
 
   head:
 
-  tail: 起点中文网
+  tail:
+  -  '起点中文网 www.qidian.com 欢迎广大书友光临阅读，最新、最快、最火的连载作品尽在起点原创！手机用户请到m.qidian.com阅读。'
+  -  '起点中文网 www.qidian.com 欢迎广大书友光临阅读，最新、最快、最火的连载作品尽在起点原创！'
+  -  '起点中文网'
+  -  '手机用户请到m.qidian.com阅读'
   noise:
+  -  '起点中文网'
+  -  'm.qidian.com'
+  -  'www.qidian.com'
+  -  '求推荐票、收藏，欢迎打赏'
+  -  '球推荐票、收藏，欢迎打赏'
+  -  '求月票'
+
+www.mpzw.com:
+  content: '.bookreadercontent'
+  rm:
+
+  head: '（猫扑中文网 www.mpzw.com）'
+
+  tail:
+  -  '起点中文网 www.qidian.com 欢迎广大书友光临阅读，最新、最快、最火的连载作品尽在起点原创！手机用户请到m.qidian.com阅读。'
+  -  '起点中文网 www.qidian.com 欢迎广大书友光临阅读，最新、最快、最火的连载作品尽在起点原创！'
+  -  '起点中文网'
+  -  '手机用户请到m.qidian.com阅读'
+  noise:
+  -  '起点中文网'
+  -  'm.qidian.com'
+  -  'www.qidian.com'
+  -  '求推荐票、收藏，欢迎打赏'
+  -  '球推荐票、收藏，欢迎打赏'
+  -  '求月票'
 
 www.bookabc.net:
   content: '#content'
@@ -402,6 +434,19 @@ www.79wx.com:
   - b
   head:
   tail:
+
+  noise:
+  -  '79免费小说阅读网79wx'
+  -  '79wx'
+  -  '79免费小说阅读网'
+  -  '免费小说阅读网'
+
+www.biqiuge.com:
+  content: '#content'
+  rm:
+  - b
+  head: '笔趣阁 www.biqiuge.com，'
+  tail: '看清爽的小说就到【顶点小说网 www.23wx.io】'
 
   noise:
   -  '79免费小说阅读网79wx'

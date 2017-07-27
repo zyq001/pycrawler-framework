@@ -6,14 +6,13 @@ import traceback
 
 import requests
 
-from Config import SEARCHHOST, ossBaseUrl
+from Config import ossBaseUrl
 # from app.ZssqSearcher import searchAndCrawl
 from app.shuqi import getContentByUrl
 from dao.aliyunOss import upload2Bucket, bucket, uploadJson2Bucket
 from dao.connFactory import getDushuConnCsor
 from dao.dushuQuanBenService import getQuanBenAllBookIds
 from dao.dushuService import updateContentById, getCapIdsByBookId, delCapById
-from dao.dushuZssqService import getZssqAllBookObjs
 from parse.easouParser import getAndParse
 from util.logHelper import myLogging
 from util.networkHelper import getERAConn
@@ -235,15 +234,16 @@ def uploadCapFromTo(f, t):
 def newLineFixer():
 
     # quanBenObjs = getQuanBenAllBookIds()
-    # fixNewLineByBookObjs(ossBaseUrl, quanBenObjs)
+    quanBenObjs = [{'id':2137876}]
+    fixNewLineByBookObjs( quanBenObjs)
 
-    zssqObjs = getZssqAllBookObjs()
-    fixNewLineByBookObjs(ossBaseUrl, zssqObjs)
+    # zssqObjs = getZssqAllBookObjs()
+    # fixNewLineByBookObjs( zssqObjs)
 
 
-def fixNewLineByBookObjs(ossBaseUrl, quanBenObjs):
+def fixNewLineByBookObjs( quanBenObjs):
 
-    from util.contentHelper import textClean
+    from parse.contentHelper import textClean
     for quanBenObj in quanBenObjs:
         bookId = quanBenObj['id']
         chapIds = getCapIdsByBookId(bookId)
