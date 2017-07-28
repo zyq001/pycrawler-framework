@@ -21,7 +21,7 @@ from util.timeHelper import getFormatedTimeSec
 def tup2UrlStr(pMap):
     res = []
     for entry in pMap:
-        res.append(entry[0] + '=' + entry[1])
+        res.append(entry[0] + '=' + str(entry[1]))
     return '&'.join(res)
     # mapstr = unicode(pMap).encode('utf-8')
     # return mapstr.replace("', '",'=').replace('"','').replace('[', '').replace(']', '')\

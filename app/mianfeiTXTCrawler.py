@@ -17,6 +17,7 @@ from exception.InputException import InputException
 from parse.contentHelper import textClean
 from shuqi import insertBookWithConn
 from util.UUIDUtils import getCapDigest
+from util.categoryHelper import getCategoryAndTypeCode
 from util.htmlHelper import getSoupByStr, getSoupByUrl
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
@@ -227,8 +228,9 @@ def crawlCurrentBookObj(mid):
     # if len(bookLabels) > 1:
     #     bookObj['type'] = bookLabels[1]
     bookObj['bookType'] = BookType
-    bookObj['typeCode'] = 0
-    bookObj['categoryCode'] = 0
+    bookObj['categoryCode'], bookObj['typeCode'], bookObj['category'] = getCategoryAndTypeCode(bookObj['category'], bookObj['type'])
+    # bookObj['typeCode'] = 0
+    # bookObj['categoryCode'] = 0
     bookObj['viewNum'] = random.randint(500000, 1000000)
 
 #获取最新章节下标，作为另一个判断更新的条件
@@ -301,7 +303,7 @@ if __name__ == '__main__':
     # handleByMTID(290172)
     # handleByMTID(171117)
 
-    handleByMTID(288443)
+    handleByMTID(32769)
     # handleByMTID(183433)
     # handleByMTID(249357)
     # handleByMTID(236565)

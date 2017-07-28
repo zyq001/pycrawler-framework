@@ -19,7 +19,7 @@ from dao.dushuService import insertBookWithConn, insertCapWithCapObj, getChapTit
 from exception.InputException import InputException
 from parse.contentHelper import textClean
 from util.UUIDUtils import getCapDigest
-from util.categoryHelper import getClassifyCodeByName
+from util.categoryHelper import getClassifyCodeByName, getCategoryAndTypeCode
 from util.logHelper import myLogging
 from util.networkHelper import getContentWithUA
 
@@ -218,17 +218,20 @@ def parseBook(allowUpdate, bookObj, zid):
     if bookObj.has_key('majorCate'):
         bookObj['category'] = bookObj['majorCate']
 
-    bookObj['categoryCode'] = getClassifyCodeByName(bookObj['category'])['categoryCode']
+    # bookObj['categoryCode'] = getClassifyCodeByName(bookObj['category'])['categoryCode']
 
     bookObj['type'] = '其他'
     if bookObj.has_key('minorCate'):
         bookObj['type'] = bookObj['minorCate']
     # bookObj['type'] = bookObj['minorCate']
     bookObj['typeCode'] = 0
-    classfyObj = getClassifyCodeByName(bookObj['type'])
-    if 0 != classfyObj['typeCode']:#二级分类命中的话 一级分类也可以更新掉了
-        bookObj['typeCode'] = classfyObj['typeCode']
-        bookObj['categoryCode'] = classfyObj['categoryCode']
+    # classfyObj = getClassifyCodeByName(bookObj['type'])
+    # if 0 != classfyObj['typeCode']:#二级分类命中的话 一级分类也可以更新掉了
+    #     bookObj['typeCode'] = classfyObj['typeCode']
+    #     bookObj['categoryCode'] = classfyObj['categoryCode']
+
+    bookObj['categoryCode'], bookObj['typeCode'], bookObj['category'] = getCategoryAndTypeCode(bookObj['category'], bookObj['type'])
+
 
     bookObj['size'] = bookObj['wordCount']
     bookObj['chapterNum'] = bookObj['chaptersCount']

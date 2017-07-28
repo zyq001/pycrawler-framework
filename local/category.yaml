@@ -804,6 +804,14 @@
   category: 奇幻
   url: ''
 
+奇幻:
+  typeCode: 461
+  alias:
+    - '玄幻奇幻'
+  categoryCode: 452
+  category: 奇幻
+  url: ''
+
 其他奇幻:
   typeCode: 461
   alias:

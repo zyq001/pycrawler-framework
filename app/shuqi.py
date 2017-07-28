@@ -25,7 +25,7 @@ from dao.dushuService import getExistsCapsRawUrlId, insertCapWithCapObj2, insert
     deleteChapsLargerThanIdx, getChapObjByBookIdChapTitle
 from local.shuqi.shuqiLocal import loadShuQSeqC, loadShuQC
 from util.UUIDUtils import getBookDigest, getCapDigest
-from util.categoryHelper import getClassifyCodeByName
+from util.categoryHelper import getClassifyCodeByName, getCategoryAndTypeCode
 from util.logHelper import myLogging
 from util.networkHelper import getContent, getContentWithUA
 from util.pyBloomHelper import getBloom, loadBloomFromFile, dumpBloomToFile
@@ -202,14 +202,16 @@ def getBookObjFromSQid(id):
     if root.getiterator('NickId') and len(root.getiterator('NickId')) > 0 and root.getiterator('NickId')[0].text:
         categoryId = int(root.getiterator('NickId')[0].text)
 
-    categoryId = getClassifyCodeByName(category, default=categoryId)['typeCode']
 
-    mappedCategoryObj = getClassifyCodeByName(tag)
-    tagId = 0
-    if 0 != mappedCategoryObj['categoryCode']:
-        tagId = mappedCategoryObj['typeCode']
-        category = mappedCategoryObj['category']
-        categoryId = mappedCategoryObj['categoryCode']
+
+    # categoryId = getClassifyCodeByName(category, default=categoryId)['typeCode']
+    #
+    # mappedCategoryObj = getClassifyCodeByName(tag)
+    # tagId = 0
+    # if 0 != mappedCategoryObj['categoryCode']:
+    #     tagId = mappedCategoryObj['typeCode']
+    #     category = mappedCategoryObj['category']
+    #     categoryId = mappedCategoryObj['categoryCode']
 
     # if shuqCategory2.has_key(tag):
     #     if shuqCategory2[tag]['id'] and len(shuqCategory2[tag]['id']) > 0:
@@ -246,8 +248,13 @@ def getBookObjFromSQid(id):
     bookObj['bookType'] = BookType
     # bookObj['typeCode'] = 100 + tagId
     # bookObj['categoryCode'] = 100 + categoryId
-    bookObj['typeCode'] = tagId
-    bookObj['categoryCode'] = categoryId
+
+    bookObj['categoryCode'], bookObj['typeCode'], bookObj['category'] =\
+        getCategoryAndTypeCode(bookObj['category'], bookObj['type'], defaultCategoryCode=categoryId)
+
+
+    # bookObj['typeCode'] = tagId
+    # bookObj['categoryCode'] = categoryId
     bookObj['firstCid'] = firstCid
     bookObj['viewNum'] = 0
 

@@ -55,6 +55,7 @@ def deleteESDocs():
 
 if __name__ == '__main__':
     # start(2490339)
+
     print getClassifyCodeByName(None)
     print getClassifyCodeByName('魔法')['typeCode']
     print getClassifyCodeByName('魔法')['categoryCode']

@@ -9,6 +9,25 @@ from local.shuqi.shuqiLocal import loadCategoryYaml
 
 categoryYaml = loadCategoryYaml()
 
+def getCategoryAndTypeCode(category, type, defaultCategoryCode = 0):
+    '''
+    根据大小分类名，返回大小分类号和大分类名（因为小分类可能归属于另外一个大分类）
+    :param category: 
+    :param type: 
+    :return: 
+    '''
+
+    categoryCode = getClassifyCodeByName(category, default=defaultCategoryCode)['categoryCode']
+
+    mappedCategoryObj = getClassifyCodeByName(type)
+    typeCode = 0
+    if 0 != mappedCategoryObj['categoryCode']:
+        typeCode = mappedCategoryObj['typeCode']
+        category = mappedCategoryObj['category']
+        categoryCode = mappedCategoryObj['categoryCode']
+
+    return categoryCode, typeCode,category
+
 def getClassifyCodeByName(name, default = 0):
     '''
     根据类型名或标签名返回category的id，已typeCode为准，如果是一级分类categoryCode会跟typeCode一样
