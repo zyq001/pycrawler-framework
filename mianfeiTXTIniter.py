@@ -10,7 +10,7 @@ import sys
 
 from Config import MianFeiTXTBookBaseUrl, MianFeiTXTChannelBaseUrl
 from app.mianfeiTXTCrawler import handleByMTID
-# from app.mianfeiTXTNewFilder import findByIdRange
+from app.mianfeiTXTNewFilder import findByIdRange
 
 # secondCategoryId=101&thirdCategoryId=1011&filterId=0&sortId=1&pageSize=15&pageNum=1
 from util.networkHelper import getContentWithUA
@@ -33,11 +33,11 @@ def fromCategoryId(categoryId):
 if __name__ == '__main__':
 
     # handleByMTID(15360)
-    fromCategoryId(101)
-    # st = 50000
-    # end = 500000
-    # if len(sys.argv) > 1:
-    #     st = int(sys.argv[1])
-    #     end = int(sys.argv[2])
-    #
-    # findByIdRange(st, end)
+    # fromCategoryId(101)
+    st = 0
+    end = 500000
+    if len(sys.argv) > 1:
+        st = int(sys.argv[1])
+        end = int(sys.argv[2])
+
+    findByIdRange(st, end)

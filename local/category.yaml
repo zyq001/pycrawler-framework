@@ -13,6 +13,14 @@
   category: 言情
   url: 'http://b.easou.com/w/booklib/all_%E8%A8%80%E6%83%85_%E6%80%BB%E8%A3%81_2_0_1.html'
 
+古代言情:
+  typeCode: 1001
+  alias:
+    - '古言'
+  categoryCode: 1
+  category: 言情
+  url: 'http://b.easou.com/w/booklib/all_%E8%A8%80%E6%83%85_%E6%80%BB%E8%A3%81_2_0_1.html'
+
 穿越:
   typeCode: 444
   alias:
