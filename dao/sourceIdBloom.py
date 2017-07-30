@@ -16,7 +16,7 @@ class SourceIdBloom:
     def loadDid(self):
         conn, csor = getDushuConnCsor()
 
-        csor.execute("select source from cn_dushu_book limit 10;")
+        csor.execute("select source from cn_dushu_book;")
         conn.commit()
         ss = csor.fetchall()
         [self.ids.add(sid[0]) for sid in ss]
