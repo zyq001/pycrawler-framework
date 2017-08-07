@@ -1,9 +1,12 @@
 ##!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import json
-import multiprocessing
-import random
-from xml.etree import ElementTree
+
+import requests
+
+from Config import DUSHU_SUGGEST_URL
+from dao.connFactory import getDushuConnCsor
+from util.logHelper import myLogging
 
 # def print_node(node):
 #     '''''打印结点基本信息'''
@@ -13,18 +16,6 @@ from xml.etree import ElementTree
 #         print "node.attrib['age']:%s" % node.attrib['age']
 #     print "node.tag:%s" % node.tag
 #     print "node.text:%s" % node.text
-import MySQLdb
-import time
-
-import re
-
-import requests
-import yaml
-import hashlib
-
-from Config import EADHOST, EADPASSWD
-from dao.connFactory import getDushuConnCsor
-from util.logHelper import myLogging
 
 ua = 'Mozilla/5.0 (Linux; U; Android 4.0; en-us; Xoom Build/HRI39) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13'
 capListAPIDeviceInfo = '&soft_id=1&ver=110817&platform=an&placeid=1007&imei=862953036746111&cellid=13&lac=-1&sdk=18&wh=720x1280&imsi=460011992901111&msv=3&enc=666501479540451111&sn=1479540459901111&vc=e8f2&mod=M3'
@@ -38,7 +29,7 @@ def indexBookSuggest(st = 218289):
     csor2.execute("select id,title,author from cn_dushu_book where id >= %s and operateStatus = 0 ", (st,))
     conn2.commit()
     results = csor2.fetchall()
-    baseUrl = 'http://123.56.66.33:19200/dushu/suggest/'
+    baseUrl = DUSHU_SUGGEST_URL
     for book in results:
         id = book[0]
         title = book[1]
@@ -67,7 +58,6 @@ if __name__ == '__main__':
     # updateCapDigest()
     indexBookSuggest()
     # handleWebsiteNoise(581398, 582410)
-    import sys
     # uploadCapByCid(int(sys.argv[1]))
     # uploadCapFromTo(699818, 700000)
     # uploadCapFromTo(int(sys.argv[1]), int(sys.argv[2]))

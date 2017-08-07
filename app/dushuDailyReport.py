@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 import requests
 
 from Config import MAILPASS, NO_REPLY_TATATIMES_COM, SMTP_EXMAIL_QQ_COM, NOREPLAYEMAIL, dushuDailyReportReciever, \
-    SEARCHHOST
+    SEARCHHOST, KIBANA_BASE_URL
 from dao.dushuService import getBookCount, getOnlineBookCount, getCountDuring
 
 yesteday = time.strftime('%Y%m%d', time.localtime(time.time() - 24 * 3600))
@@ -156,7 +156,7 @@ def dushuDailyReport():
 ">搜索情况：</p>
     <div style=" line-height:2px; width:76px; background-color:#02b884; margin-top:8px;">&nbsp;</div>
     
-    <p>搜索总次数：<b>%s</b> &nbsp;&nbsp; <a href="http://123.57.36.133:15601/goto/3dff267c48a177f063099c7ce1e96cf3">查看详情</a>
+    <p>搜索总次数：<b>%s</b> &nbsp;&nbsp; <a href="%s/goto/3dff267c48a177f063099c7ce1e96cf3">查看详情</a>
     </p>
     
 <table border="1">
@@ -165,7 +165,7 @@ def dushuDailyReport():
     <th>命中结果（书名 -- 作者）</th>
   </tr>
   <tr>
-    ''' % (str(totleCount), str(onlineCount), str(updateCount), str(totleSearch))
+    ''' % (str(totleCount), str(onlineCount), str(updateCount), str(totleSearch), KIBANA_BASE_URL)
 
     for topHit in topSearchList:
         word = topHit['key']
