@@ -8,6 +8,7 @@
 from dao.connFactory import getDushuConnCsor
 from dao.dushuService import getLatestUpdateBooks, updateOneFieldByOneField
 from dao.dushuTypeBookDao import getIdsByType, updateIdsByType
+from util.logHelper import myLogging
 
 
 def dailyLatestUpdate():
@@ -18,10 +19,12 @@ def dailyLatestUpdate():
     nanBooks = getLatestUpdateBooks(nanShengCategorys, limit=50)
 
     updateIdsByBooks(nanBooks,'girlbest')
+    myLogging.info('update boy latest ids to %s', nanBooks)
 
     nvBooks = getLatestUpdateBooks(nvShengCategorys, limit=50)
 
     updateIdsByBooks(nvBooks, 'boylastest')
+    myLogging.info('update girl latest ids to %s', nvBooks)
 
 
 
