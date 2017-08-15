@@ -5,9 +5,8 @@
 日常定时更新相关运营信息："最近更新"等
 @author: zyq
 '''
-from dao.connFactory import getDushuConnCsor
-from dao.dushuService import getLatestUpdateBooks, updateOneFieldByOneField
-from dao.dushuTypeBookDao import getIdsByType, updateIdsByType
+from dao.dushuService import getLatestUpdateBooks
+from dao.dushuTypeBookDao import  updateIdsByType
 from util.logHelper import myLogging
 
 
