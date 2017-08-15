@@ -531,6 +531,33 @@ def getChapObjByBookIdChapTitle(bookId, title):
 
     return chapObj
 
+def getLatestUpdateBooks(categorys, limit = 30):
+    '''
+    按bookId和title获取章节信息对象
+    :param bookId: 
+    :param idx: 
+    :return: 
+    '''
+    conn,csor = getDushuConnCsor()
+    dictCsor = conn.cursor(MySQLdb.cursors.DictCursor)
+
+    try:
+        dictCsor.execute('select id  from '
+                         + db_dushu + " where categoryCode in %s "
+                                      "and imgUrl != 'http://tata-img.oss-cn-shanghai.aliyuncs.com/book-default.jpg' "
+                                                         " order by updateTime desc limit %s",
+                         (categorys, limit ))
+        conn.commit()
+    except Exception as e:
+        myLogging.warning(e)
+
+    chapObj = dictCsor.fetchallDict()
+
+    csor.close()
+    conn.close()
+
+    return chapObj
+
 
 def getLatestChapByBookId(bookId):
     conn,csor = getDushuConnCsor()
