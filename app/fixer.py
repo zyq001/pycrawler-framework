@@ -233,8 +233,8 @@ def uploadCapFromTo(f, t):
 
 def newLineFixer():
 
-    # quanBenObjs = getQuanBenAllBookIds()
-    quanBenObjs = [{'id':2137876}]
+    quanBenObjs = getQuanBenAllBookIds()
+    # quanBenObjs = [{'id':2137876}]
     fixNewLineByBookObjs( quanBenObjs)
 
     # zssqObjs = getZssqAllBookObjs()

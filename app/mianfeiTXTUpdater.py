@@ -81,4 +81,4 @@ class MianFeiTXTUpdater(BaseCrawler):
 
 if __name__ == '__main__':
     # mianfeiTxtUpdateFromMysql()
-    mianfeiUpdateById(2000112)
+    mianfeiUpdateById(2567998)

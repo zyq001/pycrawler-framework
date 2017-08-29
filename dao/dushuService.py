@@ -17,6 +17,7 @@ import MySQLdb
 
 from dao.aliyunOss import upload2Bucket
 from dao.connFactory import getDushuConnCsor
+from parse.contentHelper import subTitleClean
 from parse.easouParser import getAndParse
 from util.UUIDUtils import getBookDigest
 from util.logHelper import myLogging
@@ -172,6 +173,10 @@ def insertBookWithConn(bookObj, allowUpdate = True, conn2 = None,csor2 = None):
 
     digest = getBookDigest(bookObj)
     bookObj['digest'] = digest
+
+    #统一清理操作
+    bookObj['subtitle'] = subTitleClean(bookObj['subtitle'])
+
 
     if not bookObj.has_key('source'):
         bookObj['source'] = ''
