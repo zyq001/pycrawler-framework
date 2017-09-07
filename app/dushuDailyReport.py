@@ -113,17 +113,43 @@ def dushuDailyReport():
 
     searchWordQueryTempl = '''
     {
-  "size" : 5,
-  "query" : {
-    "simple_query_string" : {
-      "query" : "%s",
-      "fields" : [ "author^5.0", "title^10.0", "subtitle^1.0" ]
+    "size": 5,
+    "query": {
+        "bool": {
+            "must_not": [
+              {
+                "range": {
+                    "status": {
+                        "from": 300,
+                        "to": null,
+                        "include_lower": true,
+                        "include_upper": true
+                    }
+                }
+            },
+            {
+                "range": {
+                    "operateStatus": {
+                        "from": 1,
+                        "to": null,
+                        "include_lower": true,
+                        "include_upper": true
+                    }
+                }
+            }
+          ],
+            "should": {
+                "simple_query_string": {
+                    "query": "%s",
+                    "fields": ["author^5.0", "title^10.0", "subtitle^1.0"]
+                }
+            }
+        }
+    },
+    "_source": {
+        "includes": ["title", "author"],
+        "excludes": []
     }
-  },
-  "_source" : {
-    "includes" : [ "title", "author" ],
-    "excludes" : [ ]
-  }
 }
     '''
 
